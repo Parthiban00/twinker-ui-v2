@@ -1,0 +1,34 @@
+ion-card {
+    font-family: 'latoBold';
+    border-radius: 0;
+}
+
+ion-grid {
+    padding: 0;
+
+    ion-row {
+        .thumbnail-col {
+            padding: 0;
+            height: 70px;
+            background: var(--ion-color-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content-col {
+            padding-left: 10px;
+            margin: auto;
+        }
+
+        .count-col {
+            margin: auto;
+
+            ion-badge {
+                border-radius: 50%;
+                min-width: 20px;
+                min-height: 20px;
+            }
+        }
+    }
+}

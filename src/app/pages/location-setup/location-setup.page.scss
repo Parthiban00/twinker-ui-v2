@@ -1,0 +1,57 @@
+.map {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+
+.map.visible {
+  opacity: 1;
+}
+
+.row-container{
+  width: 100%;
+
+  .addr-title{
+    font-family: 'latoBold' !important;
+  }
+  ion-label{
+    font-size: 14px;
+
+  }
+}
+
+.addr-form-container{
+  padding: 10px;
+  margin: 10px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  height: 200px;
+  // width: 100%;
+}
+
+.add-fab-btn{
+  position: absolute;
+  bottom: 80px;
+  right: 70px;
+}
+
+.address-content{
+  text-overflow: unset; 
+  white-space: normal;
+}
+
+.selected{
+  border: 3px solid var(--ion-color-success);
+    padding: 3px;
+    background-clip: content-box;
+}
+
+.not-selected{
+  border: 3px solid var(--ion-color-primary);
+    padding: 3px;
+    background-clip: content-box;
+}
+

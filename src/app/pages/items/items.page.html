@@ -1,0 +1,323 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart" color="light"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="shop-details-bg">
+    <img src="../../../assets/shop.jpg">
+
+    <ion-row class="shop-details overlay overlay_1">
+      <ion-col size="12" class="shop-name">
+        {{vendorDetails?.name}}
+      </ion-col>
+      <ion-col size="12" class="shop-desc">
+        {{vendorDetails?.slogan}}
+      </ion-col>
+    </ion-row>
+  </div>
+
+  <div class="item-list-details">
+    <div class="like-div">
+      <div class="like-btn-div">
+        <img src="../../../assets/curved-triangle.png">
+      </div>
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="heart" color="danger"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="item-lists">
+
+      <div class="info-section">
+        <ion-row>
+          <ion-col size="12" class="rating-star">
+            <ng-container *ngFor="let star of stars">
+              <span [class]="star"></span>
+            </ng-container>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="8" class="rating-count">
+            {{customerReviews?customerReviews.averageRating:0}} Star Ratings
+            <span>({{customerReviews?customerReviews.reviews?.length:0}} Reviews)</span>
+          </ion-col>
+          <ion-col size="4">
+            <ion-row>
+              <ion-col size="4" class="veg-img-col">
+                <div class="veg-img"><img src="assets/veg-toggle.png" /></div>
+              </ion-col>
+              <ion-col size="8" class="veg-toggle-col">
+                <ion-toggle (ionChange)="onToggleChange($event)" [checked]="vegOnly"></ion-toggle>
+              </ion-col>
+            </ion-row>
+
+
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" class="description-title title">
+            Description
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" class="description">
+            {{vendorDetails?.description}}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" class="delivery-time">
+            <ion-icon name="time-outline"></ion-icon><span>&nbsp;&nbsp;30 min - 200 for two</span>
+          </ion-col>
+        </ion-row>
+        <div class="hr-line"></div>
+      </div>
+
+      <ion-segment [value]="activeSegment" (ionChange)="segmentChange($event)">
+        <ion-segment-button value="items">
+          <ion-label>Items</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="reviews">
+          <ion-label>Reviews</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <ng-container *ngIf="activeSegment === 'items'">
+        <ion-row class="search-bar">
+          <ion-col size="12">
+            <ion-searchbar [debounce]="1000" (ionInput)="handleSearchInput($event)" placeholder="Search Items"
+              class="custom"></ion-searchbar>
+          </ion-col>
+        </ion-row>
+     
+        <ng-container *ngIf="specialOfferItems">
+          <div class="special-offer-container">
+            <ion-row class="prl-10 live-offer-row">
+              <ion-col size="8" class="title m-auto">Special Offers
+                <!-- <img src="../../assets/offers.gif" class="live-offer-img"/> -->
+              </ion-col>  
+              <ion-col size="4" class="right-btn"
+              >
+              <!-- <ion-button fill="clear" color="secondary" (click)="openFeaturedItemsMoal()">View All</ion-button> -->
+            </ion-col> 
+            </ion-row>
+            <div class="menus-offer-container">
+              <div class="scroll-container">
+                <div class="item" *ngFor="let list of specialOfferItems">
+                  <div class="img box">
+                    <div class="ribbon-2" *ngIf="list.discountType ==='in-percentage'">{{list.discount}}% OFF</div>
+                    <div class="ribbon-2" *ngIf="list.discountType ==='in-price'">₹{{list.discount}} OFF</div>
+                    <img [src]="imgBaseUrl + list.imageUrl" />
+                  </div>
+                  <div class="content-container">
+                    <div class="item-name">
+                      {{list.productName}}
+                    </div>
+                    <div class="vendor-name">
+                     (by&nbsp;{{list.vendor.name}})
+                    </div>
+                    <div class="price-box">
+                      <div class="actual-price">
+                        Rs: {{list.actualPrice}}
+                      </div>
+                      <div class="offer-price">
+                        Rs: {{list.price}}
+                      </div>
+                   
+                     </div>
+                    <div class="cart-btn">
+                      <button class="less-btn">-</button>
+                      <label>1</label>
+                      <button class="add-btn">+</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
+        <ion-accordion-group [multiple]="true" [value]="expandedAccordionValues" style="margin-top: 10px;">
+          <ion-accordion #categoryElement [value]="productLists.category._id" toggleIcon="caret-down-circle"
+            *ngFor="let productLists of productDetails;let i=index" [id]="productLists.category._id">
+            <ion-item slot="header">
+              <ion-label> {{productLists.category.categoryName}}&nbsp;({{productLists.products.length}})</ion-label>
+            </ion-item>
+            <div class="ion-padding main-list" slot="content">
+              <div class="ion-list" *ngFor="let product of productLists.products">
+                <div style="    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+                margin: 10px;
+                border-radius: 10px;">
+                  <ion-list lines="none">
+                    <ion-card class="item-list-card" [ngClass]="{'not-available':!product.isAvailable}">
+                      <ion-item>
+                        <ion-thumbnail *ngIf="product.imageUrl" slot="end">
+                          <img [src]="imgBaseUrl + product.imageUrl" />
+
+                          <ion-button class="item-img-present"
+                            *ngIf="!product.itemCount && product.isAvailable">Add</ion-button>
+                          <div class="qty-selector" *ngIf="product.isAvailable && product.itemCount">
+                            <ion-button fill="clear" [disabled]="!product.itemCount">-</ion-button>
+                            <ion-label>{{product.itemCount}}</ion-label>
+                            <ion-button fill="clear">+</ion-button>
+                          </div>
+                        </ion-thumbnail>
+
+                        <ion-thumbnail *ngIf="!product.imageUrl" slot="end">
+                          <ion-button *ngIf="!product.itemCount && product.isAvailable"
+                            class="item-img-not-present">Add</ion-button>
+                          <div class="qty-selector-notimage" *ngIf="product.isAvailable && product.itemCount">
+                            <ion-button fill="clear" [disabled]="!product.itemCount">-</ion-button>
+                            <ion-label>{{product.itemCount}}</ion-label>
+                            <ion-button fill="clear">+</ion-button>
+                          </div>
+                        </ion-thumbnail>
+
+                        <ion-label class="item-details">
+                          <ion-row class="trending-tag">
+                            <ion-col size="12">
+                              <div class="item-type">
+                                <img *ngIf="product.type==='non-veg'" src="assets/non-veg.png" />
+                                <img *ngIf="product.type==='veg'" src="assets/veg.png" />
+                                <img *ngIf="product.type==='egg'" src="assets/egg.png" />
+                              </div>
+                              <div class="tag" *ngIf="product.tag !== 'none'">
+                                <p style="font-size: 10px; color: white">{{product.tag | uppercase}}</p>
+                              </div>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row class="item-name">
+                            <ion-col size="12"> {{product.productName}} </ion-col>
+                          </ion-row>
+                          <ion-row class="item-description">
+                            <ion-col size="12"> {{product.description}} </ion-col>
+                          </ion-row>
+                          <ion-row class="item-price">
+                            <ion-col size="12"> Rs. {{product.price}} </ion-col>
+                          </ion-row>
+
+                          <ion-row *ngIf="!product.isAvailable" class="item-not-available">
+                            <ion-col size="12"> Currently Not Available </ion-col>
+                          </ion-row>
+
+                          <ion-row *ngIf="product.isAvailable && product.customizable.length">
+                            <ion-col size="12" class="customize-btn">
+                              <ion-button fill="clear" color="primary" id="customise-item"
+                                (click)="openModal(product)">
+                                Customize
+                                <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
+                              </ion-button>
+                            </ion-col>
+                          </ion-row>
+                        </ion-label>
+                      </ion-item>
+                    </ion-card>
+                  </ion-list>
+                </div>
+              </div>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+      </ng-container>
+
+      <ng-container *ngIf="activeSegment === 'reviews'">
+        <ng-container *ngIf="customerReviews && customerReviews.reviews.length">
+          <div class="comment-container" *ngFor="let list of customerReviews.reviews">
+            <div class="avatar-section">
+              <ion-avatar>
+                <img src="../../../assets/profile.png" />
+              </ion-avatar>
+            </div>
+
+            <div class="comment-section">
+              <div class="user-info">
+                <span
+                  class="username">{{list.userId.fullName?list.userId.fullName:list.userId.email?list.userId.email:'user'}}</span>
+                <span class="timestamp">{{ list.updatedAt | timeAgo }}</span>
+              </div>
+              <div class="comment-text">
+                <ion-row> <ion-col size="8" class="rating-count">
+                    {{list.starCount}} Star Ratings
+
+                  </ion-col></ion-row>
+                {{list.comments}}
+              </div>
+              <!-- <div class="action-buttons">
+                  <ion-button fill="clear" class="thumbs-up">
+                    <ion-icon slot="start" name="thumbs-up"></ion-icon>
+                    <span>99</span>
+                  </ion-button>
+          
+                  <ion-button fill="clear" class="thumbs-down">
+                    <ion-icon slot="start" name="thumbs-down"></ion-icon>
+                    <span>100</span>
+                  </ion-button>
+                </div> -->
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+</ion-content>
+
+<ion-modal #forgot_pwd_modal trigger="customise-item" cssClass="inline_modal" (ionModalDidDismiss)="reset($event)"
+  [breakpoints]="[0.1,0.5,0.9]" [initialBreakpoint]="0.5">
+
+  <ng-template>
+    <app-item-customise></app-item-customise>
+  </ng-template>
+
+</ion-modal>
+
+<div class="menu-popover-container" *ngIf="activeSegment === 'items'">
+
+  <ion-button class="menu-float-btn" id="top-center"><img src="assets/menu.png" />&nbsp;Menus</ion-button>
+  <ion-popover trigger="top-center" side="top" alignment="center">
+    <ng-template>
+      <ion-content>
+        <ion-list>
+          <ion-item class="menu-item" [button]="true" [detail]="false" *ngFor="let list of productDetails"
+            (click)="scrollToCategory(list.category._id)">
+            <ion-row class="menu-item-row" style="width: 100%;">
+              <ion-col size="3"> <img *ngIf="this.selectedCategory === list.category._id"
+                  src="assets/trending-items.gif" style="height:28px;" /></ion-col>
+              <ion-col size="7"> {{list.category.categoryName}} </ion-col>
+              <ion-col size="2" class="secondary-color">{{list.products.length}}</ion-col>
+            </ion-row>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+</div>
+
+
+<ion-footer *ngIf="activeSegment === 'reviews'">
+  <!-- <ion-toolbar> -->
+  <div class="submit-btn">
+    <!-- <ion-button expand="block" color="secondary" fill="solid" (click)="confirm()" [routerLink]="['/tabs']">Confirm</ion-button> -->
+    <ion-row>
+      <app-star-rating [rating]="3" (ratingUpdated)="onRatingUpdated($event)"></app-star-rating>
+
+    </ion-row>
+    <ion-row>
+      <ion-col size="9"><ion-textarea label="Outline textarea" labelPlacement="floating" fill="outline"
+          placeholder="Write your comments here..." [(ngModel)]="comments"></ion-textarea> </ion-col>
+      <ion-col size="3">
+        <ion-button (click)="submitReview()">
+          <ion-icon name="send"></ion-icon>
+        </ion-button></ion-col>
+    </ion-row>
+  </div>
+  <!-- </ion-toolbar> -->
+</ion-footer>

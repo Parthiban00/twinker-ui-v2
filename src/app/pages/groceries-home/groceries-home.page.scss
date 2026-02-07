@@ -1,0 +1,64 @@
+ion-header {
+  --background: #ffffff;
+}
+
+.top-slides {
+  height: 150px; // Adjust the height to match your design
+  padding: 0 10px;
+}
+
+.promo-card {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: none;
+  --background: transparent;
+}
+
+.promo-img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.search-bar {
+  --background: #ffffff;
+  --box-shadow: none;
+  margin: 10px;
+  border-radius: 8px;
+}
+
+.categories-segment {
+  --indicator-color: #28a745;
+  --background: #ffffff;
+  --color: #28a745;
+  margin: 10px 0;
+  padding: 0 10px;
+}
+
+.categories-segment ion-segment-button {
+  --color-checked: #ffffff;
+  --background-checked: #28a745;
+  --indicator-color: #ffffff;
+  border-radius: 20px;
+}
+
+.product-card {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: none;
+  --background: #ffffff;
+  text-align: center;
+}
+
+.product-img {
+  height: 80px; // Adjust the height to match the image design
+  width: auto;
+  object-fit: contain;
+}
+
+.product-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 5px;
+}

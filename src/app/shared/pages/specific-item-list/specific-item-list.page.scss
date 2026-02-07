@@ -1,0 +1,235 @@
+ion-toolbar {
+  --background: transparent;
+  --ion-color-base: transparent !important;
+
+  ion-button{
+    background: #14141469;
+    border-radius: 50%;
+  }
+}
+
+.shop-details-bg {
+  height: 300px;
+  width: 100%;
+  position: relative;
+  margin-top: -56px;
+
+  img {
+    height: 300px;
+    width: 100%;
+  }
+
+  .shop-details {
+    position: absolute;
+
+    .shop-name {
+      padding: 0 20px;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+    }
+    .shop-desc {
+      padding: 0 20px;
+      font-size: 16px;
+      // font-weight: 600;
+      color: var(--ion-color-medium);
+      margin-top: -60px;
+    }
+  }
+}
+
+.item-list-details {
+  height: 800px;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  border-radius: 30px 30px 0 0;
+  margin-top: -28px;
+  position: relative;
+
+  .like-div {
+    // position: absolute;
+    // top: 0;
+    // right: 0;
+    // // height: 100px;
+    // // width: 100px;
+    // background: white;
+    //       -webkit-clip-path: polygon(0 0, 0% 100%, 100% 44%);
+    // clip-path: polygon(0 0, 0% 100%, 100% 44%);
+
+    position: absolute;
+    top: -23px;
+    right: 25px;
+    // background: white;
+
+    ion-button {
+      position: absolute;
+      top: 5px;
+      right: -3px;
+    }
+
+    .like-btn-div {
+      width: 50px;
+      height: 50px;
+      img {
+        // box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+      }
+    }
+  }
+
+  .triangle {
+    position: relative;
+    background-color: white;
+    text-align: left;
+    box-shadow:
+      rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+      rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  }
+  .triangle:before,
+  .triangle:after {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+  }
+  .triangle,
+  .triangle:before,
+  .triangle:after {
+    width: 30px;
+    height: 30px;
+    border-top-right-radius: 30%;
+  }
+
+  .triangle {
+    transform: rotate(-90deg) skewX(-30deg) scale(1, 0.866);
+  }
+  .triangle:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+  }
+  .triangle:after {
+    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+  }
+}
+
+.overlay {
+  position: absolute;
+  background: #ffffffbf;
+
+  /* center overlay text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay_1 {
+  left: 0;
+  bottom: 0 !important;
+  width: 100%;
+  padding: 1rem;
+  height: 50%;
+}
+
+.item-lists {
+  padding: 20px 0;
+
+  .info-section {
+    padding: 0 10px;
+  }
+
+  .rating-star {
+    span {
+      margin-right: 5px;
+      color: orange;
+    }
+  }
+  .checked {
+    color: orange;
+  }
+
+  .rating-count {
+    font-size: 14px;
+    color: orange;
+    // font-weight: 600;
+    span {
+      margin-left: 10px;
+      font-weight: 400;
+      color: gray;
+    }
+  }
+
+  .description {
+    font-size: 14px;
+    color: gray;
+  }
+
+  .delivery-time {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+  }
+
+  .recommended-title-row {
+    margin-top: 10px;
+    padding: 0 10px;
+    background: var(--ion-color-primary);
+
+    .title {
+      color: white;
+    }
+  }
+}
+
+.menu-float-btn {
+  --border-radius: 20px;
+  --background: #22224d;
+  text-transform: capitalize;
+  color: white;
+
+  img {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+ion-item.menu-item {
+  font-family: "latoBold";
+}
+
+ion-row.menu-item-row {
+  ion-col {
+    margin: auto;
+  }
+
+  ion-col:nth-child(2),
+  ion-col:nth-child(3) {
+    font-size: 14px;
+  }
+}
+
+ion-toggle {
+  height: 10px;
+  width: 39px;
+  --background: #ddd;
+  --background-checked: #ddd;
+  --handle-background: #eb7769;
+  --handle-background-checked: #95c34e;
+  --handle-width: 20px;
+  --handle-height: 20px;
+  --handle-max-height: auto;
+  --handle-spacing: 0px;
+  --handle-border-radius: 5px;
+  --handle-box-shadow: none;
+  overflow: visible;
+  contain: none;
+  padding: 0;
+}
+
+.veg-img {
+  // margin-right: -10px;
+  height: 20px;
+  width: 20px;
+}
+
+.veg-toggle-col {
+  padding-left: 0;
+}

@@ -1,0 +1,72 @@
+<!-- <ion-content> -->
+
+  <div class="container" *ngIf="statusDetails">
+    <!-- completed -->
+    <div class="step completed">
+      <div class="v-stepper">
+        <div class="circle"></div>
+        <div class="line"></div>
+      </div>
+  
+      <div class="content">
+        Placed<br>
+        <ion-label>{{statusDetails.palcedTime}}</ion-label>
+      </div>
+    </div>
+  
+    <!-- active -->
+    <div class="step" *ngIf="statusDetails.status !== 'Declined'" [ngClass]="statusDetails.adminConfirmed === 'Confirmed' ? 'completed' : 'active'">
+      <div class="v-stepper">
+        <div class="circle"></div>
+        <div class="line"></div>
+      </div>
+  
+      <div class="content">
+        Confirmed<br>
+        <ion-label *ngIf="statusDetails.confirmed_time"> {{statusDetails.confirmedTime}}</ion-label>
+      </div>
+    </div>
+  
+    <!-- empty -->
+    <!-- <div class="step empty"> -->
+    <!-- <div class="step">
+      <div class="v-stepper">
+          <div class="circle"></div>
+          <div class="line"></div>
+        </div>
+  
+        <div class="content">
+          Admin Confirmed
+        </div>
+    </div> -->
+  
+    <!-- regular -->
+    <div class="step" *ngIf="statusDetails.status !== 'Declined'" [ngClass]="statusDetails.status === 'Delivered' ? 'completed' : statusDetails.adminConfirmed === 'Confirmed'?'acitve':''">
+      <div class="v-stepper">
+        <div class="circle"></div>
+        <div class="line"></div>
+      </div>
+  
+      <div class="content">
+        Delivered<br>
+        <ion-label *ngIf="statusDetails.status==='Delivered'">Delivered</ion-label><br>
+        <ion-label *ngIf="statusDetails.delivered_time"> {{statusDetails.deliveredTime}}</ion-label>
+      </div>
+    </div>
+  
+    <div class="step" *ngIf="statusDetails.status === 'Declined'" [ngClass]="statusDetails.status === 'Declined' ? 'completed' : statusDetails.adminConfirmed ==='Declined'?'acitve':''">
+      <div class="v-stepper">
+        <div class="circle"></div>
+        <div class="line"></div>
+      </div>
+  
+      <div class="content">
+        Declined<br>
+        <ion-label *ngIf="statusDetails.status==='Declined' && statusDetails.admin_confirmed==='Declined'">Declined by Admin</ion-label>
+        <ion-label *ngIf="statusDetails.status==='Declined' && statusDetails.partner_confirmed==='Declined'">Declined by Delivery Parter</ion-label><br>
+        <ion-label *ngIf="statusDetails.declinedTime"> {{statusDetails.declinedTime}}</ion-label>
+      </div>
+    </div>
+  
+  </div>
+<!-- </ion-content> -->

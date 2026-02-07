@@ -1,0 +1,238 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+      <ion-title>Order Detail View</ion-title>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+    <ion-card class="shop-details">
+      <ion-row>
+        <ion-col size="3">
+          <div class="shop-thumb">
+            <img src="../../../assets/cuisine-img.jpg" />
+          </div>
+        </ion-col>
+        <ion-col size="9">
+          <ion-row>
+            <ion-col size="12" class="shop-title">
+              Hottel Vallavan
+            </ion-col>
+            <ion-col size="12" class="shop-description">
+              alsdf alsjdfl alsdjf aflasd fla alsdjf.
+            </ion-col>
+            <ion-col size="12" class="shop-location">
+             <span> <img src="../../../assets/location_pin.png"></span>&nbsp; 123, therku raja veethi, siavaganga.
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+      </ion-row>
+
+    </ion-card>
+  </div>
+
+  <div class="container">
+    <ion-card class="cart-item-details">
+
+      <ion-row>
+        <ion-col size="1" class="item-type">
+
+            <img src="assets/non-veg.png"/>
+
+        </ion-col>
+        <ion-col size="8" class="item-details">
+          <ion-row>
+            <ion-col size="12" class="item-name">
+              Chicken Rice
+            </ion-col>
+            <ion-col size="12" class="item-description">
+              Full Plate
+            </ion-col>
+            <ion-col size="12" class="item-price">
+              Rs: 200
+            </ion-col>
+            <ion-col size="12" class="customize-btn">
+              <ion-button fill="clear" color="secondary">
+                Customize
+                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="3" class="item-qty-adjust-parent">
+          <ion-row>
+            <ion-col size="12" class="item-qty-adjust">
+              <div class="qty-selector" >
+                <ion-button fill="clear" >-</ion-button>
+                <ion-label>2</ion-label>
+                <ion-button fill="clear"  >+</ion-button>
+
+                      </div>
+            </ion-col>
+            <ion-col size="12" class="item-total">
+              Rs: 9999.00
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+      </ion-row>
+    </ion-card>
+
+    <ion-card class="cart-item-details">
+
+      <ion-row>
+        <ion-col size="1" class="item-type">
+
+            <img src="assets/egg.png"/>
+
+        </ion-col>
+        <ion-col size="8" class="item-details">
+          <ion-row>
+            <ion-col size="12" class="item-name">
+              Chicken Rice
+            </ion-col>
+            <ion-col size="12" class="item-description">
+              Full Plate
+            </ion-col>
+            <ion-col size="12" class="item-price">
+              Rs: 200
+            </ion-col>
+            <ion-col size="12" class="customize-btn">
+              <ion-button fill="clear" color="secondary">
+                Customize
+                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="3" class="item-qty-adjust-parent">
+          <ion-row>
+            <ion-col size="12" class="item-qty-adjust">
+              <div class="qty-selector" >
+                <ion-button fill="clear" >-</ion-button>
+                <ion-label>2</ion-label>
+                <ion-button fill="clear"  >+</ion-button>
+
+                      </div>
+            </ion-col>
+            <ion-col size="12" class="item-total">
+              Rs: 9999.00
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+      </ion-row>
+    </ion-card>
+
+    <ion-card class="cart-item-details">
+
+      <ion-row>
+        <ion-col size="1" class="item-type">
+
+            <img src="assets/veg.png"/>
+
+        </ion-col>
+        <ion-col size="8" class="item-details">
+          <ion-row>
+            <ion-col size="12" class="item-name">
+              Chicken Rice
+            </ion-col>
+            <ion-col size="12" class="item-description">
+              Full Plate
+            </ion-col>
+            <ion-col size="12" class="item-price">
+              Rs: 200
+            </ion-col>
+            <ion-col size="12" class="customize-btn">
+              <ion-button fill="clear" color="secondary" id="customise-item">
+                Customize
+                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="3" class="item-qty-adjust-parent">
+          <ion-row>
+            <ion-col size="12" class="item-qty-adjust">
+              <div class="qty-selector" >
+                <ion-button fill="clear" >-</ion-button>
+                <ion-label>2</ion-label>
+                <ion-button fill="clear"  >+</ion-button>
+
+                      </div>
+            </ion-col>
+            <ion-col size="12" class="item-total">
+              Rs: 9999.00
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+      </ion-row>
+    </ion-card>
+
+
+
+  </div>
+
+
+  <div class="container">
+    <ion-card class="bill-summary">
+      <ion-row>
+        <ion-col size="9" class="sub-total-text">
+          Sub Total
+        </ion-col>
+        <ion-col size="3" class="sub-total">
+           9999.00
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="9" class="delivery-cost-text">
+          Delivery Cost
+        </ion-col>
+        <ion-col size="3" class="delivery-cost">
+           30.00
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="9" class="total-amt-text">
+          Total Amount
+        </ion-col>
+        <ion-col size="3" class="total-amt">
+          9999.00
+        </ion-col>
+      </ion-row>
+      <app-status-stepper></app-status-stepper>
+    </ion-card>
+  </div>
+  
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div class="body-container">
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img alt="Person" src="assets/profile.png" />
+        </ion-avatar>
+        <ion-label class="custom-lable">
+          Parthiban&nbsp;<span class="role-span">(Delivery Partner)</span>
+          <p>9095924511</p>
+        </ion-label>
+        <!-- <ion-button slot="end" class='custom-btn-clear' fill="clear" style="margin-right: -30px;" href="https://wa.me/9095924511/?text=Hi">
+          <ion-icon name="chatbox"></ion-icon>
+        </ion-button> -->
+        <ion-button slot="end" class='custom-btn-clear' fill="clear" (click)="callToMobileNo(profileData.customer?.phone?profileData.customer?.phone:profileData.mobile)">
+          <ion-icon name="call"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </div>
+
+  </ion-toolbar>
+</ion-footer>

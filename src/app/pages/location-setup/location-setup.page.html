@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Setup your location</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="address-list-container">
+    <ion-list>
+      <ion-item (click)="presentActionSheet(list._id)" *ngFor="let list of savedAddresses">
+        <ion-avatar aria-hidden="true" slot="start" [ngClass]="list.defaultAddress ? 'selected' : 'not-selected'">
+          <img [alt]="list.addressType" [src]="getImageSource(list.addressType)" />
+        </ion-avatar>
+        <ion-row style="width: 100%;" class="row-container">
+          <ion-col size="12">
+            <ion-label class="addr-title">{{ list.addressType }}</ion-label>
+          </ion-col>
+          <ion-col size="12">
+            <ion-label class="address-content">{{ list.fullAddress }}</ion-label>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+
+    </ion-list>
+  </div>
+
+  <div class="add-fab-btn">
+    <ion-fab>
+      <ion-fab-button color="primary" [routerLink]="['/shared/location-setup']" style="--box-shadow: none;">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
+  </div>
+
+
+</ion-content>
+
+<ion-footer>
+  <!-- <ion-toolbar> -->
+  <div class="submit-btn">
+    <ion-button expand="block" color="secondary" fill="solid" (click)="navigateToHome()">Submit</ion-button>
+  </div>
+  <!-- </ion-toolbar> -->
+</ion-footer>
+

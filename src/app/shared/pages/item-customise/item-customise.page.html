@@ -1,0 +1,107 @@
+<!-- <ion-content> -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <!-- <ion-title>Welcome</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()" [strong]="true">Apply</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-list">
+    <div>
+      <!-- <div class="submit-btn">
+          <ion-button expand="block" color="secondary" fill="solid">Apply</ion-button>
+        </div> -->
+      <ion-card class="cart-item-details" *ngIf="productData">
+
+        <ion-row class="trending-tag">
+          <ion-col size="12">
+            <div class="item-type">
+              <img *ngIf="productData.type==='non-veg'" src="assets/non-veg.png" />
+              <img *ngIf="productData.type==='veg'" src="assets/veg.png" />
+              <img *ngIf="productData.type==='egg'" src="assets/egg.png" />
+            </div>
+            <div class="tag" *ngIf="productData.tag !== 'none'">
+              <p style="font-size: 10px; color: white">{{productData.tag | uppercase}}</p>
+            </div>
+          </ion-col>
+          <ion-col size="8" class="item-details">
+            <ion-row>
+              <ion-col size="12" class="item-name">
+                {{productData.productName}}
+              </ion-col>
+              <ion-col size="12" class="item-description">
+                {{productData.description}}
+              </ion-col>
+              <ion-col size="12" class="item-price">
+                Rs: {{productData.price}}
+              </ion-col>
+            </ion-row>
+          </ion-col>
+          <ion-col size="3" class="item-qty-adjust-parent">
+            <ion-row>
+              <ion-col size="12" class="item-qty-adjust">
+                <div class="qty-selector">
+                  <ion-button fill="clear">-</ion-button>
+                  <ion-label>{{productData.itemCount}}</ion-label>
+                  <ion-button fill="clear">+</ion-button>
+
+                </div>
+              </ion-col>
+              <ion-col size="12" class="item-total">
+                Rs: {{productData.price*productData.itemCount}}
+              </ion-col>
+            </ion-row>
+
+          </ion-col>
+        </ion-row>
+      </ion-card>
+
+
+
+      <ion-list lines="none" *ngIf="productData.customizable">
+        <ion-card class="item-list-card">
+          <ion-item style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            margin: 10px;
+            border-radius: 10px;" *ngFor="let list of productData.customizable">
+
+            <ion-thumbnail slot="end">
+              <ion-button class="item-img-not-present"
+                *ngIf="list.isAvailable&& list.itemCount <=0 ">Add</ion-button>
+              <div class="qty-selector-notimage" *ngIf="list.isAvailable&& list.itemCount">
+                <ion-button fill="clear" [disabled]="!list.itemCount">-</ion-button>
+                <ion-label>{{list.itemCount}}</ion-label>
+                <ion-button fill="clear">+</ion-button>
+              </div>
+            </ion-thumbnail>
+
+            <ion-label class="item-details">
+              <ion-row class="item-name">
+                <ion-col size="12">{{list.productName}} </ion-col>
+              </ion-row>
+              <ion-row class="item-description">
+                  <ion-col size="12"> {{list.description}}</ion-col>
+                </ion-row>
+              <ion-row class="item-price">
+                <ion-col size="12"> Rs. {{list.price}} </ion-col>
+              </ion-row>
+
+              <ion-row *ngIf="!list.isAvailable" class="item-not-available">
+                  <ion-col size="12"> Currently Not Available </ion-col>
+                </ion-row>
+
+
+            </ion-label>
+          </ion-item>
+        </ion-card>
+      </ion-list>
+    </div>
+  </div>
+
+</ion-content>
+<!-- </ion-content> -->

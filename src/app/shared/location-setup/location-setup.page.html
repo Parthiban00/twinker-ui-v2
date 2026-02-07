@@ -1,0 +1,41 @@
+<ion-content padding class="content">
+  <div class="map" #map></div>
+
+  <div class="sign-in-bottom-container">
+    <div class="sign-in-content">
+      <div class="next-btn-container" (click)="saveAddress()">
+        <ion-icon name="arrow-forward"></ion-icon>
+      </div>
+      <div class="title-container">
+        <h3>I'm Here...</h3>
+      </div>
+      <div class="add-container">
+        <p>{{formattedAddress}}</p>
+      </div>
+      <div class="addr-detail-container">
+        <form [formGroup]="form">
+          <ion-list>
+            <ion-item>
+              <ion-select aria-label="Type" formControlName="locality" interface="popover" placeholder="Locality *">
+                <ion-select-option *ngFor="let list of localities"
+                  [value]="list._id">{{list.locality}}</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-select aria-label="Type" formControlName="addressType" interface="popover" placeholder="Address Type *">
+                <ion-select-option value="home">Home</ion-select-option>
+                <ion-select-option value="officeWork">Office/Work</ion-select-option>
+                <ion-select-option value="others">Others</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+
+          <div class="form-input">
+            <ion-input aria-label="Landmark"  formControlName="landmark" placeholder="Landmark *" class="custom" [maxlength]="20"></ion-input>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

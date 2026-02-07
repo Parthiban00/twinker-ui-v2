@@ -1,0 +1,22 @@
+<ion-content padding class="content">
+  <div class="main-content">
+    <div class="bg-div"></div>
+
+    <div class="credential-box">
+      <div class="title">Z<span style="color: black;">hi</span>ZOO</div>
+      <form [formGroup]="signInForm">
+        <div class="inputs">
+          <div class="form-input">
+            <ion-input aria-label="Mobile No." formControlName="mobileNo" placeholder="Mobile No." class="custom" [maxlength]="20"></ion-input>
+            <div class="invalid-div" *ngIf="signInForm.get('mobileNo')?.invalid && (signInForm.get('mobileNo')?.dirty || signInForm.get('mobileNo')?.touched)">
+              <small class="invalid" *ngIf="signInForm.get('mobileNo')?.errors?.['required']">Mobile is required!</small>
+          </div>
+          </div>
+        </div>
+        <div class="submit-btn">
+          <ion-button expand="block" color="primary" (click)="requestOTP()" fill="solid">Sign In</ion-button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ion-content>

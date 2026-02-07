@@ -1,0 +1,20 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>In Progress Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item button detail="true" *ngFor="let list of orderData"  (click)="openModal()">
+    <ion-label>
+      <h3 *ngIf="list.status!=='Delivered'">{{list.placedTime}} - Amount: 230.00</h3>
+      <p>{{list.orderCode}}</p>
+      <p >{{list.itemNames}}</p>
+      <ion-chip color="success" *ngIf="list.status==='Placed'">{{list.status}}</ion-chip>
+      <ion-chip color="warning" *ngIf="list.status==='In Progress' || list.status=== 'Delivery Partner Assigned'">{{list.status}}</ion-chip>
+      <ion-chip color="success" *ngIf="list.status==='Delivered'">{{list.status}}</ion-chip>
+      <ion-chip color="danger" *ngIf="list.status==='Declined'">{{list.status}}</ion-chip>
+    </ion-label>
+  </ion-item>
+
+</ion-content>

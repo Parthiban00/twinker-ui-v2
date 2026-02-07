@@ -1,0 +1,25 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+      <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event)" placeholder="Search by Category..."
+        class="custom"></ion-searchbar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="categories-container">
+    <ion-row *ngIf="categories">
+      <ion-col size="6" [routerLink]="['/home-land']" *ngFor="let list of categories">
+        <div class="category-content">
+          <img [src]="imgBaseUrl + list.imageUrl" />
+        </div>
+      </ion-col>
+    </ion-row>
+
+  </div>
+
+</ion-content>

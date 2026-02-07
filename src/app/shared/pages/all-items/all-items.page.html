@@ -1,0 +1,59 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+      <ion-searchbar [debounce]="1000" (ionInput)="handleSearchInput($event)" placeholder="Search offer Items"
+        class="custom"></ion-searchbar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="menus-offer-container">
+    <div class="grid-container">
+      <div class="item" *ngFor="let list of featuredItems">
+        <div class="img box">
+          <div class="ribbon-2" *ngIf="list.discountType === 'in-percentage'">{{ list.discount }}% OFF</div>
+          <div class="ribbon-2" *ngIf="list.discountType === 'in-price'">₹{{ list.discount }} OFF</div>
+          <img [src]="imgBaseUrl + list.imageUrl" />
+        </div>
+        <div class="content-container">
+          <div class="item-name">
+            {{ list.productName }}
+          </div>
+          <div class="vendor-name">
+            (by&nbsp;{{ list.vendor.name }})
+          </div>
+          <div class="price-box">
+            <div class="actual-price">
+              Rs: {{ list.actualPrice }}
+            </div>
+            <div class="offer-price">
+              Rs: {{ list.price }}
+            </div>
+          </div>
+          <div class="cart-btn">
+            <button class="less-btn">-</button>
+            <label>1</label>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="presentPopover($event)">
+      <ion-icon name="filter-circle"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<!-- <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
+  <ng-template>
+    <ion-content class="ion-padding">Hello World!</ion-content>
+  </ng-template>
+</ion-popover> -->

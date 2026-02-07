@@ -1,0 +1,408 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Foods</ion-title>
+
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="openCouponModal()">
+        <img src="assets/offers.png" />
+        Offers
+      </ion-button>
+    </ion-buttons> -->
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart" color="light"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-row class="prl-10 live-offer-row">
+    <ion-col size="12" class="title">Live Offers <img src="../../assets/offers.gif" class="live-offer-img"/></ion-col>
+  </ion-row>
+  <div class="live-offer-container">
+    <swiper-container [slidesPerView]="1" [loop]="true" [autoplay]="true" [pagination]="true">
+      <swiper-slide>  <img src="assets/banner3.png" /></swiper-slide>
+      <swiper-slide><img src="assets/banner2.jpg" /></swiper-slide>
+      <swiper-slide> <img src="assets/live-offer-banner.png" /></swiper-slide>
+    </swiper-container>
+  </div>
+
+  <ng-container *ngIf="featuredItems">
+    <ion-row class="prl-10 live-offer-row">
+      <ion-col size="8" class="title m-auto">Featured Items<img src="../../assets/offers.gif" class="live-offer-img"/></ion-col>  <ion-col size="4" class="right-btn"
+      ><ion-button fill="clear" color="secondary" (click)="openFeaturedItemsMoal()">View All</ion-button></ion-col
+    > 
+    </ion-row>
+    <div class="menus-offer-container">
+      <div class="scroll-container">
+        <div class="item" *ngFor="let list of featuredItems">
+          <div class="img box">
+            <div class="ribbon-2" *ngIf="list.discountType ==='in-percentage'">{{list.discount}}% OFF</div>
+            <div class="ribbon-2" *ngIf="list.discountType ==='in-price'">₹{{list.discount}} OFF</div>
+            <img [src]="imgBaseUrl + list.imageUrl" />
+          </div>
+          <div class="content-container">
+            <div class="item-name">
+              {{list.productName}}
+            </div>
+            <div class="vendor-name">
+             (by&nbsp;{{list.vendor.name}})
+            </div>
+            <div class="price-box">
+              <div class="actual-price">
+                Rs: {{list.actualPrice}}
+              </div>
+              <div class="offer-price">
+                Rs: {{list.price}}
+              </div>
+           
+             </div>
+            <div class="cart-btn">
+              <button class="less-btn">-</button>
+              <label>1</label>
+              <button class="add-btn">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  
+
+  <ion-row class="prl-10" style="margin-top: 10px;" *ngIf="popularCuisines">
+    <ion-col size="12" class="title">Popular Cuisines</ion-col>
+  </ion-row>
+  <div class="category-items-container">
+    <ion-grid>
+      <ion-row style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+      border-radius: 10px;">
+        <ion-col (click)="openModal(list)" *ngFor = "let list of popularCuisines"
+          ><div class="img"> <img [src]="imgBaseUrl + list.imageUrl"/></div>
+          <div class="title"><ion-label>{{list.popularCuisineKeyword}}</ion-label></div></ion-col
+        >
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <ion-row class="search-bar">
+    <ion-col size="12">
+      <ion-searchbar
+        [debounce]="1000"
+        (ionInput)="handleSearchInput($event)"
+        placeholder="Search your Favourite"
+        class="custom"
+      ></ion-searchbar>
+    </ion-col>
+  </ion-row>
+<!--   
+  <ion-row class="prl-10 popular-title-row">
+    <ion-col size="8" class="title">Restaurants (Near by U)</ion-col>
+  </ion-row> -->
+
+  <div class="shop-container" [routerLink]="['/items']"  [queryParams]="{vendorId:list._id}" *ngFor="let list of vendorDetails | slice:0:5">
+    <ion-row class="shop-img-row" >
+      <ion-col size="12" class="shop-img-col">
+        <div class="rate-reviews">
+          <ion-row>
+            <ion-col size="12" style="text-align: center;">
+              <span class="rating"
+              ><img class="star" src="assets/rating-star.png" />4.9</span
+            >
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" style="font-size: 12px;color: white;">
+              (124 ratings)
+            </ion-col>
+          </ion-row>
+        </div>
+        <img [src]="imgBaseUrl + list.profileImgUrl"/>
+      </ion-col>
+    </ion-row>
+    <ion-row class="shop-name-row">
+      <ion-col size="12" class="shop-name-col"> {{ list.name }}</ion-col>
+      <ion-row class="shop-desc-row">
+        <ion-col size="12" class="shop-desc-col">
+          <span class="shop-type">{{list.description}}</span>
+        </ion-col>
+      </ion-row>
+   
+    </ion-row>
+    <ion-row class="shop-spec-row">
+      <ion-col size="12" class="shop-spec-col">
+        {{list.distance}}km - {{list.approxDeliveryTime}} mins
+      </ion-col>
+    </ion-row>
+  </div>
+
+
+  <div class="most-popular-container">
+    <ion-row class="prl-10">
+      <ion-col size="8" class="title" style="color: white !important;">Most Popular</ion-col>
+      <!-- <ion-col size="4" class="right-btn"
+        ><ion-button fill="clear" color="secondary">View All</ion-button></ion-col
+      > -->
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" class="most-popular-col">
+        <div class="cuisines-container">
+          <div class="cuisines" *ngFor="let list of popularVendors">
+            <div class="cuisine-img">
+              <div class="rate-reviews">
+                <ion-row>
+                  <ion-col size="12" style="text-align: center;">
+                    <span class="rating"
+                    ><img class="star" src="assets/rating-star.png" />4.9</span
+                  >
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="12" style="font-size: 12px;color: white;">
+                    (124 ratings)
+                  </ion-col>
+                </ion-row>
+              </div>
+              <img [src]="imgBaseUrl + list.profileImgUrl"/>
+            </div>
+            <div class="cuisine-name">
+              <ion-row>
+                <ion-col size="12" class="shop-name-col"> {{list.name}} </ion-col>
+              </ion-row>
+              <ion-row class="shop-desc-row">
+                <ion-col size="12" class="shop-desc-col elipsis">
+                 {{list.description}}
+                </ion-col>
+              </ion-row>
+            </div>
+          </div>
+  
+        </div>
+      </ion-col>
+    </ion-row>
+
+  </div>
+  <div class="trending-container">
+    <ion-row class="prl-10">
+      <ion-col size="8" class="title">Trending Right Now!</ion-col>
+      <ion-col size="4" class="right-btn"></ion-col>
+    </ion-row>
+
+    <div class="ion-list">
+      <div *ngFor="let product of productDetails;let i=index" style="    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+      margin: 10px;
+      border-radius: 10px;">
+        <ion-list lines="none">
+          <ion-card
+            class="item-list-card"
+            [ngClass]="{'not-available':!product.availableStatus}"
+          >
+            <ion-item>
+              <ion-thumbnail *ngIf="product.imageUrl" slot="end">
+                <img src="{{product.imageUrl}}" />
+
+                <ion-button
+                  class="item-img-present"
+                  *ngIf="!product.itemCount && product.availableStatus"
+                  >Add</ion-button
+                >
+                <div
+                  class="qty-selector"
+                  *ngIf="product.availableStatus && product.itemCount"
+                >
+                  <ion-button fill="clear" [disabled]="!product.itemCount"
+                    >-</ion-button
+                  >
+                  <ion-label>{{product.itemCount}}</ion-label>
+                  <ion-button fill="clear">+</ion-button>
+                </div>
+              </ion-thumbnail>
+
+              <ion-thumbnail *ngIf="!product.imageUrl" slot="end">
+                <ion-button
+                  *ngIf="!product.itemCount && product.availableStatus"
+                  class="item-img-not-present"
+                  >Add</ion-button
+                >
+                <div
+                  class="qty-selector-notimage"
+                  *ngIf="product.availableStatus && product.itemCount"
+                >
+                  <ion-button fill="clear" [disabled]="!product.itemCount"
+                    >-</ion-button
+                  >
+                  <ion-label>{{product.itemCount}}</ion-label>
+                  <ion-button fill="clear">+</ion-button>
+                </div>
+              </ion-thumbnail>
+
+              <ion-label class="item-details">
+                <ion-row class="trending-tag">
+                  <ion-col size="12">
+                    <div class="item-type">
+                      <img src="assets/non-veg.png"/>
+                    </div>
+                    <div class="tag">
+                      <p style="font-size: 10px; color: white">TRENDING</p>
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="item-name">
+                  <ion-col size="12"> {{product.productName}} </ion-col>
+                </ion-row>
+                <ion-row class="item-description">
+                  <ion-col size="12"> {{product.description}} </ion-col>
+                </ion-row>
+                <ion-row class="item-price">
+                  <ion-col size="12"> Rs. {{product.price}} </ion-col>
+                </ion-row>
+
+                <ion-row
+                  *ngIf="!product.availableStatus"
+                  class="item-not-available"
+                >
+                  <ion-col size="12"> Currently Not Available </ion-col>
+                </ion-row>
+
+
+              </ion-label>
+            </ion-item>
+          </ion-card>
+        </ion-list>
+      </div>
+    </div>
+
+  </div>
+  <div class="trending-container">
+    <ion-row class="prl-10">
+      <ion-col size="8" class="title">Recently ordered by U!</ion-col>
+      <ion-col size="4" class="right-btn"></ion-col>
+    </ion-row>
+
+    <div class="ion-list">
+      <div *ngFor="let product of productDetails;let i=index"  style="    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+      margin: 10px;
+      border-radius: 10px;">
+        <ion-list lines="none">
+          <ion-card
+            class="item-list-card"
+            [ngClass]="{'not-available':!product.availableStatus}"
+          >
+            <ion-item>
+              <ion-thumbnail *ngIf="product.imageUrl" slot="end">
+                <img src="{{product.imageUrl}}" />
+
+                <ion-button
+                  class="item-img-present"
+                  *ngIf="!product.itemCount && product.availableStatus"
+                  >Add</ion-button
+                >
+                <div
+                  class="qty-selector"
+                  *ngIf="product.availableStatus && product.itemCount"
+                >
+                  <ion-button fill="clear" [disabled]="!product.itemCount"
+                    >-</ion-button
+                  >
+                  <ion-label>{{product.itemCount}}</ion-label>
+                  <ion-button fill="clear">+</ion-button>
+                </div>
+              </ion-thumbnail>
+
+              <ion-thumbnail *ngIf="!product.imageUrl" slot="end">
+                <ion-button
+                  *ngIf="!product.itemCount && product.availableStatus"
+                  class="item-img-not-present"
+                  >Add</ion-button
+                >
+                <div
+                  class="qty-selector-notimage"
+                  *ngIf="product.availableStatus && product.itemCount"
+                >
+                  <ion-button fill="clear" [disabled]="!product.itemCount"
+                    >-</ion-button
+                  >
+                  <ion-label>{{product.itemCount}}</ion-label>
+                  <ion-button fill="clear">+</ion-button>
+                </div>
+              </ion-thumbnail>
+
+              <ion-label class="item-details">
+                <ion-row class="recently-tag">
+                  <ion-col size="12">
+                    <div class="item-type">
+                      <img src="assets/non-veg.png"/>
+                    </div>
+                    <div class="tag">
+                      <p style="font-size: 10px; color: white">RECENTLY ORDERED</p>
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="item-name">
+                  <ion-col size="12"> {{product.productName}} </ion-col>
+                </ion-row>
+                <ion-row class="item-description">
+                  <ion-col size="12"> {{product.description}} </ion-col>
+                </ion-row>
+                <ion-row class="item-price">
+                  <ion-col size="12"> Rs. {{product.price}} </ion-col>
+                </ion-row>
+
+                <ion-row
+                  *ngIf="!product.availableStatus"
+                  class="item-not-available"
+                >
+                  <ion-col size="12"> Currently Not Available </ion-col>
+                </ion-row>
+
+
+              </ion-label>
+            </ion-item>
+          </ion-card>
+        </ion-list>
+      </div>
+    </div>
+
+  </div>
+  <!-- <ion-row class="prl-10 popular-title-row">
+    <ion-col size="8" class="title">Restaurants</ion-col>
+  </ion-row> -->
+  <div class="shop-container" [routerLink]="['/items']" *ngFor="let list of vendorDetails | slice:5">
+    <ion-row class="shop-img-row" >
+      <ion-col size="12" class="shop-img-col">
+        <div class="rate-reviews">
+          <ion-row>
+            <ion-col size="12" style="text-align: center;">
+              <span class="rating"
+              ><img class="star" src="assets/rating-star.png" />4.9</span
+            >
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" style="font-size: 12px;color: white;">
+              (124 ratings)
+            </ion-col>
+          </ion-row>
+        </div>
+        <img [src]="imgBaseUrl + list.profileImgUrl"/>
+      </ion-col>
+    </ion-row>
+    <ion-row class="shop-name-row">
+      <ion-col size="12" class="shop-name-col"> {{ list.name }}</ion-col>
+      <ion-row class="shop-desc-row">
+        <ion-col size="12" class="shop-desc-col">
+          <span class="shop-type">{{list.description}}</span>
+        </ion-col>
+      </ion-row>
+   
+    </ion-row>
+    <ion-row class="shop-spec-row">
+      <ion-col size="12" class="shop-spec-col">
+        {{list.distance}}km - 20 mins
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-content>
+
+

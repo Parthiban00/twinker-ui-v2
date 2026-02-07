@@ -1,0 +1,55 @@
+ion-input.custom {
+  --background: #e3e3e3;
+  --color: #000000;
+  --placeholder-color: #777;
+  --placeholder-opacity: 0.8;
+  --padding-bottom: 10px;
+  --padding-end: 10px;
+  --padding-start: 10px;
+  --padding-top: 10px;
+  height: 50px;
+  border-radius: 10px;
+}
+
+/* Scoped components require higher specificity to customize */
+ion-searchbar.custom {
+  --border-radius: 10px;
+  --box-shadow: none;
+  --background: var(--ion-color-tertiary);
+}
+
+ion-toolbar {
+  --background: var(--ion-color-bg);
+  color: var(--ion-color-light);
+  border-radius: 0 0 10px 10px;
+
+  ion-title{
+    color: var(--ion-color-light);
+    font-size: 16px;
+  }
+}
+
+ion-modal.inline_modal{
+  --border-radius: 10px
+}
+
+ion-radio {
+  --border-radius: 4px;
+  --inner-border-radius: 4px;
+
+  --color: #ddd;
+  --color-checked: var(--ion-color-primary);
+}
+
+ion-radio.ios::part(container) {
+  width: 20px;
+  height: 20px;
+
+  border: 2px solid #ddd;
+  border-radius: 4px;
+}
+
+.radio-checked.ios::part(container) {
+  border-color: var(--ion-color-primary);
+}
+

@@ -1,0 +1,75 @@
+<ion-content padding class="content">
+  <div class="main-content">
+    <div class="bg-div">
+      
+    </div>
+    <div class="credential-box">
+      <div class="logo">Z<span style="color: black;">hi</span>ZOO</div>
+      
+      <div class="title-container">
+        <h3>otp Verification</h3>
+      </div>
+      <div class="title">
+        <h2>Verify Mobile Number</h2>
+        <p>Enter the 4-Digit code sent to you at +919095924511</p>
+      </div>
+      <div class="inputs">
+        <div class="otp-field">
+          <ion-row>
+            <ion-col>
+              <ion-input
+                class="x"
+                #otp1
+                required="true"
+                maxLength="1"
+                [(ngModel)]="otp.first"
+                (keyup)="otpController($event,otp2,otp1,'')"
+              >
+              </ion-input>
+              <ion-input
+                class="x"
+                #otp2
+                required="true"
+                maxLength="1"
+                [(ngModel)]="otp.second"
+                (keyup)="otpController($event,otp3,otp1,otp1)"
+              >
+              </ion-input>
+              <ion-input
+                class="x"
+                #otp3
+                required="true"
+                maxLength="1"
+                [(ngModel)]="otp.third"
+                (keyup)="otpController($event,otp4,otp2,otp2)"
+              >
+              </ion-input>
+
+              <ion-input
+                class="x"
+                #otp4
+                required="true"
+                maxLength="1"
+                [(ngModel)]="otp.fourth"
+                (keyup)="otpController($event,'',otp3,otp3)"
+              >
+              </ion-input>
+            </ion-col>
+          </ion-row>
+        </div>
+
+      </div>
+
+      <div class="resend-otp">
+        <p>
+          Don't receove code? <ion-button fill="clear" (click)="resentOtp()">Resent Again</ion-button>
+        </p>
+      </div>
+   
+      <div class="submit-btn">
+        <ion-button expand="block" color="primary" (click)="verifyOtpAndLogin()" fill="solid">Verify</ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>
+

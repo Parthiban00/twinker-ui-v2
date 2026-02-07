@@ -1,0 +1,129 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+      <ion-searchbar [debounce]="1000" (ionInput)="handleSearchInput($event)" placeholder="Search"
+        class="custom"></ion-searchbar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="shop-details-bg" *ngIf="receivedData">
+    <img [src]="imgBaseUrl + receivedData.imageUrl">
+
+    <ion-row class="shop-details overlay overlay_1">
+      <ion-col size="12" class="shop-name">
+        {{receivedData.popularCuisineKeyword}}
+      </ion-col>
+      <ion-col size="12" class="shop-desc">
+        123 Items
+      </ion-col>
+    </ion-row>
+  </div>
+
+  <div class="item-list-details">
+
+    <div class="item-lists" *ngIf="data.length">
+
+      <div class="main-list" *ngFor="let vendorList of data;let i=index">
+        <ion-row class="recommended-title-row">
+          <ion-col size="6" class="title">
+            {{vendorList.vendor.name}}
+          </ion-col>
+          <ion-col size="6">
+
+          </ion-col>
+        </ion-row>
+        <div class="ion-list" *ngFor="let list of vendorList.products">
+          <div style="    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+          margin: 10px;
+          border-radius: 10px;">
+            <ion-list lines="none">
+              <ion-card class="item-list-card" [ngClass]="{'not-available':!list.isAvailable}">
+                <ion-item>
+                  <ion-thumbnail *ngIf="list.imageUrl" slot="end">
+                    <img [src]="imgBaseUrl + list.imageUrl" />
+
+                    <ion-button class="item-img-present" *ngIf="!list.itemCount && list.isAvailable">Add</ion-button>
+                    <div class="qty-selector" *ngIf="list.isAvailable && list.itemCount">
+                      <ion-button fill="clear" [disabled]="!list.itemCount">-</ion-button>
+                      <ion-label>{{list.itemCount}}</ion-label>
+                      <ion-button fill="clear">+</ion-button>
+                    </div>
+                  </ion-thumbnail>
+
+                  <ion-thumbnail *ngIf="!list.imageUrl" slot="end">
+                    <ion-button *ngIf="!list.itemCount && list.isAvailable"
+                      class="item-img-not-present">Add</ion-button>
+                    <div class="qty-selector-notimage" *ngIf="list.isAvailable && list.itemCount">
+                      <ion-button fill="clear" [disabled]="!list.itemCount">-</ion-button>
+                      <ion-label>{{list.itemCount}}</ion-label>
+                      <ion-button fill="clear">+</ion-button>
+                    </div>
+                  </ion-thumbnail>
+
+                  <ion-label class="item-details">
+                    <ion-row class="trending-tag">
+                      <ion-col size="12">
+                        <div class="item-type">
+                          <img *ngIf="list.type==='non-veg'" src="assets/non-veg.png" />
+                          <img *ngIf="list.type==='veg'" src="assets/veg.png" />
+                          <img *ngIf="list.type==='egg'" src="assets/egg.png" />
+                        </div>
+                        <div class="tag" *ngIf="list.tag !== 'none'">
+                          <p style="font-size: 10px; color: white">{{list.tag | uppercase}}</p>
+                        </div>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row class="item-name">
+                      <ion-col size="12"> {{list.productName}} </ion-col>
+                    </ion-row>
+                    <ion-row class="item-description">
+                      <ion-col size="12"> {{list.description}} </ion-col>
+                    </ion-row>
+                    <ion-row class="item-price">
+                      <ion-col size="12"> Rs. {{list.price}} </ion-col>
+                    </ion-row>
+
+                    <ion-row *ngIf="!list.isAvailable" class="item-not-available">
+                      <ion-col size="12"> Currently Not Available </ion-col>
+                    </ion-row>
+
+
+                  </ion-label>
+                </ion-item>
+              </ion-card>
+            </ion-list>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
+
+<div style="margin-bottom:20px; align-items: center;
+justify-content: center;display: flex;" *ngIf="data.length">
+
+  <ion-button class="menu-float-btn" id="top-center"><img src="assets/menu.png" />&nbsp;Restaurants</ion-button>
+  <ion-popover trigger="top-center" side="top" alignment="center">
+    <ng-template>
+      <ion-content>
+        <ion-list>
+          <ion-item class="menu-item" [button]="true" [detail]="false" *ngFor="let list of data">
+            <ion-row class="menu-item-row" style="width: 100%;">
+              <ion-col size="3"> <img src="assets/active-menu1.gif" style="height:28px;" /></ion-col>
+              <ion-col size="7"> {{list.vendor.name}} </ion-col>
+              <ion-col size="2">{{list.products.length}}</ion-col>
+            </ion-row>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+</div>

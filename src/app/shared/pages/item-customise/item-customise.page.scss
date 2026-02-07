@@ -1,0 +1,131 @@
+.ion-list{
+  ion-list{
+    ion-thumbnail{
+      height: fit-content;
+      .item-img-not-present{
+        bottom: -18px;
+      }
+    }
+    .item-details{
+      padding: 0;
+    }
+  }
+}
+
+.submit-btn {
+  margin-top: 20px;
+  padding: 5px;
+
+  ion-button {
+    color: #ffffff;
+    height: 50px;
+    font-weight: 500;
+    --box-shadow: none;
+    --border-radius: 10px;
+  }
+}
+
+.cart-item-details{
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  padding: 7px;
+
+  .item-type{
+    img{
+      width: 15px;
+    }
+  }
+
+  .item-details{
+    padding: 0;
+  }
+
+  .item-name{
+    font-size: 14px;
+    font-family: "latoBold";
+  }
+
+  .item-description{
+    font-size: 14px;
+    font-family: "latoRegular";
+    color: var(--ion-color-medium);
+  }
+
+  .item-price{
+    color: var(--ion-color-secondary);
+    font-size: 14px;
+    font-family: "latoBold";
+  }
+
+  .customize-btn{
+    ion-button {
+    height: fit-content;
+    font-size: 14px;
+
+  .button-native{
+    padding: 0;
+  }
+    }
+  }
+
+
+
+.item-qty-adjust-parent{
+  padding: 0;
+
+  .item-qty-adjust{
+    .qty-selector{
+      display: flex;
+
+
+    // position: absolute;
+  //  bottom:16px;
+   right: 10px;
+   height: 30px;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid rgb(248, 120, 14);
+      border-radius:2px;
+      // margin-top:10px;
+      width:fit-content;
+
+
+  ion-button{
+    width: 30px;
+  }
+
+  .ion-label{
+    font-size: 12px;
+  }
+  }
+  }
+
+  .item-total{
+    font-family: 'latoBold';
+  }
+
+}
+
+}
+
+.trending-tag {
+  ion-col {
+    display: flex;
+    .tag {
+      height: 18px;
+      width: fit-content;
+      background-color: var(--ion-color-secondary);
+      border-radius: 5px;
+      margin-left: 5px;
+      padding: 0 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .item-type {
+      height: 18px;
+      width: 18px;
+    }
+  }
+}

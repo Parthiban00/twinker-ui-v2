@@ -1,0 +1,652 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+@import "../src/theme/theme.scss";
+
+@font-face {
+  font-family: "latoRegular";
+  src: url("./assets/fonts/Lato-Regular.ttf");
+}
+@font-face {
+  font-family: "latoBold";
+  src: url("./assets/fonts/Lato-Bold.ttf");
+}
+@font-face {
+  font-family: "latoLight";
+  src: url("./assets/fonts/Lato-Light.ttf");
+}
+
+@font-face {
+  font-family: "latoThin";
+  src: url("./assets/fonts/Lato-Thin.ttf");
+}
+
+body {
+  font-family: "latoRegular" !important;
+}
+
+ion-content,
+ion-item,
+ion-list,
+ion-label {
+  font-family: "latoRegular" !important;
+  color: var(--ion-color-medium-shade) !important;
+}
+
+ion-title {
+  font-family: "latoBold";
+}
+
+ion-button {
+  font-family: "latoBold";
+  text-transform: capitalize;
+}
+
+.title {
+  font-family: "latoBold";
+  font-size: 16px;
+  // margin: auto;
+  color: var(--ion-color-medium);
+}
+
+.right-btn {
+  text-align: right;
+}
+
+.prl-10 {
+  padding: 0 10px;
+}
+
+ion-col {
+  color: var(--ion-color-medium-shade);
+}
+
+.hr-line {
+  height: 1px;
+  width: 100%;
+  background: var(--ion-color-medium);
+  margin-top: 5px;
+}
+
+.ion-list {
+  ion-list {
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .item-list-card {
+    border-radius: 5px;
+    box-shadow: none;
+    margin: 0;
+
+    ion-item {
+      ion-thumbnail {
+        position: relative;
+        height: 120px;
+        width: 110px;
+        border-radius: 2px;
+        margin: 0;
+
+        img {
+          border-radius: 20px;
+          // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+          box-shadow:
+            rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+            rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+        }
+
+        .item-img-present {
+          position: absolute;
+          left: 18px;
+          bottom: 5px;
+          --background: rgb(255, 255, 255) !important;
+          --color: seagreen;
+          --box-shadow: 0;
+          width: 70px;
+          height: 30px;
+        }
+
+        .item-img-not-present {
+          position: absolute;
+          left: 18px;
+          bottom: 28px;
+          --background: seagreen !important;
+          --color: white;
+          --box-shadow: 0;
+          width: 70px;
+        }
+
+        .qty-selector {
+          display: flex;
+          position: absolute;
+          bottom: 5px;
+          left: 17px;
+          justify-content: center;
+          align-items: center;
+          background: #f6f6f6;
+          border-radius: 5px;
+          margin-top: 10px;
+          width: -moz-fit-content;
+          width: fit-content;
+          height: 30px;
+          font-size: 12px;
+          // margin-left: 35px;
+        }
+        .qty-selector-notimage {
+          display: flex;
+          position: absolute;
+          bottom: 28px;
+          left: 17px;
+          justify-content: center;
+          align-items: center;
+          background: #f6f6f6;
+          border-radius: 5px;
+          margin-top: 10px;
+          width: fit-content;
+          height: 30px;
+          font-size: 12px;
+          // margin-left: 35px;
+        }
+      }
+    }
+    .item-details {
+      height: 100%;
+      width: 100%;
+      padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .item-name {
+        font-family: "latoBold";
+        font-size: 14px;
+        text-wrap: wrap;
+      }
+
+      .item-description {
+        font-size: 14px;
+        font-family: "latoRegular";
+        text-wrap: wrap;
+      }
+
+      .item-price {
+        ion-col {
+          color: var(--ion-color-secondary);
+          font-size: 14px;
+          font-family: "latoBold";
+        }
+      }
+
+      .item-not-available {
+        ion-col {
+          font-size: 12px;
+          font-style: italic;
+        }
+      }
+      .trending-tag {
+        ion-col {
+          display: flex;
+          .tag {
+            height: 18px;
+            width: fit-content;
+            background-color: var(--ion-color-secondary);
+            text-align: center;
+            border-radius: 5px;
+            margin-left: 5px;
+            padding: 0 5px;
+          }
+
+          .item-type {
+            height: 18px;
+            width: 18px;
+          }
+        }
+      }
+
+      .recently-tag{
+        ion-col {
+          display: flex;
+          .tag {
+            height: 18px;
+            width: fit-content;
+            background-color: #f87171;
+            text-align: center;
+            border-radius: 5px;
+            margin-left: 5px;
+            padding: 0 5px;
+          }
+
+          .item-type {
+            height: 18px;
+            width: 18px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.form-input{
+  margin: 10px 0;
+}
+
+.submit-btn {
+  // margin-bottom: 50px;
+  padding: 5px;
+
+  ion-button {
+    color: #ffffff;
+    height: 50px;
+    font-weight: 500;
+    --box-shadow: none;
+    --border-radius: 10px;
+    --ion-color-contrast: white !important;
+  }
+}
+
+.main-container{
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  // padding: 10px;
+  height: fit-content;
+  margin: 10px;
+}
+
+.elipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+}
+
+.secondary-color{
+  color: var(--ion-color-secondary)
+}
+
+.invalid-div{
+  margin-left: 10px;
+}
+
+.invalid{
+  color: #f87171;
+  font-family: 'latoBold';
+}
+
+.custom-toast{
+  color:#ffffff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//for snow flake
+/* customizable snowflake styling */
+.snowflake {
+  color: #fff;
+  font-size: 1em;
+  font-family: Arial;
+  text-shadow: 0 0 1px #000;
+}
+
+@-webkit-keyframes snowflakes-fall {
+  0% {
+      top: -10%;
+  }
+  100% {
+      top: 100%;
+  }
+}
+@-webkit-keyframes snowflakes-shake {
+  0% {
+      -webkit-transform: translateX(0px);
+      transform: translateX(0px);
+  }
+  50% {
+      -webkit-transform: translateX(80px);
+      transform: translateX(80px);
+  }
+  100% {
+      -webkit-transform: translateX(0px);
+      transform: translateX(0px);
+  }
+}
+@keyframes snowflakes-fall {
+  0% {
+      top: -10%;
+  }
+  100% {
+      top: 100%;
+  }
+}
+@keyframes snowflakes-shake {
+  0% {
+      transform: translateX(0px);
+  }
+  50% {
+      transform: translateX(80px);
+  }
+  100% {
+      transform: translateX(0px);
+  }
+}
+.snowflake {
+  position: fixed;
+  top: -10%;
+  z-index: 9999;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+  -webkit-animation-name: snowflakes-fall, snowflakes-shake;
+  -webkit-animation-duration: 10s, 3s;
+  -webkit-animation-timing-function: linear, ease-in-out;
+  -webkit-animation-iteration-count: infinite, infinite;
+  -webkit-animation-play-state: running, running;
+  animation-name: snowflakes-fall, snowflakes-shake;
+  animation-duration: 10s, 3s;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-play-state: running, running;
+}
+.snowflake:nth-of-type(0) {
+  left: 1%;
+  -webkit-animation-delay: 0s, 0s;
+  animation-delay: 0s, 0s;
+}
+.snowflake:nth-of-type(1) {
+  left: 10%;
+  -webkit-animation-delay: 1s, 1s;
+  animation-delay: 1s, 1s;
+}
+.snowflake:nth-of-type(2) {
+  left: 20%;
+  -webkit-animation-delay: 6s, 0.5s;
+  animation-delay: 6s, 0.5s;
+}
+.snowflake:nth-of-type(3) {
+  left: 30%;
+  -webkit-animation-delay: 4s, 2s;
+  animation-delay: 4s, 2s;
+}
+.snowflake:nth-of-type(4) {
+  left: 40%;
+  -webkit-animation-delay: 2s, 2s;
+  animation-delay: 2s, 2s;
+}
+.snowflake:nth-of-type(5) {
+  left: 50%;
+  -webkit-animation-delay: 8s, 3s;
+  animation-delay: 8s, 3s;
+}
+.snowflake:nth-of-type(6) {
+  left: 60%;
+  -webkit-animation-delay: 6s, 2s;
+  animation-delay: 6s, 2s;
+}
+.snowflake:nth-of-type(7) {
+  left: 70%;
+  -webkit-animation-delay: 2.5s, 1s;
+  animation-delay: 2.5s, 1s;
+}
+.snowflake:nth-of-type(8) {
+  left: 80%;
+  -webkit-animation-delay: 1s, 0s;
+  animation-delay: 1s, 0s;
+}
+.snowflake:nth-of-type(9) {
+  left: 90%;
+  -webkit-animation-delay: 3s, 1.5s;
+  animation-delay: 3s, 1.5s;
+}
+//snow flake end
+
+
+swiper-container {
+  --swiper-pagination-bullet-inactive-color: var(--ion-color-step-200, #cccccc);
+  --swiper-pagination-color: var(--ion-color-primary, #0054e9);
+  --swiper-pagination-progressbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.25);
+  --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
+  --swiper-scrollbar-drag-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
+}
+
+swiper-slide {
+  display: flex;
+  position: relative;
+
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 18px;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+swiper-slide img {
+  width: calc(100% - 10px);
+  height: 160px;
+  border-radius: 10px;
+}
+
+.swiper-pagination-bullet-active {
+  background: rgb(53, 53, 53)
+}
+
+.m-auto{
+  margin: auto;
+}
+
+ion-accordion.accordion-collapsing ion-item[slot='header'],
+ion-accordion.accordion-collapsed ion-item[slot='header'] {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-light-contrast);
+
+  ion-label{
+    font-family: 'latoBold' !important;
+  }
+}
+
+ion-accordion.accordion-expanding ion-item[slot='header'],
+ion-accordion.accordion-expanded ion-item[slot='header'] {
+  --background: #e4e4e7;
+  --color: var(--ion-color-primary-contrast);
+
+  ion-label{
+    font-family: 'latoBold' !important;
+    color: rgb(34, 34, 34) !important;
+  }
+}
+
+
+
+//special offers and featured items container
+.live-offer-row {
+  margin-top: 10px;
+}
+
+.live-offer-img {
+  margin-top: 10px;
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  margin-top: -3px;
+}
+
+.menus-offer-container {
+  // background: #ff9191;
+  
+  .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .item {
+    flex: 0 0 auto;
+    /* border: solid 1px #fff; */
+    height: 245px;
+    width: 172px;
+    padding: 0px;
+    border-radius: 5px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background: white;
+    margin: 3px;
+
+    .img {
+      height: 45%;
+      width: 100%;
+      background-color: rgb(255, 180, 180);
+      border-radius: 5px;
+
+      img {
+        height: 100%;
+        width: 100%;
+        border-radius: 5px;
+      }
+    }
+    .content-container {
+      height: 50%;
+      position: relative;
+      padding: 5px;
+
+      .item-name {
+        font-family: 'latoBold';
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+
+      .vendor-name {
+        font-size: 14px;
+        color: gray;
+        margin-bottom: 5px;
+      }
+
+      .price-box {
+        font-size: 14px;
+        display: flex;
+        gap: 10px;
+        margin-bottom: 5px;
+
+        .actual-price {
+          font-size: 14px;
+          text-decoration: line-through;
+          color: #f87171;
+         font-family: 'latoBold';
+        }
+
+        .offer-price {
+          font-size: 14px;
+          color: var(--ion-color-primary);
+          font-family: 'latoBold';
+        }
+      }
+    }
+    .cart-btn {
+      position: absolute;
+      bottom: 5px;
+      height: 25px;
+      width: calc(100% - 60px);
+      background-color: var(--ion-color-secondary);
+      // margin-top: 40px;
+      margin-left: auto;
+      margin-right: auto;
+      // position: relative;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      left: 20%;
+      box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+
+      label {
+        font-family: "latoBold";
+    color: white;
+    font-size: 16px;
+      }
+
+      .less-btn,
+      .add-btn {
+        height: 25px;
+        width: 25px;
+        border: none;
+        background-color: #fff;
+        color: #000;
+        border-radius: 5px;
+        font-family: "latoBold";
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+.ribbon-2 {
+  --f: 10px; /* control the folded part*/
+  --r: 15px; /* control the ribbon shape */
+  --t: 10px; /* the top offset */
+
+  position: absolute;
+  inset: var(--t) calc(-1 * var(--f)) auto auto;
+  padding: 6px 10px var(--f) calc(10px + var(--r));
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--f)),
+    calc(100% - var(--f)) 100%,
+    calc(100% - var(--f)) calc(100% - var(--f)),
+    0 calc(100% - var(--f)),
+    var(--r) calc(50% - var(--f) / 2)
+  );
+  background: #bd1550;
+  box-shadow: 0 calc(-1 * var(--f)) 0 inset #0005;
+
+  font-size: 14px;
+  padding-right: 15px !important;
+  color: white;
+  font-family: 'latoBold';
+}
+
+.box {
+  background: lightblue;
+  position: relative;
+}

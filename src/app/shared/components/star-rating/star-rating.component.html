@@ -1,0 +1,5 @@
+<ion-row>
+  <ion-col *ngFor="let star of stars; let i = index" (click)="onStarClick(i)">
+    <ion-icon [name]="star ? 'star' : 'star-outline'" [color]="color" style="font-size: 24px;"></ion-icon>
+  </ion-col>
+</ion-row>

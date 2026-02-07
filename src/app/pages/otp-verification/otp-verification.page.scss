@@ -1,0 +1,110 @@
+ion-header {
+  ion-toolbar {
+    text-align: center;
+    ion-title {
+      font-family: "latoBold";
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+}
+
+.credential-box {
+  width: 100%;
+  padding: 50px 20px;
+  background: white;
+  border-radius: 10px;
+  z-index: 1;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.bg-div {
+  position: absolute;
+  height: 50%;
+  width: 100%;
+  background-color: #fbab7e;
+  background-image: linear-gradient(62deg, #fbab7e 0%, #f7ce68 100%);
+  top: 0;
+  border-radius: 0 0 10px 10px;
+}
+
+ion-content.content {
+  position: relative;
+  font-family: "latoRegular";
+  --ion-background-color: var(--ion-color-light);
+
+  .title {
+    text-align: center;
+    h2 {
+      font-family: latoBold;
+    }
+    p {
+      color: rgb(94, 94, 94);
+    }
+  }
+
+  .submit-btn {
+    margin-top: 50px;
+    ion-button {
+      color: #ffffff;
+      height: 50px;
+      font-weight: 500;
+      --box-shadow: none;
+      --border-radius: 10px;
+    }
+  }
+
+  .otp-field {
+    text-align: center;
+    .x {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      margin: 10px;
+      border-radius: 50%;
+      --background: #e1e1e1;
+      --padding-top: 15px;
+      --padding-start: 0;
+    }
+  }
+
+  .resend-otp {
+    font-size: 14px;
+    text-align: center;
+    color: rgb(150, 149, 149);
+    p {
+      ion-button {
+        text-transform: capitalize;
+        margin-top: -5px;
+      }
+    }
+  }
+}
+
+.main-content {
+  height: 100%;
+  // background: #0d0d41;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  text-align: center;
+  color: var(--ion-color-primary);
+  font-size: 30px;
+  font-family: "latoBold";
+}
+
+.inputs {
+  margin-top: 50px;
+}
+
+.title-container {
+  text-align: center;
+  h3 {
+    font-family: "latoBold";
+    font-weight: 600;
+  }
+}

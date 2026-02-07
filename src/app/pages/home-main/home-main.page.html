@@ -1,0 +1,146 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Good Morning Sarah!</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart" color="light"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding class="content">
+  <div>
+    <div class="location-top" style="position: sticky; top: 0px; background: white; z-index: 11;"
+      *ngIf="defaultAddress">
+      <ion-row class="delivery-location">
+        <ion-col size="12" class="delivering-to"> Delivering To </ion-col>
+      </ion-row>
+      <ion-row class="location">
+        <ion-item [routerLink]="['/location-setup']">
+          <ion-avatar aria-hidden="true" slot="start">
+            <img [alt]="defaultAddress.addressType" [src]="getImageSource(defaultAddress.addressType)" />
+          </ion-avatar>
+          <ion-row style="width: 100%;" class="row-container">
+            <ion-col size="12">
+
+              <ion-label class="addr-title">{{ defaultAddress.addressType }}</ion-label>
+            </ion-col>
+            <ion-col size="12">
+              <ion-label>{{defaultAddress.fullAddress}}</ion-label>
+
+            </ion-col>
+          </ion-row>
+        </ion-item>
+      </ion-row>
+
+    </div>
+    <div class="main-container">
+      <div class="announcement-container">
+        <img src="../../../assets/announcement-banner.jpg" />
+      </div>
+    </div>
+
+  <!-- <ion-row class="prl-10 live-offer-row">
+      <ion-col size="8" class="title">Daily Fresh<small>&nbsp;(Live Price - {{todayDate | date:"dd/MM/yyyy"}})</small></ion-col> <ion-col
+        size="4" class="right-btn">
+        <ion-button fill="clear" color="secondary" [routerLink]="['/essentials-home']">Explore All</ion-button>
+      </ion-col>
+    </ion-row> -->
+
+    <!-- <div class="category-section">
+      <ion-list style="background: #efefef;">
+        <div class="category-container">
+          <div class="category-card" *ngFor="let category of dailyGroceries" [routerLink]="['/essentials-home']">
+            <img [src]="category.image" alt="{{category.name}}" />
+            <ion-card-content class="category-card-content">
+              <ion-label>{{category.name}}</ion-label>
+            </ion-card-content>
+          </div>
+        </div>
+      </ion-list>
+    </div> -->
+
+    <div class="todays-offers">
+      <div class="container-label">
+        <ion-label>Explore your wishes</ion-label>
+      </div>
+    </div>
+    <div class="categories-container">
+
+      <ion-row>
+        <ion-col size="6" 
+          *ngFor="let list of categories | slice:0:4" [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']" [queryParams]="{categoryId:list._id, localityId:defaultAddress.locality._id}">
+          <div class="category-content">
+            <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
+          </div>
+        </ion-col>
+      </ion-row>
+
+    </div>
+    <div class="view-all">
+      <ion-button fill="clear" color="secondary" (click)="exploreCategories()">
+        Explore all
+        <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- <div class="todays-offers">
+      <div class="container-label">
+        <ion-label>Grocery Mart</ion-label>
+      </div>
+    </div>
+    <div class="banner" [routerLink]="['/groceries-home']">
+      <div class="banner-image active"><img src="../../../assets/fruits-banner.png"></div>
+      <div class="banner-image"><img src="../../../assets/veg-banner-1.png"></div>
+      <div class="banner-image"><img src="../../../assets/diary-banner.png"></div>
+      <div class="banner-image"><img src="../../../assets/organic.png"></div>
+    </div> -->
+
+    <div class="buddy-category-container">
+      <div class="todays-offers">
+        <div class="container-label">
+          <ion-label>MoMo Buddy Services</ion-label>
+        </div>
+      </div>
+      <div class="buddy-container">
+        <ion-grid style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        margin: 10px;
+        border-radius: 10px;">
+          <ion-row>
+            <ion-col>
+              <div class="img">
+                <img src="assets/send-items.png" />
+              </div>
+              <div class="title"><ion-label>Send/Receive Items/Packages</ion-label></div>
+            </ion-col>
+            <ion-col>
+              <div class="img"><img src="assets/your-needs.png" /></div>
+              <div class="title"><ion-label>Your needs from anywhere</ion-label></div>
+            </ion-col>
+            <ion-col>
+              <div class="img"> <img src="assets/buddy.png" /></div>
+              <div class="title"><ion-label>Buddy for you (about Me)</ion-label></div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+    </div>
+
+    <div class="categories-container">
+
+      <ion-row>
+        <ion-col size="6"
+          *ngFor="let list of categories | slice:4" [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"  [queryParams]="{storeId:list._id}">
+          <div class="category-content">
+            <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
+          </div>
+        </ion-col>
+      </ion-row>
+
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,136 @@
+.menus-offer-container {
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .item {
+        background-color: #fff;
+        border: solid 1px #fff;
+        height: 245px;
+        width: 100%;
+        padding: 0px;
+        border-radius: 5px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+        .img {
+            height: 45%;
+            width: 100%;
+            background-color: rgb(255, 180, 180);
+            border-radius: 5px;
+
+            img {
+                height: 100%;
+                width: 100%;
+                border-radius: 5px;
+            }
+        }
+
+        .content-container {
+            height: 50%;
+            position: relative;
+            padding: 5px;
+
+            .item-name {
+                font-family: "latoBold";
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
+
+            .vendor-name {
+                font-size: 14px;
+                color: gray;
+                margin-bottom: 5px;
+            }
+
+            .price-box {
+                font-size: 14px;
+                display: flex;
+                gap: 10px;
+                margin-bottom: 5px;
+
+                .actual-price {
+                    font-size: 14px;
+                    text-decoration: line-through;
+                    color: #f87171;
+                    font-family: "latoBold";
+                }
+
+                .offer-price {
+                    font-size: 14px;
+                    color: var(--ion-color-primary);
+                    font-family: "latoBold";
+                }
+            }
+        }
+
+        .cart-btn {
+            position: absolute;
+            bottom: 5px;
+            height: 25px;
+            width: calc(100% - 60px);
+            background-color: var(--ion-color-secondary);
+            // margin-top: 40px;
+            margin-left: auto;
+            margin-right: auto;
+            // position: relative;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            left: 20%;
+            box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+      
+            label {
+              font-family: "latoBold";
+          color: white;
+          font-size: 16px;
+            }
+      
+            .less-btn,
+            .add-btn {
+              height: 25px;
+              width: 25px;
+              border: none;
+              background-color: #fff;
+              color: #000;
+              border-radius: 5px;
+              font-family: "latoBold";
+              font-size: 18px;
+            }
+        }
+    }
+}
+
+.ribbon-2 {
+    --f: 10px; /* control the folded part*/
+    --r: 15px; /* control the ribbon shape */
+    --t: 10px; /* the top offset */
+
+    position: absolute;
+    inset: var(--t) calc(-1 * var(--f)) auto auto;
+    padding: 6px 10px var(--f) calc(10px + var(--r));
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - var(--f)),
+        calc(100% - var(--f)) 100%,
+        calc(100% - var(--f)) calc(100% - var(--f)),
+        0 calc(100% - var(--f)),
+        var(--r) calc(50% - var(--f) / 2)
+    );
+    background: #bd1550;
+    box-shadow: 0 calc(-1 * var(--f)) 0 inset #0005;
+
+    font-size: 14px;
+    padding-right: 15px !important;
+    color: white;
+    font-family: 'latoBold';
+}
+
+.box {
+    background: lightblue;
+    position: relative;
+}

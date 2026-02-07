@@ -1,0 +1,73 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Confirm Payment and Order</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding class="content">
+  <div>
+    <ion-row class="delivery-location">
+      <ion-col size="12" class="delivering-to"> Delivering To </ion-col>
+    </ion-row>
+    <ion-row class="location">
+      <ion-item [routerLink]="['/location-setup']">
+        <ion-avatar aria-hidden="true" slot="start">
+          <img alt="" src="../../../assets/office.png" />
+        </ion-avatar>
+        <ion-row style="width: 100%;" class="row-container">
+          <ion-col size="12">
+
+            <ion-label class="addr-title">Office/Others</ion-label>
+          </ion-col>
+          <ion-col size="12">
+            <ion-label>123, 3rd street, Ghandhi Nagar, Sivaganga </ion-label>
+
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-row>
+
+    <div class="payable-amt-container">
+      <ion-row>
+        <ion-col size="8" class="title">Payable Amount (Rs.)</ion-col>
+        <ion-col size="4" class="amt">20000.00</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col class="amt-ins" size="12">Kindly keep exact change for payable amount. Thanks</ion-col>
+      </ion-row>
+    </div>
+
+    <div class="payable-amt-container">
+      <ion-row>
+        <ion-col size="12" class="title">Payment Options</ion-col>
+      </ion-row>
+     <ion-row>
+      <ion-list style="width: 100%;">
+        <ion-radio-group value="strawberries">
+          <ion-item>
+            <ion-label>Payment Gateway(Soon...)</ion-label>
+            <ion-radio slot="end" value="PG" [disabled]="true"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>Cash On Delivery</ion-label>
+            <ion-radio slot="end" value="COD"></ion-radio>
+          </ion-item>
+          </ion-radio-group>
+      </ion-list>
+     </ion-row>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <!-- <ion-toolbar> -->
+  <div class="submit-btn">
+    <ion-button expand="block" color="secondary" fill="solid" (click)="confirm()" [routerLink]="['/tabs']">Confirm</ion-button>
+  </div>
+  <!-- </ion-toolbar> -->
+</ion-footer>

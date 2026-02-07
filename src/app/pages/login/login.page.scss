@@ -1,0 +1,53 @@
+ion-header {
+  ion-toolbar {
+    text-align: center;
+    ion-title {
+      font-family: "latoBold";
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+}
+
+ion-content.content {
+  font-family: "latoRegular";
+  --ion-background-color: var(--ion-color-light);
+
+  .credential-box {
+    width: 100%;
+    padding: 50px 20px;
+    background: white;
+    border-radius: 10px;
+    z-index: 1;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
+
+  .main-content {
+    height: 100%;
+    // background: #0d0d41;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .title {
+    text-align: center;
+    color: var(--ion-color-primary);
+    font-size: 30px;
+  }
+
+  .inputs {
+    margin-top: 50px;
+  }
+
+  .bg-div {
+    position: absolute;
+    height: 50%;
+    width: 100%;
+    background-color: #fbab7e;
+    background-image: linear-gradient(62deg, #fbab7e 0%, #f7ce68 100%);
+    top: 0;
+    border-radius: 0 0 10px 10px;
+  }
+}

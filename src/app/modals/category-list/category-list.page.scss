@@ -1,0 +1,138 @@
+.categories-container {
+    // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 10px;
+
+    .container-label {
+      margin-top: 10px;
+
+      ion-label {
+        font-family: "latoBold";
+        font-weight: 600;
+        font-size: 14px;
+      }
+    }
+
+    ion-card {
+      padding: 0px;
+      box-shadow: none;
+
+      //  background-color:  #ffd148; //secondary
+      //  height: 300px;
+      //  overflow: scroll;
+      //   scroll-behavior: smooth;
+      ion-card-content {
+        ion-col>div {
+          background-color: #ffffff;
+          // border: solid 1px #ddd;
+          // padding: 10px;
+          height: 100px;
+          border-radius: 5px;
+
+          .category-img {
+            // style="background-color: green;height:80px;border-radius: 5px;"
+            background-color: green;
+            height: 80px;
+            border-radius: 5px;
+          }
+
+          .category-label {
+            // style="bottom:0;height:30px;font-size: 12px;font-weight:600;text-align: center;"
+            bottom: 0;
+            height: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+
+  .categories-container {
+    padding: 0;
+    // background: rgb(250, 193, 24);
+    // background: linear-gradient(90deg, rgba(250, 193, 24, 1) 0%, rgba(246, 184, 7, 1) 50%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+    // background: url(../../../assets/back.png);
+    // background-size: cover;
+    .start-col {
+      background: var(--ion-color-primary);
+    }
+  
+    .category-img-div {
+      height: 50px;
+      width: 50px;
+      background: gray;
+      border-radius: 5px;
+      transform: rotate(45deg);
+      z-index: 1;
+      position: absolute;
+      top: 14px;
+      left: -32px;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+  
+      img {
+        height: 50px;
+        width: 50px;
+        border-radius: 5px;
+        // transform: rotate(-45deg);
+      }
+    }
+  
+    .category-name-div {
+      height: 80px;
+      width: 98%;
+      border-radius: 50px 5px 5px 50px;
+      position: relative;
+      padding: 10px 0;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+      background: white;
+    }
+  
+    .category-name {
+      font-family: "latoBold";
+    }
+  
+    .category-items {
+      font-size: 12px;
+    }
+  
+    .view-all-arrow {
+      position: absolute;
+      right: -16px;
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background: white;
+      top: 23px;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    ion-row{
+      ion-col{
+        height: 200px;
+        width: 100%;
+  
+        padding: 5px;
+  
+        .category-content{
+          background:#ffecbe;;
+          height: 100%;
+          width: 100%;
+          border-radius: 10px;
+  
+          img{
+            height: 190px;
+            width: 100%;
+            border-radius: 10px;
+          }
+        }
+      }
+    }
+  
+  }
+  

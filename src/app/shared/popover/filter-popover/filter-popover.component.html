@@ -1,0 +1,66 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Filter</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Restaurants</ion-label>
+      <ion-select [(ngModel)]="selectedVendor">
+        <ion-select-option *ngFor="let vendor of vendors" [value]="vendor">{{ vendor.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Price Range</ion-label>
+      <ion-range dualKnobs="true" min="20" max="500" [(ngModel)]="priceRange">
+        <ion-label slot="start">₹{{ priceRange.lower }}</ion-label>
+        <ion-label slot="end">₹{{ priceRange.upper }}</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <ion-item >
+      <ion-label>Offer Type</ion-label>
+      <ion-radio-group [(ngModel)]="offerType">
+        <ion-item>
+          <ion-label>In Percentage</ion-label>
+          <ion-radio slot="start" value="in-percentage"></ion-radio>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-label>In Price</ion-label>
+          <ion-radio slot="start" value="in-price"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-item>
+
+    <ion-item *ngIf="offerType === 'in-percentage'">
+      <ion-label>Offer Percentage Range</ion-label>
+      <ion-range dualKnobs="true" min="0" max="100" [(ngModel)]="offerPercentageRange">
+        <ion-label slot="start">{{ offerPercentageRange.lower }}%</ion-label>
+        <ion-label slot="end">{{ offerPercentageRange.upper }}%</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <ion-item *ngIf="offerType === 'in-price'">
+      <ion-label>Offer Price Range</ion-label>
+      <ion-range dualKnobs="true" min="0" max="500" [(ngModel)]="offerPriceRange">
+        <ion-label slot="start">₹{{ offerPriceRange.lower }}</ion-label>
+        <ion-label slot="end">₹{{ offerPriceRange.upper }}</ion-label>
+      </ion-range>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="clearFilters()">Clear Filters</ion-button>
+      <ion-button (click)="applyFilters()">Apply</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

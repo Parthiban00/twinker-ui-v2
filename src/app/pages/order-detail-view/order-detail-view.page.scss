@@ -1,0 +1,142 @@
+.role-span{
+    font-size: 14px;
+    color: gray;
+}
+
+.custom-lable {
+    white-space: unset !important;
+    line-height: 1;
+}
+
+//shop details
+.shop-details{
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 10px;
+  
+   .shop-thumb{
+    img{
+      border-radius: 10px;
+    }
+   }
+  
+   .shop-title{
+    font-family: 'latoBold';
+   }
+   .shop-description{
+    font-size: 14px;
+    font-family: 'latoRegular';
+    color: var(--ion-color-medium);
+  
+   }
+   .shop-location{
+    font-size: 12px;
+    font-family: "latoRegular";
+  
+    span{
+      img{
+        width: 10px;
+      }
+    }
+   }
+  }
+
+  //cart item details
+  .cart-item-details{
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+  
+    .item-type{
+      img{
+        width: 15px;
+      }
+    }
+  
+    .item-details{
+      padding: 0;
+    }
+  
+    .item-name{
+      font-size: 14px;
+      font-family: "latoBold";
+    }
+  
+    .item-description{
+      font-size: 14px;
+      font-family: "latoRegular";
+      color: var(--ion-color-medium);
+    }
+  
+    .item-price{
+      font-family: 'latoBold';
+      font-size: 14px;
+    }
+  
+    .customize-btn{
+      ion-button {
+      height: fit-content;
+      font-size: 14px;
+  
+    .button-native{
+      padding: 0;
+    }
+      }
+    }
+  
+  
+  
+  .item-qty-adjust-parent{
+    padding: 0;
+  
+    .item-qty-adjust{
+      .qty-selector{
+        display: flex;
+  
+  
+      // position: absolute;
+    //  bottom:16px;
+     right: 10px;
+     height: 30px;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid rgb(248, 120, 14);
+        border-radius:2px;
+        // margin-top:10px;
+        width:fit-content;
+  
+  
+    ion-button{
+      width: 30px;
+    }
+  
+    .ion-label{
+      font-size: 12px;
+    }
+    }
+    }
+  
+    .item-total{
+      font-family: 'latoBold';
+    }
+  
+  }
+  
+  }
+
+  .bill-summary{
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    padding: 10px;
+    .sub-total-text, .delivery-cost-text, .total-amt-text{
+      font-family: 'latoBold';
+    }
+  
+    .sub-total, .delivery-cost, .total-amt{
+      font-family: 'latoBold';
+      text-align: right;
+    }
+  
+    .total-amt, .total-amt-text{
+      font-family: 'latoBold';
+      font-size: 16px;
+    }
+  
+  }
