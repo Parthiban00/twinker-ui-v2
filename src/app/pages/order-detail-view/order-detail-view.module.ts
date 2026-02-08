@@ -15,8 +15,8 @@ import { StatusStepperPageModule } from 'src/app/shared/pages/status-stepper/sta
     FormsModule,
     IonicModule,
     OrderDetailViewPageRoutingModule,
-    StatusStepperPageModule
-  ],
-  declarations: [OrderDetailViewPage]
+    StatusStepperPageModule,
+    OrderDetailViewPage
+  ]
 })
 export class OrderDetailViewPageModule {}

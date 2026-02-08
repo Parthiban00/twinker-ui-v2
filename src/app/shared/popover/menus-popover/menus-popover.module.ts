@@ -13,8 +13,8 @@ import { MenusPopoverPage } from './menus-popover.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    MenusPopoverPageRoutingModule
-  ],
-  imports: [MenusPopoverPage]
+    MenusPopoverPageRoutingModule,
+    MenusPopoverPage
+  ]
 })
 export class MenusPopoverPageModule {}

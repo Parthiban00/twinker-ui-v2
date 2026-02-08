@@ -1,3 +1,5 @@
+@use "../src/theme/theme.scss";
+
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
@@ -24,7 +26,6 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
-@import "../src/theme/theme.scss";
 
 @font-face {
   font-family: "latoRegular";

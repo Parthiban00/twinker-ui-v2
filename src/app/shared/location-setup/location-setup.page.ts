@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, Renderer2, ViewChild, NgZone } from '@angular/core';
 import { GmapsService } from '../../services/gmaps/gmaps.service';
 import { Geolocation } from '@capacitor/geolocation';
 import { LocationService } from './location.service';
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { StorageService } from 'src/app/services/storage.service';
 import { EventBusService } from 'src/app/services/event-bus.service';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-location-setup',
@@ -17,10 +18,7 @@ import { EventBusService } from 'src/app/services/event-bus.service';
 export class LocationSetupPage implements OnInit {
   @ViewChild('map', { static: true }) mapElementRef: ElementRef;
   googleMaps: any;
-  center = {
-    lat: 9.848731,
-    lng: 78.4845096
-  };
+  center = { lat: 9.848731, lng: 78.4845096 };
   currentPositionCoords: any;
   map: any;
   mapClickListener: any;
@@ -34,6 +32,17 @@ export class LocationSetupPage implements OnInit {
   fromPage: string;
   userData: any;
 
+  // Search & autocomplete
+  searchQuery = '';
+  searchFocused = false;
+  predictions: any[] = [];
+  private autocompleteService: any;
+  private placesService: any;
+  private searchDebounceTimer: any;
+
+  // Bottom sheet
+  sheetExpanded = false;
+
   constructor(
     private gmaps: GmapsService,
     private renderer: Renderer2,
@@ -43,7 +52,9 @@ export class LocationSetupPage implements OnInit {
     private fb: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private storageService: StorageService,
-    private eventBus: EventBusService
+    private eventBus: EventBusService,
+    private ngZone: NgZone,
+    private navCtrl: NavController
   ) {
     this.form = this.fb.group({
       locality: ['', [Validators.required]],
@@ -52,8 +63,6 @@ export class LocationSetupPage implements OnInit {
       fullAddress: ['', [Validators.required]],
       coords: [{}, [Validators.required]]
     });
-
-
   }
 
   get formAbstractControl(): { [key: string]: AbstractControl } {
@@ -64,12 +73,9 @@ export class LocationSetupPage implements OnInit {
 
   ionViewWillEnter() {
     this.activatedRoute.queryParams.subscribe(params => {
-      // Access individual query parameters here
       this.fromPage = params.mobileNo;
     });
-
     this.userData = this.storageService.getUser();
-
     this.getLocalities();
   }
 
@@ -77,19 +83,13 @@ export class LocationSetupPage implements OnInit {
     this.locationService.getLocalities().subscribe({
       next: (resdata: any) => {
         if (resdata.status) {
-          if (resdata.data) {
-            this.localities = resdata.data;
-          } else {
-            this.localities = [];
-          }
+          this.localities = resdata.data ? resdata.data : [];
         } else {
           this.commonService.presentToast('bottom', resdata.message, 'danger');
         }
       },
       error: (err: any) => {
         this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching localities!', 'danger');
-      },
-      complete: () => {
       },
     });
   }
@@ -106,14 +106,9 @@ export class LocationSetupPage implements OnInit {
         lat: data.coords.latitude,
         lng: data.coords.longitude
       };
-
       this.loadMap();
-
-      this.form.patchValue({
-        coords: this.currentPositionCoords
-      });
+      this.form.patchValue({ coords: this.currentPositionCoords });
     });
-
   }
 
   async loadMap() {
@@ -122,106 +117,129 @@ export class LocationSetupPage implements OnInit {
       this.googleMaps = googleMaps;
       const mapEl = this.mapElementRef.nativeElement;
       const location = new googleMaps.LatLng(this.currentPositionCoords.lat, this.currentPositionCoords.lng);
+
       this.map = new googleMaps.Map(mapEl, {
         center: location,
-        zoom: 15,
+        zoom: 18,
+        disableDefaultUI: true,
+        zoomControl: false,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
       });
+
       this.renderer.addClass(mapEl, 'visible');
-      this.addMarker(location);
-      this.onMapClick();
-
-
       this.geocoder = new googleMaps.Geocoder();
+
+      // Initialize Places services
+      this.autocompleteService = new googleMaps.places.AutocompleteService();
+      this.placesService = new googleMaps.places.PlacesService(this.map);
+
+      // Reverse geocode current position
       this.reverseGeocode(this.currentPositionCoords.lat, this.currentPositionCoords.lng);
+
+      // Listen for map idle to update address when user pans
+      this.map.addListener('idle', () => {
+        const center = this.map.getCenter();
+        this.ngZone.run(() => {
+          this.form.patchValue({
+            coords: { lat: center.lat(), lng: center.lng() }
+          });
+        });
+        this.reverseGeocode(center.lat(), center.lng());
+      });
 
     } catch (e) {
       console.log(e);
     }
-
-
   }
 
-  //to get address
-  reverseGeocode(latitude, longitude) {
-    console.log('getAddress entered');
-    this.geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results, status) => {
-      if (status === 'OK') {
-        if (results[0]) {
-          console.log('fomatted addres (reverse geocode) ', results[0].formatted_address);
+  reverseGeocode(latitude: number, longitude: number) {
+    this.geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results: any[], status: string) => {
+      if (status === 'OK' && results[0]) {
+        this.ngZone.run(() => {
           this.formattedAddress = results[0].formatted_address;
-
-          this.form.patchValue({
-            fullAddress: this.formattedAddress
-          });
-        } else {
-          window.alert('No results found');
-        }
-      } else {
-        window.alert('Geocoder failed due to: ' + status);
+          this.form.patchValue({ fullAddress: this.formattedAddress });
+        });
       }
-
     });
   }
 
-  onMapClick() {
-    this.mapClickListener = this.googleMaps.event.addListener(this.map, 'click', (mapsMouseEvent) => {
-      console.log(mapsMouseEvent.latLng.toJSON());
-      //  this.addMarker(mapsMouseEvent.latLng);
-    });
-  }
+  // ── Search / Autocomplete ──
 
-  addMarker(location) {
-    const googleMaps: any = this.googleMaps;
-    const icon = {
-      url: 'assets/location_pin.png',
-      scaledSize: new googleMaps.Size(50, 50),
-    };
-    const marker = new googleMaps.Marker({
-      position: location,
-      map: this.map,
-      icon,
-      draggable: false,
-      animation: googleMaps.Animation.DROP,
-    });
-    this.markers.push(marker);
+  onSearchInput() {
+    clearTimeout(this.searchDebounceTimer);
+    const query = this.searchQuery.trim();
 
-    this.map.addListener('drag', (e) => {
-      // console.log(`Current Map Center: ${this.map.getCenter()}`);
-      console.log('current map center - lat ', this.map.getCenter().lat(), ' lng ', this.map.getCenter().lng());
-      //  this.reverseGeocode(this.map.getCenter().lat(), this.map.getCenter().lng());
-      marker.setPosition(this.map.getCenter());
-
-      this.form.patchValue({
-        coords: { lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() }
-      });
-    });
-
-    this.map.addListener('idle', (e) => {
-      // console.log(`Current Map Center: ${this.map.getCenter()}`);
-      //  console.log('current map center - lat ',this.map.getCenter().lat(),' lng ',this.map.getCenter().lng())
-      this.reverseGeocode(this.map.getCenter().lat(), this.map.getCenter().lng());
-      // marker.setPosition(this.map.getCenter());
-    });
-  }
-
-  checkAndRemoveMarker(marker) {
-    const index = this.markers.findIndex(x => x.position.lat() === marker.position.lat() && x.position.lng() === marker.position.lng());
-    console.log('is marker already: ', index);
-    if (index >= 0) {
-      this.markers[index].setMap(null);
-      this.markers.splice(index, 1);
+    if (query.length < 2) {
+      this.predictions = [];
       return;
     }
+
+    this.searchDebounceTimer = setTimeout(() => {
+      if (!this.autocompleteService) return;
+
+      this.autocompleteService.getPlacePredictions(
+        {
+          input: query,
+          componentRestrictions: { country: 'in' },
+        },
+        (predictions: any[], status: string) => {
+          this.ngZone.run(() => {
+            this.predictions = (status === 'OK' && predictions) ? predictions : [];
+          });
+        }
+      );
+    }, 300);
   }
 
-  // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
-  ngOnDestroy() {
-    // this.googleMaps.event.removeAllListeners();
-    if (this.mapClickListener) { this.googleMaps.event.removeListener(this.mapClickListener); }
-    if (this.markerClickListener) { this.googleMaps.event.removeListener(this.markerClickListener); }
+  selectPrediction(prediction: any) {
+    this.searchQuery = prediction.structured_formatting.main_text;
+    this.predictions = [];
+    this.searchFocused = false;
+
+    // Get place details for coordinates
+    this.placesService.getDetails(
+      { placeId: prediction.place_id, fields: ['geometry'] },
+      (place: any, status: string) => {
+        if (status === 'OK' && place?.geometry?.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const newLocation = new this.googleMaps.LatLng(lat, lng);
+          this.map.panTo(newLocation);
+          this.map.setZoom(16);
+        }
+      }
+    );
   }
+
+  clearSearch(event: Event) {
+    event.preventDefault();
+    this.searchQuery = '';
+    this.predictions = [];
+  }
+
+  onSearchBlur() {
+    setTimeout(() => {
+      this.searchFocused = false;
+      this.predictions = [];
+    }, 200);
+  }
+
+  // ── Navigation ──
+
+  goBack() {
+    this.navCtrl.back();
+  }
+
+  // ── Save ──
 
   saveAddress() {
+    if (!this.sheetExpanded) {
+      this.sheetExpanded = true;
+      return;
+    }
+
     if (this.form.valid) {
       const reqData = this.form.getRawValue();
       // eslint-disable-next-line no-underscore-dangle
@@ -230,11 +248,9 @@ export class LocationSetupPage implements OnInit {
         next: (resdata: any) => {
           if (resdata.status) {
             this.commonService.presentToast('bottom', resdata.message, 'success');
-
             if (resdata.data) {
               this.storageService.saveUser(resdata.data);
             }
-
             if (!this.fromPage) {
               this.router.navigate(['/tabs/']);
               this.emitEvent();
@@ -245,8 +261,6 @@ export class LocationSetupPage implements OnInit {
         },
         error: (err: any) => {
           this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while create address!', 'danger');
-        },
-        complete: () => {
         },
       });
     } else {
@@ -259,4 +273,10 @@ export class LocationSetupPage implements OnInit {
     this.eventBus.emit('address-updated', payload);
   }
 
+  // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
+  ngOnDestroy() {
+    if (this.mapClickListener) { this.googleMaps.event.removeListener(this.mapClickListener); }
+    if (this.markerClickListener) { this.googleMaps.event.removeListener(this.markerClickListener); }
+    clearTimeout(this.searchDebounceTimer);
+  }
 }

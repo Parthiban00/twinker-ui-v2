@@ -288,6 +288,8 @@ export class ItemsPage implements OnInit {
     }
   }
 
+  reset(event: any) {}
+
   handleModalData(productData) {
     // Handle the returned product data here
     console.log('Product data:', productData);

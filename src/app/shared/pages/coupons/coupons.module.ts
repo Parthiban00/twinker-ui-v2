@@ -14,9 +14,9 @@ import { CouponsPage } from './coupons.page';
     FormsModule,
     IonicModule,
     CouponsPageRoutingModule
+  ,CouponsPage
   ], exports: [
     CouponsPage
-  ],
-  declarations: [CouponsPage]
+  ]
 })
 export class CouponsPageModule { }

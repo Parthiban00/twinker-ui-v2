@@ -1,41 +1,133 @@
-<ion-content padding class="content">
-  <div class="map" #map></div>
+<ion-content class="location-content" [scrollY]="false">
 
-  <div class="sign-in-bottom-container">
-    <div class="sign-in-content">
-      <div class="next-btn-container" (click)="saveAddress()">
-        <ion-icon name="arrow-forward"></ion-icon>
-      </div>
-      <div class="title-container">
-        <h3>I'm Here...</h3>
-      </div>
-      <div class="add-container">
-        <p>{{formattedAddress}}</p>
-      </div>
-      <div class="addr-detail-container">
-        <form [formGroup]="form">
-          <ion-list>
-            <ion-item>
-              <ion-select aria-label="Type" formControlName="locality" interface="popover" placeholder="Locality *">
-                <ion-select-option *ngFor="let list of localities"
-                  [value]="list._id">{{list.locality}}</ion-select-option>
-              </ion-select>
-            </ion-item>
-            <ion-item>
-              <ion-select aria-label="Type" formControlName="addressType" interface="popover" placeholder="Address Type *">
-                <ion-select-option value="home">Home</ion-select-option>
-                <ion-select-option value="officeWork">Office/Work</ion-select-option>
-                <ion-select-option value="others">Others</ion-select-option>
-              </ion-select>
-            </ion-item>
-          </ion-list>
+  <!-- Map -->
+  <div class="map-container">
+    <div class="map" #map></div>
 
-          <div class="form-input">
-            <ion-input aria-label="Landmark"  formControlName="landmark" placeholder="Landmark *" class="custom" [maxlength]="20"></ion-input>
-          </div>
-        </form>
+    <!-- Center pin overlay (always centered on map) -->
+    <div class="center-pin">
+      <img src="assets/location_pin.png" alt="pin" />
+    </div>
+  </div>
+
+  <!-- Search Bar Overlay -->
+  <div class="search-overlay">
+    <ion-button class="back-btn" fill="clear" (click)="goBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <div class="search-input-wrap" [class.active]="searchFocused">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input
+        #searchInput
+        type="text"
+        placeholder="Search location..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="searchFocused = true"
+        (blur)="onSearchBlur()"
+        autocomplete="off"
+      />
+      <ion-icon
+        *ngIf="searchQuery"
+        name="close-circle"
+        class="clear-icon"
+        (mousedown)="clearSearch($event)"
+      ></ion-icon>
+    </div>
+  </div>
+
+  <!-- Autocomplete Results -->
+  <div class="autocomplete-results" *ngIf="predictions.length > 0 && searchFocused">
+    <div
+      class="prediction-item"
+      *ngFor="let prediction of predictions"
+      (mousedown)="selectPrediction(prediction)"
+    >
+      <ion-icon name="location-outline" class="pred-icon"></ion-icon>
+      <div class="pred-text">
+        <span class="pred-main">{{ prediction.structured_formatting.main_text }}</span>
+        <span class="pred-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet -->
+  <div class="bottom-sheet" [class.expanded]="sheetExpanded">
+    <!-- Drag Handle -->
+    <div class="drag-handle" (click)="sheetExpanded = !sheetExpanded">
+      <div class="handle-bar"></div>
+    </div>
+
+    <!-- Current Address -->
+    <div class="current-address">
+      <div class="address-icon">
+        <ion-icon name="location" color="danger"></ion-icon>
+      </div>
+      <div class="address-info">
+        <span class="address-label">Current Location</span>
+        <p class="address-text">{{ formattedAddress || 'Fetching address...' }}</p>
       </div>
     </div>
 
+    <!-- Form -->
+    <div class="address-form" *ngIf="sheetExpanded">
+      <form [formGroup]="form">
+        <!-- Locality -->
+        <div class="form-field">
+          <label class="field-label">Locality</label>
+          <ion-select formControlName="locality" interface="popover" placeholder="Select locality">
+            <ion-select-option *ngFor="let list of localities" [value]="list._id">
+              {{ list.locality }}
+            </ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Address Type -->
+        <div class="form-field">
+          <label class="field-label">Address Type</label>
+          <div class="address-type-chips">
+            <div
+              class="type-chip"
+              [class.selected]="form.get('addressType')?.value === 'home'"
+              (click)="form.patchValue({ addressType: 'home' })"
+            >
+              <ion-icon name="home-outline"></ion-icon>
+              <span>Home</span>
+            </div>
+            <div
+              class="type-chip"
+              [class.selected]="form.get('addressType')?.value === 'officeWork'"
+              (click)="form.patchValue({ addressType: 'officeWork' })"
+            >
+              <ion-icon name="briefcase-outline"></ion-icon>
+              <span>Office</span>
+            </div>
+            <div
+              class="type-chip"
+              [class.selected]="form.get('addressType')?.value === 'others'"
+              (click)="form.patchValue({ addressType: 'others' })"
+            >
+              <ion-icon name="navigate-outline"></ion-icon>
+              <span>Other</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Landmark -->
+        <div class="form-field">
+          <label class="field-label">Landmark</label>
+          <div class="input-container">
+            <ion-input formControlName="landmark" placeholder="Nearby landmark" [maxlength]="20"></ion-input>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Save Button -->
+    <ion-button class="save-btn" expand="block" (click)="saveAddress()">
+      <span *ngIf="!sheetExpanded">Confirm Location</span>
+      <span *ngIf="sheetExpanded">Save Address</span>
+    </ion-button>
   </div>
+
 </ion-content>

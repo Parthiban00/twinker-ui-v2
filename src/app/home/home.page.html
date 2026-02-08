@@ -48,25 +48,25 @@
       </div>
     </div>
     <div class="todays-offer-container">
-      <ion-slides [options]="liveOffersSlideOptions" class="ion-margin-top">
-        <ion-slide>
+      <swiper-container [slidesPerView]="1.5" [centeredSlides]="true" [loop]="true" [spaceBetween]="10" class="ion-margin-top">
+        <swiper-slide>
           <ion-card>
             <img src="../../assets/test-banner.jpg" />
           </ion-card>
-        </ion-slide>
+        </swiper-slide>
 
-        <ion-slide>
+        <swiper-slide>
           <ion-card>
             <img src="../../assets/test-banner.jpg" />
           </ion-card>
-        </ion-slide>
+        </swiper-slide>
 
-        <ion-slide>
+        <swiper-slide>
           <ion-card>
             <img src="../../assets/test-banner.jpg" />
           </ion-card>
-        </ion-slide>
-      </ion-slides>
+        </swiper-slide>
+      </swiper-container>
     </div>
     <div class="todays-offers">
       <div class="container-label">

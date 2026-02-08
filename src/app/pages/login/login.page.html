@@ -1,22 +1,33 @@
-<ion-content padding class="content">
-  <div class="main-content">
-    <div class="bg-div"></div>
-
-    <div class="credential-box">
-      <div class="title">Z<span style="color: black;">hi</span>ZOO</div>
-      <form [formGroup]="signInForm">
-        <div class="inputs">
-          <div class="form-input">
-            <ion-input aria-label="Mobile No." formControlName="mobileNo" placeholder="Mobile No." class="custom" [maxlength]="20"></ion-input>
-            <div class="invalid-div" *ngIf="signInForm.get('mobileNo')?.invalid && (signInForm.get('mobileNo')?.dirty || signInForm.get('mobileNo')?.touched)">
-              <small class="invalid" *ngIf="signInForm.get('mobileNo')?.errors?.['required']">Mobile is required!</small>
-          </div>
-          </div>
-        </div>
-        <div class="submit-btn">
-          <ion-button expand="block" color="primary" (click)="requestOTP()" fill="solid">Sign In</ion-button>
-        </div>
-      </form>
+<ion-content class="login-content">
+  <div class="login-wrapper">
+    <!-- Illustration -->
+    <div class="illustration">
+      <img src="assets/otp-illustration.svg" alt="OTP Verification" />
     </div>
+
+    <!-- Title & Subtitle -->
+    <h1 class="page-title">OTP Verification</h1>
+    <p class="page-subtitle">Enter phone number to send one time Password</p>
+
+    <!-- Form -->
+    <form [formGroup]="signInForm">
+      <div class="phone-input-container" [class.focused]="phoneInputFocused">
+        <label class="floating-label">Phone Number</label>
+        <ion-input
+          formControlName="mobileNo"
+          type="tel"
+          placeholder="+91 9999999999"
+          [maxlength]="10"
+          (ionFocus)="phoneInputFocused = true"
+          (ionBlur)="phoneInputFocused = false"
+        ></ion-input>
+      </div>
+      <div class="invalid-div" *ngIf="signInForm.get('mobileNo')?.invalid && (signInForm.get('mobileNo')?.dirty || signInForm.get('mobileNo')?.touched)">
+        <small class="invalid-text" *ngIf="signInForm.get('mobileNo')?.errors?.['required']">Mobile number is required</small>
+        <small class="invalid-text" *ngIf="signInForm.get('mobileNo')?.errors?.['minlength']">Enter a valid 10-digit mobile number</small>
+      </div>
+
+      <ion-button class="continue-btn" expand="block" (click)="requestOTP()">Continue</ion-button>
+    </form>
   </div>
 </ion-content>

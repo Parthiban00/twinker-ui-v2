@@ -7,6 +7,7 @@ export const environment = {
   imageBaseUrl: 'http://localhost:3000/',
   // imageBaseUrl: 'https://momo-api-3z3q.onrender.com/',
   logoUrl:'',
-  googleMapApi:'AIzaSyDeZg09kSkBvFqa4eqfDSsfkL4gARcLQkk'
+  // googleMapApi:'AIzaSyDeZg09kSkBvFqa4eqfDSsfkL4gARcLQkk'
+  googleMapApi: 'AIzaSyC6L2akY6Toq9E0jblJ3tOQCwNM-mjbxCo'
 };
 

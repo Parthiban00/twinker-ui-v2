@@ -13,6 +13,7 @@ import { CommonService } from 'src/app/services/common.service';
 export class LoginPage implements OnInit {
 
   signInForm: FormGroup;
+  phoneInputFocused = false;
 
   constructor(private router: Router, private fb: FormBuilder, private loginService: LoginService, private commonService: CommonService) {
     this.signInForm = this.fb.group({

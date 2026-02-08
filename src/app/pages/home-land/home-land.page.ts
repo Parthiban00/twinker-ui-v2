@@ -29,6 +29,7 @@ export class HomeLandPage implements OnInit {
   imgBaseUrl: string = environment.imageBaseUrl;
   featuredItems: any[] = [];
   popularCuisines: any[] = [];
+  productDetails: any[] = [];
 
   liveOffersSlideOptions = {
     // slidesPerView: 1.5,

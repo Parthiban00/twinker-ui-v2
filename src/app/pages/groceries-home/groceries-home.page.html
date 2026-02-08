@@ -6,25 +6,25 @@
 
 <ion-content>
   <!-- Top Scrollable Cards -->
-  <ion-slides [options]="slideOpts" autoplay="true" loop="true" class="top-slides">
-    <ion-slide>
+  <swiper-container [slidesPerView]="1" [loop]="true" [autoplay]="true" class="top-slides">
+    <swiper-slide>
       <ion-card class="promo-card">
         <img src="../../../assets/banner2.jpg" class="promo-img" />
         <ion-card-content>
           <ion-card-title>Flat 5% Off on imported fruits</ion-card-title>
         </ion-card-content>
       </ion-card>
-    </ion-slide>
-    <ion-slide>
+    </swiper-slide>
+    <swiper-slide>
       <ion-card class="promo-card">
         <img src="assets/img/card2.jpg" class="promo-img" />
         <ion-card-content>
           <ion-card-title>This mango season, bring the party home!</ion-card-title>
         </ion-card-content>
       </ion-card>
-    </ion-slide>
+    </swiper-slide>
     <!-- Add more slides as needed -->
-  </ion-slides>
+  </swiper-container>
 
   <!-- Search Bar -->
   <ion-searchbar placeholder="Search for fruits, vegetables..." class="search-bar"></ion-searchbar>

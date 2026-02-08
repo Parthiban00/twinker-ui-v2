@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 })
 export class HomeMainPage implements OnInit {
   defaultAddress: any;
-  categories: any;
+  categories: any[] = [];
   imgBaseUrl = environment.imageBaseUrl;
   eventMessage: string;
   eventSubscription: Subscription;

@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-coupons',
   templateUrl: './coupons.page.html',
   styleUrls: ['./coupons.page.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
 })
 export class CouponsPage implements OnInit {
 
