@@ -8,6 +8,9 @@ import { CommonService } from 'src/app/services/common.service';
 import { environment } from 'src/environments/environment';
 import { EventBusService } from 'src/app/services/event-bus.service';
 import { Subscription } from 'rxjs';
+import { register } from 'swiper/element/bundle';
+
+register();
 
 @Component({
   selector: 'app-home-main',
@@ -23,45 +26,59 @@ export class HomeMainPage implements OnInit {
   eventSubscription: Subscription;
   todayDate: Date = new Date();
 
-  slideOpts = {
-    initialSlide: 1,
-    speed: 400,
-    autoplay: true,
-  };
-
-
-  liveOffersSlideOptions = {
-    slidesPerView: 1.5,
-    centeredSlides: true,
-    loop: true,
-    spaceBetween: 10,
-    autoplay: true,
-  };
-
-  dailyGroceries = [
-    { name: 'Chicken', image: 'assets/chicken_vector.jpg' },
-    { name: 'Mutton', image: 'assets/mutton_vector.jpg' },
-    { name: 'Fish', image: 'assets/fish.jpg' },
-    { name: 'Sea Foods', image: 'assets/prawn.jpg' },
-    // { name: 'Grab', image: 'assets/grab.jpg' }
+  deals = [
+    {
+      title: "Today's Best Deals",
+      subtitle: 'Off up to 75%',
+      overlayColor: 'rgba(248, 92, 112, 0.85)',
+      image: 'assets/announcement-banner.jpg'
+    },
+    {
+      title: 'Weekly Best Deals',
+      subtitle: 'Off up to 50%',
+      overlayColor: 'rgba(255, 140, 66, 0.85)',
+      image: 'assets/announcement-banner.jpg'
+    },
+    {
+      title: 'Special Offers',
+      subtitle: 'Off up to 60%',
+      overlayColor: 'rgba(74, 91, 245, 0.85)',
+      image: 'assets/announcement-banner.jpg'
+    },
+    {
+      title: 'Flash Sale',
+      subtitle: 'Off up to 40%',
+      overlayColor: 'rgba(45, 188, 182, 0.85)',
+      image: 'assets/announcement-banner.jpg'
+    }
   ];
 
-  constructor(public router: Router, private modalCtrl: ModalController,
-    private storageService: StorageService, private homeService: HomeMainService,
-    private commonService: CommonService, private navController: NavController, private eventBus: EventBusService) { }
+  quickCategories = [
+    { name: 'Near Me', icon: 'location-outline', bgColor: '#FFF0F0', iconColor: '#F85C70' },
+    { name: 'Popular', icon: 'star-outline', bgColor: '#FFF0F0', iconColor: '#F85C70' },
+    { name: 'Discount', icon: 'pricetag-outline', bgColor: '#FFF5F0', iconColor: '#FC5C7D' },
+    { name: '24 Hours', icon: 'time-outline', bgColor: '#FFF0F5', iconColor: '#FC5C7D' },
+    { name: 'Quick Delivery', icon: 'bicycle-outline', bgColor: '#FFF0F0', iconColor: '#F85C70' }
+  ];
+
+  categoryCards = [
+    { name: 'Customer Top Picks', count: 321, color: '#F85C70' },
+    { name: 'Beverages', count: 189, color: '#FF8C42' },
+    { name: 'Fast Food', count: 526, color: '#4A5BF5' },
+    { name: 'Desserts', count: 891, color: '#2DBCB6' }
+  ];
+
+  constructor(
+    public router: Router,
+    private modalCtrl: ModalController,
+    private storageService: StorageService,
+    private homeService: HomeMainService,
+    private commonService: CommonService,
+    private navController: NavController,
+    private eventBus: EventBusService
+  ) {}
 
   ngOnInit() {
-    this.startBannerRotation();
-
-    const list = document.querySelectorAll('.list');
-    const nav = document.querySelector('.navigation');
-    list.forEach(item => item.addEventListener('click', (e: any) => {
-      list.forEach(li => li.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      // e.currentTarget.
-
-    }));
-
     this.eventSubscription = this.eventBus.on('address-updated').subscribe((payload) => {
       this.ionViewWillEnter();
     });
@@ -88,8 +105,8 @@ export class HomeMainPage implements OnInit {
       this.eventSubscription.unsubscribe();
     }
   }
-  getDefaultAddressByUserId(userId: string) {
 
+  getDefaultAddressByUserId(userId: string) {
     this.homeService.getDefaultAddressByUserId(userId).subscribe({
       next: (resdata: any) => {
         if (resdata.status) {
@@ -104,18 +121,14 @@ export class HomeMainPage implements OnInit {
         }
       },
       error: (err: any) => {
-        // eslint-disable-next-line max-len
         this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching default address!', 'danger');
-
         if (err.error.message && err.error.message === 'Address not found') {
           this.router.navigate(['/shared/location-setup']);
         }
       },
-      complete: () => {
-      },
+      complete: () => {},
     });
   }
-
 
   getAllCategoriesByLocality() {
     if (this.defaultAddress) {
@@ -133,17 +146,14 @@ export class HomeMainPage implements OnInit {
           }
         },
         error: (err: any) => {
-          // eslint-disable-next-line max-len
           this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching default address!', 'danger');
         },
-        complete: () => {
-        },
+        complete: () => {},
       });
     } else {
       this.commonService.presentToast('bottom', 'Delivery address not found!', 'danger');
     }
   }
-
 
   getImageSource(addressType: string): string {
     switch (addressType) {
@@ -154,16 +164,12 @@ export class HomeMainPage implements OnInit {
       case 'others':
         return 'assets/others.png';
       default:
-        return 'assets/default.png'; // Optional: a default image if none matches
+        return 'assets/default.png';
     }
   }
 
   goToHome(category: string) {
     this.router.navigate(['/home'], { queryParams: { category } });
-  }
-
-  handleInput(ev: any) {
-    console.log(ev);
   }
 
   async exploreCategories() {
@@ -174,20 +180,8 @@ export class HomeMainPage implements OnInit {
     modal.present();
 
     const { data, role } = await modal.onWillDismiss();
-
     if (role === 'confirm') {
-      // this.message = `Hello, ${data}!`;
+      // handle confirmation
     }
-  }
-
-  startBannerRotation() {
-    const banners = document.querySelectorAll('.banner-image');
-    let currentIndex = 0;
-
-    setInterval(() => {
-      banners[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex + 1) % banners.length;
-      banners[currentIndex].classList.add('active');
-    }, 3000); // Change the image every 3 seconds
   }
 }

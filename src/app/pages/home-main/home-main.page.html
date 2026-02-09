@@ -1,146 +1,161 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>Good Morning Sarah!</ion-title>
-
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon slot="icon-only" name="cart" color="light"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <div class="header-top">
+      <div class="address-section" [routerLink]="['/shared/location-setup']">
+        <span class="address-label">Your current address</span>
+        <div class="address-value" *ngIf="defaultAddress">
+          <span class="elipsis">{{ defaultAddress.fullAddress }}</span>
+          <ion-icon name="chevron-down"></ion-icon>
+        </div>
+      </div>
+      <div class="header-icons">
+        <ion-icon name="heart-outline"></ion-icon>
+        <ion-icon name="notifications-outline"></ion-icon>
+      </div>
+    </div>
+    <div class="search-container">
+      <div class="search-bar">
+        <ion-icon name="search-outline"></ion-icon>
+        <span>What would you like to eat?</span>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding class="content">
-  <div>
-    <div class="location-top" style="position: sticky; top: 0px; background: white; z-index: 11;"
-      *ngIf="defaultAddress">
-      <ion-row class="delivery-location">
-        <ion-col size="12" class="delivering-to"> Delivering To </ion-col>
-      </ion-row>
-      <ion-row class="location">
-        <ion-item [routerLink]="['/location-setup']">
-          <ion-avatar aria-hidden="true" slot="start">
-            <img [alt]="defaultAddress.addressType" [src]="getImageSource(defaultAddress.addressType)" />
-          </ion-avatar>
-          <ion-row style="width: 100%;" class="row-container">
-            <ion-col size="12">
+<ion-content>
 
-              <ion-label class="addr-title">{{ defaultAddress.addressType }}</ion-label>
-            </ion-col>
-            <ion-col size="12">
-              <ion-label>{{defaultAddress.fullAddress}}</ion-label>
-
-            </ion-col>
-          </ion-row>
-        </ion-item>
-      </ion-row>
-
-    </div>
-    <div class="main-container">
-      <div class="announcement-container">
-        <img src="../../../assets/announcement-banner.jpg" />
-      </div>
-    </div>
-
-  <!-- <ion-row class="prl-10 live-offer-row">
-      <ion-col size="8" class="title">Daily Fresh<small>&nbsp;(Live Price - {{todayDate | date:"dd/MM/yyyy"}})</small></ion-col> <ion-col
-        size="4" class="right-btn">
-        <ion-button fill="clear" color="secondary" [routerLink]="['/essentials-home']">Explore All</ion-button>
-      </ion-col>
-    </ion-row> -->
-
-    <!-- <div class="category-section">
-      <ion-list style="background: #efefef;">
-        <div class="category-container">
-          <div class="category-card" *ngFor="let category of dailyGroceries" [routerLink]="['/essentials-home']">
-            <img [src]="category.image" alt="{{category.name}}" />
-            <ion-card-content class="category-card-content">
-              <ion-label>{{category.name}}</ion-label>
-            </ion-card-content>
+  <!-- Banner Deals Carousel -->
+  <div class="banner-carousel">
+    <swiper-container slides-per-view="1.3" space-between="12" pagination="true" autoplay-delay="3000" loop="true">
+      <swiper-slide *ngFor="let deal of deals">
+        <div class="deal-card" [ngStyle]="{'background-image': 'linear-gradient(to right, ' + deal.overlayColor + ' 40%, transparent 100%), url(' + deal.image + ')'}">
+          <div class="deal-text">
+            <h3>{{ deal.title }}</h3>
+            <p>{{ deal.subtitle }}</p>
           </div>
         </div>
-      </ion-list>
-    </div> -->
+      </swiper-slide>
+    </swiper-container>
+  </div>
 
-    <div class="todays-offers">
-      <div class="container-label">
-        <ion-label>Explore your wishes</ion-label>
+  <!-- Wallet Section -->
+  <div class="wallet-section">
+    <div class="wallet-item">
+      <div class="wallet-icon wallet-bg">
+        <ion-icon name="wallet-outline"></ion-icon>
+      </div>
+      <div class="wallet-info">
+        <div class="wallet-title">Your Wallet</div>
+        <div class="wallet-value">Rp699.000</div>
       </div>
     </div>
-    <div class="categories-container">
+    <div class="wallet-divider"></div>
+    <div class="wallet-item">
+      <div class="wallet-icon coins-bg">
+        <ion-icon name="disc-outline"></ion-icon>
+      </div>
+      <div class="wallet-info">
+        <div class="wallet-title">Your Coins</div>
+        <div class="wallet-value">1.200</div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Quick Categories -->
+  <div class="quick-categories-scroll">
+    <div class="quick-category" *ngFor="let cat of quickCategories"
+      [routerLink]="['/home-land']"
+      [queryParams]="{title: cat.name, localityId: defaultAddress?.locality?._id}">
+      <div class="quick-icon" [ngStyle]="{'background-color': cat.bgColor}">
+        <ion-icon [name]="cat.icon" [ngStyle]="{'color': cat.iconColor}"></ion-icon>
+      </div>
+      <span class="quick-label">{{ cat.name }}</span>
+    </div>
+  </div>
+
+  <!-- Explore Categories (from API) -->
+  <div class="explore-section" *ngIf="categories?.length">
+    <div class="section-header">
+      <h2>Explore your wishes</h2>
+    </div>
+    <div class="categories-grid">
       <ion-row>
-        <ion-col size="6" 
-          *ngFor="let list of categories | slice:0:4" [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']" [queryParams]="{categoryId:list._id, localityId:defaultAddress.locality._id}">
+        <ion-col size="6"
+          *ngFor="let list of categories | slice:0:4"
+          [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"
+          [queryParams]="{categoryId:list._id, localityId:defaultAddress?.locality?._id}">
           <div class="category-content">
             <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
           </div>
         </ion-col>
       </ion-row>
-
     </div>
-    <div class="view-all">
-      <ion-button fill="clear" color="secondary" (click)="exploreCategories()">
+    <div class="view-all-btn">
+      <ion-button fill="clear" (click)="exploreCategories()">
         Explore all
         <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
       </ion-button>
     </div>
+  </div>
 
-    <!-- <div class="todays-offers">
-      <div class="container-label">
-        <ion-label>Grocery Mart</ion-label>
+  <!-- Categories Section -->
+  <div class="daily-dishes-section">
+    <div class="section-header">
+      <h2>Categories</h2>
+      <span class="see-all" (click)="exploreCategories()">See all</span>
+    </div>
+    <div class="dishes-grid">
+      <div class="dish-card" *ngFor="let card of categoryCards"
+        [routerLink]="['/home-land']"
+        [queryParams]="{title: card.name, localityId: defaultAddress?.locality?._id}"
+        [ngStyle]="{'background-color': card.color}">
+        <h4>{{ card.name }}</h4>
+        <p>{{ card.count }} Restaurant Already</p>
       </div>
     </div>
-    <div class="banner" [routerLink]="['/groceries-home']">
-      <div class="banner-image active"><img src="../../../assets/fruits-banner.png"></div>
-      <div class="banner-image"><img src="../../../assets/veg-banner-1.png"></div>
-      <div class="banner-image"><img src="../../../assets/diary-banner.png"></div>
-      <div class="banner-image"><img src="../../../assets/organic.png"></div>
-    </div> -->
+  </div>
 
-    <div class="buddy-category-container">
-      <div class="todays-offers">
-        <div class="container-label">
-          <ion-label>MoMo Buddy Services</ion-label>
+  <!-- Buddy Services -->
+  <div class="buddy-section">
+    <div class="section-header">
+      <h2>MoMo Buddy Services</h2>
+    </div>
+    <div class="buddy-grid">
+      <div class="buddy-item">
+        <div class="buddy-icon">
+          <img src="assets/send-items.png" />
         </div>
+        <span>Send/Receive Items</span>
       </div>
-      <div class="buddy-container">
-        <ion-grid style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-        margin: 10px;
-        border-radius: 10px;">
-          <ion-row>
-            <ion-col>
-              <div class="img">
-                <img src="assets/send-items.png" />
-              </div>
-              <div class="title"><ion-label>Send/Receive Items/Packages</ion-label></div>
-            </ion-col>
-            <ion-col>
-              <div class="img"><img src="assets/your-needs.png" /></div>
-              <div class="title"><ion-label>Your needs from anywhere</ion-label></div>
-            </ion-col>
-            <ion-col>
-              <div class="img"> <img src="assets/buddy.png" /></div>
-              <div class="title"><ion-label>Buddy for you (about Me)</ion-label></div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+      <div class="buddy-item">
+        <div class="buddy-icon">
+          <img src="assets/your-needs.png" />
+        </div>
+        <span>Your needs</span>
       </div>
-
+      <div class="buddy-item">
+        <div class="buddy-icon">
+          <img src="assets/buddy.png" />
+        </div>
+        <span>Buddy for you</span>
+      </div>
     </div>
+  </div>
 
-    <div class="categories-container">
-
+  <!-- More Categories -->
+  <div class="more-categories" *ngIf="categories?.length > 4">
+    <div class="categories-grid">
       <ion-row>
         <ion-col size="6"
-          *ngFor="let list of categories | slice:4" [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"  [queryParams]="{storeId:list._id}">
+          *ngFor="let list of categories | slice:4"
+          [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"
+          [queryParams]="{storeId:list._id}">
           <div class="category-content">
             <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
           </div>
         </ion-col>
       </ion-row>
-
     </div>
-
   </div>
+
 </ion-content>

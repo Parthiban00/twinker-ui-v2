@@ -19,9 +19,9 @@ ion-searchbar.custom {
 }
 
 ion-toolbar {
-  --background: var(--ion-color-bg);
+  --background: linear-gradient(135deg, #F85C70 0%, #FC5C7D 100%);
   color: var(--ion-color-light);
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 16px 16px;
 
   ion-title{
     color: var(--ion-color-light);

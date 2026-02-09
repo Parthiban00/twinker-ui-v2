@@ -1,342 +1,875 @@
-ion-toolbar {
-  --background: transparent;
-  --ion-color-base: transparent !important;
+// ==========================================
+// HEADER — transparent → white sticky
+// ==========================================
+ion-header {
+  transition: background 0.3s ease;
 
-  ion-button {
-    background: #ffffff4d;
-    border-radius: 50%;
-  }
-}
-
-.shop-details-bg {
-  height: 220px;
-  width: 100%;
-  position: relative;
-  margin-top: -56px;
-
-  img {
-    height: 300px;
-    width: 100%;
-  }
-
-  .shop-details {
-    position: absolute;
-
-    .shop-name {
-      padding: 0 20px;
-      font-size: 28px;
-      font-weight: 600;
-      color: white;
-    }
-    .shop-desc {
-      padding: 0 20px;
-      font-size: 16px;
-      // font-weight: 600;
-      color: white;
-      margin-top: -60px;
-    }
-  }
-}
-
-.item-list-details {
-  height: 800px;
-  width: 100%;
-  background-color: rgb(255, 255, 255);
-  border-radius: 30px 30px 0 0;
-  margin-top: -28px;
-  position: relative;
-
-  .like-div {
-    position: absolute;
-    top: -23px;
-    right: 25px;
+  ion-toolbar {
+    --background: transparent;
+    --ion-color-base: transparent !important;
+    --border-width: 0 !important;
 
     ion-button {
-      position: absolute;
-      top: 5px;
-      right: -3px;
+      --background: rgba(255, 255, 255, 0.25);
+      --border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      margin: 0 4px;
     }
+  }
 
-    .like-btn-div {
-      width: 50px;
-      height: 50px;
-      img {
-        // box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  .sticky-title {
+    font-family: 'latoBold';
+    font-size: 16px;
+    color: #1a1a1a !important;
+    padding-left: 0;
+  }
+
+  // Sticky-mode overrides
+  &.sticky-active {
+    background: #ffffff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+    ion-toolbar {
+      --background: #ffffff;
+
+      ion-button {
+        --background: #f2f2f2;
       }
     }
   }
+}
 
-  .triangle {
-    position: relative;
-    background-color: white;
-    text-align: left;
-    box-shadow:
-      rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-      rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-  }
-  .triangle:before,
-  .triangle:after {
-    content: "";
-    position: absolute;
-    background-color: inherit;
-  }
-  .triangle,
-  .triangle:before,
-  .triangle:after {
-    width: 30px;
-    height: 30px;
-    border-top-right-radius: 30%;
+// ==========================================
+// STICKY BAR — search + tabs slide down
+// ==========================================
+.sticky-bar {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: #ffffff;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease;
+
+  &.visible {
+    max-height: 120px;
+    opacity: 1;
   }
 
-  .triangle {
-    transform: rotate(-90deg) skewX(-30deg) scale(1, 0.866);
+  .sticky-search {
+    padding: 0 14px;
+
+    .sticky-searchbar {
+      --background: #f5f5f5;
+      --border-radius: 10px;
+      --box-shadow: none;
+      --placeholder-color: #aaa;
+      --icon-color: #aaa;
+      --height: 38px;
+      padding: 0;
+      font-size: 13px;
+    }
   }
-  .triangle:before {
-    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
-  }
-  .triangle:after {
-    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+
+  .sticky-tabs {
+    border-bottom: 1px solid #f0f0f0;
+
+    .tabs-scroll {
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 14px;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .tab-btn {
+      font-family: 'latoBold';
+      font-size: 12px;
+      color: #999;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 14px;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+
+      &.active {
+        color: #F85C70;
+        border-bottom-color: #F85C70;
+      }
+    }
   }
 }
 
-.overlay {
-  position: absolute;
-  background: rgb(0 0 0 / 40%);
-
-  /* center overlay text */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.overlay_1 {
-  left: 0;
-  bottom: 0 !important;
+// ==========================================
+// COVER IMAGE
+// ==========================================
+.cover-image {
   width: 100%;
-  padding: 1rem;
-  height: 100%;
-}
-
-.item-lists {
-  padding: 20px 0;
-
-  .info-section {
-    padding: 0 10px;
-  }
-
-  .rating-star {
-    span {
-      margin-right: 5px;
-      color: orange;
-    }
-  }
-  .checked {
-    color: orange;
-  }
-
-  .rating-count {
-    font-size: 14px;
-    color: orange;
-    // font-weight: 600;
-    span {
-      margin-left: 10px;
-      font-weight: 400;
-      color: gray;
-    }
-  }
-
-  .description {
-    font-size: 14px;
-    color: gray;
-  }
-
-  .delivery-time {
-    font-size: 14px;
-    color: var(--ion-color-medium);
-    display: flex;
-    /* justify-content: center; */
-    align-items: center;
-  }
-
-  .recommended-title-row {
-    margin-top: 10px;
-    padding: 0 10px;
-    background: var(--ion-color-primary);
-
-    .title {
-      color: white;
-    }
-  }
-}
-
-.menu-float-btn {
-  --border-radius: 20px;
-  --background: #22224d;
-  text-transform: capitalize;
-  color: white;
+  height: 240px;
+  margin-top: -56px;
+  overflow: hidden;
 
   img {
-    height: 20px;
-    width: 20px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-ion-item.menu-item {
-  font-family: "latoBold";
+// ==========================================
+// INFO CARD
+// ==========================================
+.info-card {
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  margin-top: -28px;
+  position: relative;
+  z-index: 2;
+  padding: 28px 20px 20px;
+  min-height: 100vh;
 }
 
-ion-row.menu-item-row {
-  ion-col {
-    margin: auto;
-    font-family: "latoBold";
-  }
+// ==========================================
+// FAVORITE BUTTON
+// ==========================================
+.fav-btn-wrap {
+  position: absolute;
+  top: -20px;
+  right: 20px;
+  z-index: 3;
 
-  ion-col:nth-child(2),
-  ion-col:nth-child(3) {
-    font-size: 14px;
-  }
-}
+  .fav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
-ion-toggle {
-  height: 10px;
-  width: 39px;
-  --background: #ddd;
-  --background-checked: #ddd;
-  --handle-background: #eb7769;
-  --handle-background-checked: #95c34e;
-  --handle-width: 20px;
-  --handle-height: 20px;
-  --handle-max-height: auto;
-  --handle-spacing: 0px;
-  --handle-border-radius: 5px;
-  --handle-box-shadow: none;
-  overflow: visible;
-  contain: none;
-  padding: 0;
-}
-
-.veg-img {
-  // margin-right: -10px;
-  height: 20px;
-  width: 20px;
-}
-
-.veg-toggle-col {
-  padding-left: 0;
-}
-
-.main-list {
-  padding: 0 !important;
-}
-
-.menu-popover-container {
-  margin-bottom: 20px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
-
-
-.comment-container {
-  display: flex;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-
-  .avatar-section {
-    margin-right: 10px;
-    
-    ion-avatar {
-      width: 30px;  // Reduced size
-      height: 30px; // Reduced size
+    ion-icon {
+      font-size: 22px;
     }
+  }
+}
+
+// ==========================================
+// RESTAURANT INFO
+// ==========================================
+.restaurant-name {
+  font-family: 'latoBold';
+  font-size: 22px;
+  color: #1a1a1a;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.restaurant-address {
+  font-family: 'latoRegular';
+  font-size: 13px;
+  color: #888888;
+  margin: 0 0 14px;
+}
+
+// ==========================================
+// INFO BADGES
+// ==========================================
+.info-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #f5f5f5;
+    border-radius: 20px;
+    padding: 6px 12px;
+
+    .badge-icon {
+      font-size: 15px;
+      color: #888888;
+
+      &.star {
+        color: #f5a623;
+      }
+    }
+
+    span {
+      font-family: 'latoBold';
+      font-size: 12px;
+      color: #1a1a1a;
+    }
+  }
+}
+
+// ==========================================
+// TAG PILLS
+// ==========================================
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .tag-pill {
+    font-family: 'latoRegular';
+    font-size: 11px;
+    color: #F85C70;
+    border: 1px solid #F85C70;
+    border-radius: 20px;
+    padding: 4px 12px;
+    background: rgba(248, 92, 112, 0.06);
+  }
+}
+
+// ==========================================
+// DISCOUNT SECTION
+// ==========================================
+.discount-section {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+
+  .discount-label {
+    font-family: 'latoBold';
+    font-size: 13px;
+    color: #1a1a1a;
+    margin: 0 0 8px;
+  }
+
+  .discount-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .discount-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+
+      span {
+        font-family: 'latoRegular';
+        font-size: 12px;
+        color: #555;
+      }
+    }
+  }
+}
+
+// ==========================================
+// INLINE SEARCH BAR
+// ==========================================
+.search-bar-inline {
+  margin-bottom: 14px;
+
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 0 14px;
+    height: 44px;
+    transition: box-shadow 0.2s ease;
+
+    &:focus-within {
+      box-shadow: 0 0 0 1.5px #F85C70;
+    }
+
+    .search-icon {
+      font-size: 18px;
+      color: #aaa;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'latoRegular';
+      font-size: 14px;
+      color: #1a1a1a;
+      outline: none;
+      height: 100%;
+
+      &::placeholder {
+        color: #bbb;
+      }
+    }
+
+    .clear-icon {
+      font-size: 18px;
+      color: #ccc;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 8px;
+      transition: color 0.15s;
+
+      &:hover {
+        color: #999;
+      }
+    }
+  }
+}
+
+// ==========================================
+// CATEGORY TABS (inline)
+// ==========================================
+.category-tabs {
+  margin-bottom: 18px;
+  margin-left: -20px;
+  margin-right: -20px;
+  border-bottom: 1px solid #f0f0f0;
+
+  .tabs-scroll {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px;
+    gap: 0;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .tab-btn {
+    font-family: 'latoBold';
+    font-size: 13px;
+    color: #999;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 16px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+
+    &.active {
+      color: #F85C70;
+      border-bottom-color: #F85C70;
+    }
+  }
+}
+
+// ==========================================
+// MOST POPULAR SECTION
+// ==========================================
+.popular-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: 'latoBold';
+  font-size: 17px;
+  color: #1a1a1a;
+  margin: 0 0 14px;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.popular-card {
+  cursor: pointer;
+
+  .popular-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 0.85;
+    border-radius: 14px;
+    overflow: visible;
+    margin-bottom: 16px;
 
     img {
       width: 100%;
       height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
     }
-  }
 
-  .comment-section {
-    flex: 1;
+    .add-btn {
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 28px;
+      background: #ffffff;
+      color: #2ecc71;
+      border: 1px solid #2ecc71;
+      border-radius: 6px;
+      font-family: 'latoBold';
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
 
-    .user-info {
+    .qty-control {
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
+      background: #2ecc71;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 
-      .username {
-        font-weight: bold;
-        margin-right: 10px;
-        font-size: 12px; // Reduced font size
+      .qty-btn {
+        width: 28px;
+        height: 28px;
+        background: #fff;
+        color: #2ecc71;
+        border: 1px solid #2ecc71;
+        font-family: 'latoBold';
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .timestamp {
-        color: gray;
-        font-size: 10px; // Reduced font size
+      .qty-count {
+        font-family: 'latoBold';
+        font-size: 14px;
+        color: #fff;
+        padding: 0 10px;
+        min-width: 14px;
+        text-align: center;
       }
     }
+  }
 
-    .comment-text {
-      margin: 5px 0;
-      font-size: 14px; // Reduced font size
+  .popular-name {
+    font-family: 'latoBold';
+    font-size: 13px;
+    color: #1a1a1a;
+    margin: 0 0 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .popular-desc {
+    font-family: 'latoRegular';
+    font-size: 11px;
+    color: #999;
+    margin: 0 0 4px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .popular-price {
+    font-family: 'latoBold';
+    font-size: 12px;
+    color: #F85C70;
+    margin: 0;
+  }
+}
+
+// ==========================================
+// CATEGORY SECTIONS
+// ==========================================
+.category-section {
+  margin-bottom: 24px;
+  scroll-margin-top: 20px;
+}
+
+// ==========================================
+// ITEM CARD
+// ==========================================
+.item-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f2f2f2;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+
+  .item-type-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+
+    .type-icon {
+      width: 16px;
+      height: 16px;
     }
 
-    .action-buttons {
+    .item-tag {
+      font-family: 'latoBold';
+      font-size: 9px;
+      color: #fff;
+      background: #F85C70;
+      border-radius: 4px;
+      padding: 2px 6px;
+      letter-spacing: 0.3px;
+    }
+  }
+
+  .item-name {
+    font-family: 'latoBold';
+    font-size: 15px;
+    color: #1a1a1a;
+    margin: 0 0 4px;
+    line-height: 1.3;
+  }
+
+  .item-desc {
+    font-family: 'latoRegular';
+    font-size: 12px;
+    color: #999;
+    margin: 0 0 6px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .item-price {
+    font-family: 'latoBold';
+    font-size: 14px;
+    color: #1a1a1a;
+    margin: 0;
+  }
+}
+
+.item-img-wrap {
+  flex: 0 0 auto;
+  width: 100px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .item-img {
+    width: 100px;
+    height: 85px;
+    border-radius: 14px;
+    object-fit: cover;
+  }
+
+  .add-btn {
+    position: absolute;
+    bottom: -10px;
+    width: 70px;
+    height: 28px;
+    background: #ffffff;
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+    border-radius: 6px;
+    font-family: 'latoBold';
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .qty-control {
+    position: absolute;
+    bottom: -10px;
+    display: flex;
+    align-items: center;
+    background: #2ecc71;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      color: #2ecc71;
+      border: 1px solid #2ecc71;
+      font-family: 'latoBold';
+      font-size: 16px;
+      cursor: pointer;
       display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      ion-button {
-        --padding-start: 0;
-        --padding-end: 0;
-        --padding-top: 0;
-        --padding-bottom: 0;
-        --icon-size: 18px; // Reduced icon size
-        margin-right: 10px;
-
-        &.thumbs-up {
-          color: var(--ion-color-primary)// Set thumbs up icon color to green
-        }
-
-        &.thumbs-down{
-          color: var(--ion-color-secondary)
-        }
-
-        span {
-          margin-left: 5px;
-          font-size: 12px; // Reduced font size
-        }
-      }
+    .qty-count {
+      font-family: 'latoBold';
+      font-size: 14px;
+      color: #fff;
+      padding: 0 10px;
+      min-width: 14px;
+      text-align: center;
     }
   }
 }
 
-.submit-btn{
-  background: white;
+// ==========================================
+// NO RESULTS
+// ==========================================
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  color: #bbb;
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-family: 'latoRegular';
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    margin: 0;
+  }
 }
 
+// ==========================================
+// CART BAR
+// ==========================================
+.cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #F85C70, #FC5C7D);
+  padding: 14px 20px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 
-.search-bar {
-  position: sticky;
-  top: -56px;
-  z-index: 11;
-  background: white;
+  &.shifted {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  .cart-bar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .cart-bar-count {
+      font-family: 'latoBold';
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .cart-bar-name {
+      font-family: 'latoRegular';
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .cart-bar-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .cart-bar-price {
+      font-family: 'latoBold';
+      font-size: 16px;
+      color: #fff;
+    }
+
+    ion-icon {
+      font-size: 20px;
+      color: #fff;
+    }
+  }
 }
-.customize-btn{
-  ion-button {
-  height: fit-content;
+
+// ==========================================
+// FLOATING MENU BUTTON
+// ==========================================
+.floating-menu-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  font-family: 'latoBold';
   font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              bottom 0.3s ease;
 
-.button-native{
-  padding: 0;
-}
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &.above-cart {
+    bottom: 76px;
+  }
+
+  &.hidden {
+    transform: translateX(-50%) translateY(80px);
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
-.special-offer-container{
-  background:#27272a !important;
+// ==========================================
+// MENU BACKDROP
+// ==========================================
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 
-  .title{
-    color: white !important;
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
   }
-  .menus-offer-container {
-    background: #27272a !important;
+}
+
+// ==========================================
+// MENU BOTTOM SHEET
+// ==========================================
+.menu-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  padding: 8px 0 0;
+  max-height: 55vh;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+
+  &.open {
+    transform: translateY(0);
+  }
+
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin: 0 auto 12px;
+    cursor: pointer;
+  }
+
+  .sheet-title {
+    font-family: 'latoBold';
+    font-size: 18px;
+    color: #1a1a1a;
+    margin: 0 0 6px;
+    padding: 0 20px;
+  }
+
+  .sheet-list {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 env(safe-area-inset-bottom, 20px);
+
+    .sheet-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+
+      &:active {
+        background: #f8f8f8;
+      }
+
+      &.active {
+        background: rgba(248, 92, 112, 0.06);
+
+        .sheet-item-name {
+          color: #F85C70;
+        }
+
+        .sheet-item-count {
+          background: #F85C70;
+          color: #fff;
+        }
+      }
+
+      .sheet-item-name {
+        font-family: 'latoBold';
+        font-size: 15px;
+        color: #1a1a1a;
+        text-align: left;
+      }
+
+      .sheet-item-count {
+        font-family: 'latoBold';
+        font-size: 12px;
+        color: #888;
+        background: #f0f0f0;
+        border-radius: 12px;
+        padding: 3px 10px;
+        min-width: 28px;
+        text-align: center;
+      }
+    }
   }
 }
