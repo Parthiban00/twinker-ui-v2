@@ -219,7 +219,7 @@
 </div>
 
 <!-- Cart Bar -->
-<div class="cart-bar" *ngIf="cartItems.length" [class.shifted]="showMenuSheet">
+<div class="cart-bar" *ngIf="cartItems.length" [class.shifted]="showMenuSheet" (click)="goToCart()">
   <div class="cart-bar-info">
     <span class="cart-bar-count">{{ cartTotalItems }} {{ cartTotalItems === 1 ? 'Item' : 'Items' }}</span>
     <span class="cart-bar-name">{{ cartFirstItemName }}{{ cartItems.length > 1 ? ' & more' : '' }}</span>

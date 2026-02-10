@@ -8,6 +8,7 @@ import { CartPageRoutingModule } from './cart-routing.module';
 
 import { CartPage } from './cart.page';
 import { ItemCustomisePageModule } from 'src/app/shared/pages/item-customise/item-customise.module';
+import { PaymentPageModule } from '../payment/payment.module';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { ItemCustomisePageModule } from 'src/app/shared/pages/item-customise/ite
     FormsModule,
     IonicModule,
     CartPageRoutingModule,
-    ItemCustomisePageModule
+    ItemCustomisePageModule,
+    PaymentPageModule
   ],
   declarations: [CartPage]
 })

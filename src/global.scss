@@ -654,9 +654,45 @@ ion-modal.item-customise-sheet {
   --border-radius: 20px 20px 0 0;
   --background: #ffffff;
   --box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+
+  // Fix ion-footer visibility in breakpoint sheet modals
+//   .ion-page {
+//     display: flex;
+//     flex-direction: column;
+//     overflow: hidden;
+//   }
+
+//   ion-content {
+//     flex: 1 1 auto;
+//     min-height: 0;
+//   }
+
+//   ion-footer {
+//     flex-shrink: 0;
+//   }
 }
 
 .box {
   background: lightblue;
   position: relative;
+}
+
+// ==========================================
+// PAYMENT CONFIRM FULL-SCREEN MODAL
+// ==========================================
+ion-modal.payment-confirm-modal {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  --background: #ffffff;
+}
+
+// ==========================================
+// ORDER STATUS FULL-SCREEN MODAL
+// ==========================================
+ion-modal.order-status-modal {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  --background: #ffffff;
 }

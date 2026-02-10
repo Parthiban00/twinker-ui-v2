@@ -372,6 +372,7 @@ export class ItemsPage implements OnInit {
   }
 
   saveCartToStorage() {
+    const vendor = this.displayVendor;
     const data = this.cartItems.map((p: any) => ({
       _id: p._id,
       cartItemId: p.cartItemId || null,
@@ -383,7 +384,11 @@ export class ItemsPage implements OnInit {
       dummyImg: p.dummyImg,
       type: p.type,
       customizations: p.customizations || null,
-      customizationSummary: p.customizationSummary || null
+      customizationSummary: p.customizationSummary || null,
+      vendorId: p.vendorId || this.vendorId,
+      vendorName: p.vendorName || vendor.name,
+      vendorImage: p.vendorImage || vendor.profileImgUrl || vendor.dummyImg,
+      vendorCuisine: p.vendorCuisine || vendor.cuisine || vendor.slogan
     }));
     localStorage.setItem('cart-items', JSON.stringify(data));
   }
@@ -568,11 +573,10 @@ export class ItemsPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: ItemCustomisePage,
       componentProps: { data: product },
-      breakpoints: [0, 0.5, 0.85],
-      initialBreakpoint: 0.85,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
       cssClass: 'item-customise-sheet',
-      handle: true,
-      handleBehavior: 'cycle'
+      handle: true
     });
     modal.present();
     const { data, role } = await modal.onWillDismiss();
@@ -583,6 +587,7 @@ export class ItemsPage implements OnInit {
 
   handleModalData(modalData: any) {
     const product = modalData.product;
+    const vendor = this.displayVendor;
     const cartEntry = {
       _id: product._id,
       cartItemId: `${product._id}_${Date.now()}`,
@@ -594,9 +599,17 @@ export class ItemsPage implements OnInit {
       dummyImg: product.dummyImg,
       type: product.type,
       customizations: modalData.customizations,
-      customizationSummary: modalData.customizationSummary
+      customizationSummary: modalData.customizationSummary,
+      vendorId: this.vendorId,
+      vendorName: vendor.name,
+      vendorImage: vendor.profileImgUrl || vendor.dummyImg,
+      vendorCuisine: vendor.cuisine || vendor.slogan
     };
     this.cartItems.push(cartEntry);
     this.saveCartToStorage();
+  }
+
+  goToCart() {
+    this.router.navigate(['/cart']);
   }
 }

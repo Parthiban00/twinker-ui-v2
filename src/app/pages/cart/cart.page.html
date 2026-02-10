@@ -1,246 +1,169 @@
+<!-- Header -->
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>My Cart</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back" color="dark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="cart-title">My Cart</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="heart-outline" color="danger"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="container">
-    <ion-card class="shop-details">
-      <ion-row>
-        <ion-col size="3">
-          <div class="shop-thumb">
-            <img src="../../../assets/cuisine-img.jpg" />
+<ion-content [fullscreen]="true">
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="isCartEmpty">
+    <ion-icon name="cart-outline" class="empty-icon"></ion-icon>
+    <h2 class="empty-title">Your cart is empty</h2>
+    <p class="empty-subtitle">Add items from a restaurant to start your order</p>
+    <button class="browse-btn" (click)="browsRestaurants()">Browse Restaurants</button>
+  </div>
+
+  <div class="cart-content" *ngIf="!isCartEmpty">
+
+    <!-- Delivery Location -->
+    <div class="section-block">
+      <h3 class="section-heading">Delivery location</h3>
+      <div class="delivery-card">
+        <div class="delivery-info">
+          <p class="delivery-distance"><strong>4.6Km distance</strong></p>
+          <p class="delivery-meta">Est. delivery fee 12rb &middot; Delivery in 15 min</p>
+        </div>
+        <button class="link-btn">Change location</button>
+      </div>
+      <div class="action-chips">
+        <button class="chip-btn">Edit address details</button>
+        <button class="chip-btn">Add note</button>
+      </div>
+      <div class="address-box">
+        <p>Gunawarman street No.3, Selong, Kec. Kby. Baru, South Jakarta, Jakarta 12110</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Vendor Groups -->
+    <div class="vendor-group" *ngFor="let group of vendorGroups">
+      <!-- Vendor Header -->
+      <div class="vendor-header" (click)="goToVendor(group.vendorId)">
+        <div class="vendor-avatar">
+          <img [src]="getVendorImage(group)" [alt]="group.vendorName" />
+        </div>
+        <div class="vendor-info">
+          <h4 class="vendor-name">{{ group.vendorName }}</h4>
+          <p class="vendor-cuisine" *ngIf="group.vendorCuisine">{{ group.vendorCuisine }}</p>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="vendor-arrow"></ion-icon>
+      </div>
+
+      <!-- Cart Items -->
+      <div class="cart-item" *ngFor="let item of group.items">
+        <div class="cart-item-left">
+          <div class="item-type-row">
+            <img *ngIf="item.type === 'non-veg'" src="assets/non-veg.png" class="type-icon" />
+            <img *ngIf="item.type === 'veg'" src="assets/veg.png" class="type-icon" />
+            <img *ngIf="item.type === 'egg'" src="assets/egg.png" class="type-icon" />
           </div>
-        </ion-col>
-        <ion-col size="9">
-          <ion-row>
-            <ion-col size="12" class="shop-title">
-              Hottel Vallavan
-            </ion-col>
-            <ion-col size="12" class="shop-description">
-              alsdf alsjdfl alsdjf aflasd fla alsdjf.
-            </ion-col>
-            <ion-col size="12" class="shop-location">
-             <span> <img src="../../../assets/location_pin.png"></span>&nbsp; 123, therku raja veethi, siavaganga.
-            </ion-col>
-          </ion-row>
+          <h4 class="cart-item-name">{{ item.productName }}</h4>
+          <p class="cart-item-customization" *ngIf="item.customizationSummary">{{ item.customizationSummary }}</p>
+          <div class="cart-item-price-row">
+            <span class="cart-item-price">$ {{ (item.price * item.itemCount).toFixed(2) }}</span>
+            <span class="cart-item-original" *ngIf="item.basePrice && item.basePrice !== item.price">
+              $ {{ (item.basePrice * item.itemCount).toFixed(2) }}
+            </span>
+          </div>
+          <div class="cart-item-actions">
+            <div class="qty-control">
+              <button class="qty-btn" (click)="decrementItem(item)">
+                <ion-icon name="remove-outline"></ion-icon>
+              </button>
+              <span class="qty-count">{{ item.itemCount }}</span>
+              <button class="qty-btn" (click)="incrementItem(item)">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
+            </div>
+            <button class="note-btn">Note</button>
+            <button class="heart-btn">
+              <ion-icon name="heart-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+        <div class="cart-item-right">
+          <img [src]="getItemImage(item)" [alt]="item.productName" class="cart-item-img" />
+        </div>
+      </div>
 
-        </ion-col>
-      </ion-row>
+      <!-- Add More -->
+      <div class="add-more-row">
+        <span class="add-more-label">Need anything dishes?</span>
+        <button class="add-more-btn" (click)="goToVendor(group.vendorId)">Add more</button>
+      </div>
 
-    </ion-card>
-  </div>
+      <!-- Per-vendor subtotal (only for multi-vendor) -->
+      <div class="vendor-subtotal" *ngIf="hasMultipleVendors">
+        <span>Subtotal</span>
+        <span class="subtotal-amount">$ {{ group.subtotal.toFixed(2) }}</span>
+      </div>
+    </div>
 
-  <div class="container">
-    <ion-card class="cart-item-details">
+    <div class="divider"></div>
 
-      <ion-row>
-        <ion-col size="1" class="item-type">
+    <!-- Payment Summary -->
+    <div class="section-block">
+      <h3 class="section-heading">Payment summary</h3>
 
-            <img src="assets/non-veg.png"/>
+      <div class="discount-banner">
+        <ion-icon name="pricetags-outline" class="discount-banner-icon"></ion-icon>
+        <span class="discount-banner-text">3 Discounts are applied</span>
+        <ion-icon name="chevron-forward-outline" class="discount-banner-arrow"></ion-icon>
+      </div>
 
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
+      <div class="summary-row">
+        <span>Price</span>
+        <div class="summary-prices">
+          <span class="original-price" *ngIf="totalSaved > 0">$ {{ totalOriginalPrice.toFixed(2) }}</span>
+          <span>$ {{ totalDiscountedPrice.toFixed(2) }}</span>
+        </div>
+      </div>
+      <div class="summary-row">
+        <span>Delivery fee</span>
+        <div class="summary-prices">
+          <span class="original-price">$ 20.00</span>
+          <span class="free-text">Free</span>
+        </div>
+      </div>
+      <div class="summary-row total-row">
+        <span>Total payment</span>
+        <span class="total-amount">$ {{ totalPayment.toFixed(2) }}</span>
+      </div>
+      <button class="view-details-link">View details</button>
+    </div>
 
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
+    <!-- Payment Method -->
+    <div class="payment-method">
+      <ion-icon name="wallet-outline" class="wallet-icon"></ion-icon>
+      <span class="wallet-label">My wallet</span>
+      <ion-icon name="chevron-down-outline" class="wallet-arrow"></ion-icon>
+      <span class="wallet-dot">&middot;</span>
+      <span class="wallet-amount">$ {{ totalPayment.toFixed(2) }}</span>
+    </div>
 
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-    <ion-card class="cart-item-details">
-
-      <ion-row>
-        <ion-col size="1" class="item-type">
-
-            <img src="assets/egg.png"/>
-
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
-
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-    <ion-card class="cart-item-details">
-
-      <ion-row>
-        <ion-col size="1" class="item-type">
-
-            <img src="assets/veg.png"/>
-
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary" id="customise-item">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
-
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-
+    <!-- Savings -->
+    <p class="savings-text" *ngIf="totalSaved > 0">You saved $ {{ totalSaved.toFixed(2) }}</p>
 
   </div>
-
-  <div class="container">
-    <ion-card class="apply-coupon">
-
-<ion-row>
-  <ion-col size="2" class="offer-icon">
-    <img src="assets/offers_black.png" />
-  </ion-col>
-  <ion-col size="7" class="apply-coupon-text">
-    Apply Coupon
-  </ion-col>
-  <ion-col size="3" class="end-arrow">
-    <ion-button fill="clear" color="secondary">
-      <ion-icon name="chevron-forward"></ion-icon>
-    </ion-button>
-  </ion-col>
-</ion-row>
-    </ion-card>
-  </div>
-
-  <div class="container">
-    <ion-card class="bill-summary">
-      <ion-row>
-        <ion-col size="9" class="sub-total-text">
-          Sub Total
-        </ion-col>
-        <ion-col size="3" class="sub-total">
-           9999.00
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="9" class="delivery-cost-text">
-          Delivery Cost
-        </ion-col>
-        <ion-col size="3" class="delivery-cost">
-           30.00
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="9" class="total-amt-text">
-          Total Amount
-        </ion-col>
-        <ion-col size="3" class="total-amt">
-          9999.00
-        </ion-col>
-      </ion-row>
-    </ion-card>
-  </div>
-
-
-  <div class="submit-btn">
-    <ion-button expand="block" color="secondary" fill="solid" (click)="openModal()">Proceed to Pay</ion-button>
-  </div>
-
 
 </ion-content>
 
-<ion-modal #forgot_pwd_modal
-trigger = "customise-item"
-cssClass="inline_modal"
-(ionModalDidDismiss)="reset($event)"
-[breakpoints]="[0.1,0.5,0.9]"
-[initialBreakpoint]="0.5">
-
-<ng-template>
-<app-item-customise></app-item-customise>
-</ng-template>
-
-</ion-modal>
-
+<!-- Footer: Place Order -->
+<ion-footer class="ion-no-border" *ngIf="!isCartEmpty">
+  <div class="footer-wrap">
+    <button class="place-order-btn" (click)="openPaymentModal()">Place order</button>
+  </div>
+</ion-footer>

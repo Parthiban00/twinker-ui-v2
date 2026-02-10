@@ -73,31 +73,6 @@
     </div>
   </div>
 
-  <!-- Explore Categories (from API) -->
-  <!-- <div class="explore-section" *ngIf="categories?.length">
-    <div class="section-header">
-      <h2>Explore your wishes</h2>
-    </div>
-    <div class="categories-grid">
-      <ion-row>
-        <ion-col size="6"
-          *ngFor="let list of categories | slice:0:4"
-          [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"
-          [queryParams]="{categoryId:list._id, localityId:defaultAddress?.locality?._id}">
-          <div class="category-content">
-            <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
-          </div>
-        </ion-col>
-      </ion-row>
-    </div>
-    <div class="view-all-btn">
-      <ion-button fill="clear" (click)="exploreCategories()">
-        Explore all
-        <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
-      </ion-button>
-    </div>
-  </div> -->
-
   <!-- Categories Section -->
   <div class="daily-dishes-section">
     <div class="section-header">
@@ -139,22 +114,6 @@
         </div>
         <span>Buddy for you</span>
       </div>
-    </div>
-  </div>
-
-  <!-- More Categories -->
-  <div class="more-categories" *ngIf="categories?.length > 4">
-    <div class="categories-grid">
-      <ion-row>
-        <ion-col size="6"
-          *ngFor="let list of categories | slice:4"
-          [routerLink]="list.categoryName !== 'Sea Foods' ? ['/home-land'] : ['/essentials-home']"
-          [queryParams]="{storeId:list._id}">
-          <div class="category-content">
-            <img src="{{imgBaseUrl}}{{list.imageUrl}}" />
-          </div>
-        </ion-col>
-      </ion-row>
     </div>
   </div>
 

@@ -1,159 +1,547 @@
-ion-button {
-  img {
-    width: 25px;
-    margin-right: 2px;
+// Colors
+$primary: #F85C70;
+$secondary: #FC5C7D;
+$text-primary: #1a1a1a;
+$text-secondary: #888888;
+$text-muted: #999999;
+$bg-light: #f5f5f5;
+$bg-card: #fafafa;
+$green: #2ecc71;
+
+// Header
+ion-toolbar {
+  --background: #fff;
+  --border-width: 0;
+}
+
+.cart-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 18px;
+  color: $text-primary;
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 72px;
+    color: #ddd;
+    margin-bottom: 20px;
+  }
+
+  .empty-title {
+    font-family: 'latoBold', sans-serif;
+    font-size: 20px;
+    color: $text-primary;
+    margin: 0 0 8px;
+  }
+
+  .empty-subtitle {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: $text-secondary;
+    margin: 0 0 28px;
+  }
+
+  .browse-btn {
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+    font-family: 'latoBold', sans-serif;
+    font-size: 15px;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 36px;
+    cursor: pointer;
   }
 }
 
-.shop-details{
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  border-radius: 10px;
-
- .shop-thumb{
-  img{
-    border-radius: 10px;
-  }
- }
-
- .shop-title{
-  font-family: 'latoBold';
- }
- .shop-description{
-  font-size: 14px;
-  font-family: 'latoRegular';
-  color: var(--ion-color-medium);
-
- }
- .shop-location{
-  font-size: 12px;
-  font-family: "latoRegular";
-
-  span{
-    img{
-      width: 10px;
-    }
-  }
- }
+// Cart Content
+.cart-content {
+  padding-bottom: 20px;
 }
 
-.cart-item-details{
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+// Section Block
+.section-block {
+  padding: 16px;
+}
 
-  .item-type{
-    img{
-      width: 15px;
-    }
+.section-heading {
+  font-family: 'latoBold', sans-serif;
+  font-size: 17px;
+  color: $text-primary;
+  margin: 0 0 14px;
+}
+
+// Delivery Card
+.delivery-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+
+  .delivery-info {
+    flex: 1;
   }
 
-  .item-details{
-    padding: 0;
-  }
-
-  .item-name{
+  .delivery-distance {
+    font-family: 'latoBold', sans-serif;
     font-size: 14px;
-    font-family: "latoBold";
+    color: $text-primary;
+    margin: 0 0 4px;
   }
 
-  .item-description{
-    font-size: 14px;
-    font-family: "latoRegular";
-    color: var(--ion-color-medium);
-  }
-
-  .item-price{
-    font-family: 'latoBold';
-    font-size: 14px;
-  }
-
-  .customize-btn{
-    ion-button {
-    height: fit-content;
-    font-size: 14px;
-
-  .button-native{
-    padding: 0;
-  }
-    }
-  }
-
-.item-qty-adjust-parent{
-  padding: 0;
-
-  .item-qty-adjust{
-    .qty-selector{
-      display: flex;
-
-
-    // position: absolute;
-  //  bottom:16px;
-   right: 10px;
-   height: 30px;
-      justify-content: center;
-      align-items: center;
-      background: #ffffff;
-      border: 1px solid rgb(248, 120, 14);
-      border-radius:2px;
-      // margin-top:10px;
-      width:fit-content;
-
-
-  ion-button{
-    width: 30px;
-  }
-
-  .ion-label{
+  .delivery-meta {
+    font-family: 'latoRegular', sans-serif;
     font-size: 12px;
+    color: $text-secondary;
+    margin: 0;
   }
-  }
-  }
-
-  .item-total{
-    font-family: 'latoBold';
-  }
-
 }
 
+.link-btn {
+  background: none;
+  border: none;
+  color: $primary;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0;
 }
 
-.apply-coupon{
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-  .offer-icon{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// Action Chips
+.action-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 
-    img{
-      width: 30px;
+.chip-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+  cursor: pointer;
+}
+
+// Address Box
+.address-box {
+  background: #FFF0F1;
+  border-radius: 10px;
+  padding: 12px 14px;
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $primary;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Divider
+.divider {
+  height: 8px;
+  background: $bg-light;
+}
+
+// Vendor Group
+.vendor-group {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vendor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  .vendor-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 
-  .apply-coupon-text{
-    font-family: 'latoBold';
-    display: flex;
-    align-items: center;
-
+  .vendor-info {
+    flex: 1;
+    min-width: 0;
   }
 
-  .end-arrow{
+  .vendor-name {
+    font-family: 'latoBold', sans-serif;
+    font-size: 15px;
+    color: $text-primary;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
+  .vendor-cuisine {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: $text-secondary;
+    margin: 2px 0 0;
+  }
+
+  .vendor-arrow {
+    color: $text-muted;
+    font-size: 18px;
+    flex-shrink: 0;
   }
 }
 
-.bill-summary{
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-  padding: 10px;
-  .sub-total-text, .delivery-cost-text, .total-amt-text{
-    font-family: 'latoBold';
-  }
+// Cart Item
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
 
-  .sub-total, .delivery-cost, .total-amt{
-    font-family: 'latoBold';
-    text-align: right;
+  &:last-of-type {
+    border-bottom: none;
   }
+}
 
-  .total-amt, .total-amt-text{
-    font-family: 'latoBold';
+.cart-item-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-type-row {
+  margin-bottom: 4px;
+
+  .type-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.cart-item-name {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: $text-primary;
+  margin: 0 0 4px;
+}
+
+.cart-item-customization {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  margin: 0 0 6px;
+}
+
+.cart-item-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cart-item-price {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.cart-item-original {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-muted;
+  text-decoration: line-through;
+}
+
+// Cart Item Actions
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+
+  ion-icon {
     font-size: 16px;
+    color: $primary;
+  }
+}
+
+.qty-count {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: $text-primary;
+  min-width: 24px;
+  text-align: center;
+}
+
+.note-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 5px 14px;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-primary;
+  cursor: pointer;
+}
+
+.heart-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 20px;
+    color: $text-muted;
+  }
+}
+
+// Cart Item Image
+.cart-item-right {
+  flex-shrink: 0;
+
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+}
+
+// Add More Row
+.add-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 4px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+
+  .add-more-label {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: $text-primary;
   }
 
+  .add-more-btn {
+    background: #fff;
+    border: 1.5px solid $primary;
+    border-radius: 20px;
+    padding: 6px 20px;
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    color: $primary;
+    cursor: pointer;
+  }
+}
+
+// Per-vendor Subtotal
+.vendor-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 0;
+  margin-top: 8px;
+  border-top: 1px dashed #e0e0e0;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: $text-secondary;
+
+  .subtotal-amount {
+    font-family: 'latoBold', sans-serif;
+    color: $text-primary;
+  }
+}
+
+// Payment Summary
+.discount-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFF0F1;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  .discount-banner-icon {
+    font-size: 20px;
+    color: $primary;
+  }
+
+  .discount-banner-text {
+    flex: 1;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: $primary;
+  }
+
+  .discount-banner-arrow {
+    font-size: 18px;
+    color: $primary;
+  }
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: $text-primary;
+
+  .summary-prices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .original-price {
+    color: $text-muted;
+    text-decoration: line-through;
+    font-size: 13px;
+  }
+
+  .free-text {
+    color: $green;
+    font-family: 'latoBold', sans-serif;
+  }
+
+  &.total-row {
+    padding-top: 12px;
+    margin-top: 4px;
+    border-top: 1px solid #eee;
+    font-family: 'latoBold', sans-serif;
+    font-size: 15px;
+
+    .total-amount {
+      font-family: 'latoBold', sans-serif;
+      font-size: 16px;
+    }
+  }
+}
+
+.view-details-link {
+  background: none;
+  border: none;
+  padding: 8px 0 0;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $primary;
+  cursor: pointer;
+}
+
+// Payment Method
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: $bg-card;
+  border-top: 1px solid #f0f0f0;
+
+  .wallet-icon {
+    font-size: 22px;
+    color: $text-primary;
+  }
+
+  .wallet-label {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: $primary;
+  }
+
+  .wallet-arrow {
+    font-size: 14px;
+    color: $primary;
+  }
+
+  .wallet-dot {
+    color: $text-muted;
+    font-size: 18px;
+  }
+
+  .wallet-amount {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: $text-primary;
+    margin-left: auto;
+  }
+}
+
+// Savings
+.savings-text {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $primary;
+  padding: 10px 16px 0;
+  margin: 0;
+}
+
+// Footer
+ion-footer {
+  background: #fff;
+
+  .footer-wrap {
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
+.place-order-btn {
+  width: 100%;
+  background: linear-gradient(135deg, $primary, $secondary);
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 16px;
+  border: none;
+  border-radius: 30px;
+  padding: 14px;
+  cursor: pointer;
 }

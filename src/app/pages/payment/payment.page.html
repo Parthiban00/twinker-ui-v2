@@ -1,73 +1,115 @@
+<!-- Header -->
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="cancel()">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+        <ion-icon slot="icon-only" name="arrow-back" color="dark"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Confirm Payment and Order</ion-title>
+    <ion-title class="payment-title">Confirm Order</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding class="content">
-  <div>
-    <ion-row class="delivery-location">
-      <ion-col size="12" class="delivering-to"> Delivering To </ion-col>
-    </ion-row>
-    <ion-row class="location">
-      <ion-item [routerLink]="['/location-setup']">
-        <ion-avatar aria-hidden="true" slot="start">
-          <img alt="" src="../../../assets/office.png" />
-        </ion-avatar>
-        <ion-row style="width: 100%;" class="row-container">
-          <ion-col size="12">
+<ion-content [scrollY]="true" class="payment-content">
 
-            <ion-label class="addr-title">Office/Others</ion-label>
-          </ion-col>
-          <ion-col size="12">
-            <ion-label>123, 3rd street, Ghandhi Nagar, Sivaganga </ion-label>
-
-          </ion-col>
-        </ion-row>
-      </ion-item>
-    </ion-row>
-
-    <div class="payable-amt-container">
-      <ion-row>
-        <ion-col size="8" class="title">Payable Amount (Rs.)</ion-col>
-        <ion-col size="4" class="amt">20000.00</ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col class="amt-ins" size="12">Kindly keep exact change for payable amount. Thanks</ion-col>
-      </ion-row>
+  <!-- Order Summary Card -->
+  <div class="order-summary-card">
+    <div class="summary-top">
+      <div class="summary-icon-wrap">
+        <ion-icon name="receipt-outline"></ion-icon>
+      </div>
+      <div class="summary-details">
+        <span class="summary-label">Order Total</span>
+        <span class="summary-amount">$ {{ totalAmount.toFixed(2) }}</span>
+      </div>
+      <div class="summary-badge">
+        <span class="badge-text">{{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }}</span>
+      </div>
     </div>
-
-    <div class="payable-amt-container">
-      <ion-row>
-        <ion-col size="12" class="title">Payment Options</ion-col>
-      </ion-row>
-     <ion-row>
-      <ion-list style="width: 100%;">
-        <ion-radio-group value="strawberries">
-          <ion-item>
-            <ion-label>Payment Gateway(Soon...)</ion-label>
-            <ion-radio slot="end" value="PG" [disabled]="true"></ion-radio>
-          </ion-item>
-          <ion-item>
-            <ion-label>Cash On Delivery</ion-label>
-            <ion-radio slot="end" value="COD"></ion-radio>
-          </ion-item>
-          </ion-radio-group>
-      </ion-list>
-     </ion-row>
+    <div class="savings-strip" *ngIf="totalSaved > 0">
+      <ion-icon name="pricetag-outline"></ion-icon>
+      <span>You're saving $ {{ totalSaved.toFixed(2) }} on this order</span>
     </div>
   </div>
+
+  <!-- Delivery Address -->
+  <div class="section">
+    <div class="section-label">
+      <ion-icon name="location-outline" class="section-icon"></ion-icon>
+      <span>Delivering to</span>
+    </div>
+    <div class="address-card">
+      <div class="address-left">
+        <span class="address-tag">
+          <ion-icon name="business-outline"></ion-icon>
+          Office
+        </span>
+        <p class="address-text">{{ deliveryAddress || 'Gunawarman street No.3, Selong, Kec. Kby. Baru, South Jakarta 12110' }}</p>
+      </div>
+      <button class="change-link">Change</button>
+    </div>
+  </div>
+
+  <!-- Payment Method -->
+  <div class="section">
+    <div class="section-label">
+      <ion-icon name="wallet-outline" class="section-icon"></ion-icon>
+      <span>Payment method</span>
+    </div>
+
+    <div class="payment-options">
+      <button
+        *ngFor="let option of paymentOptions"
+        class="payment-option"
+        [class.selected]="selectedPayment === option.id"
+        [class.disabled]="!option.enabled"
+        (click)="selectPayment(option.id)">
+
+        <div class="option-radio">
+          <div class="radio-outer">
+            <div class="radio-inner" *ngIf="selectedPayment === option.id"></div>
+          </div>
+        </div>
+
+        <div class="option-icon-wrap" [class.disabled-icon]="!option.enabled">
+          <ion-icon [name]="option.icon"></ion-icon>
+        </div>
+
+        <div class="option-text">
+          <span class="option-name">{{ option.name }}</span>
+          <span class="option-desc">{{ option.description }}</span>
+        </div>
+
+        <span class="soon-tag" *ngIf="!option.enabled">Soon</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Exact Change Note -->
+  <div class="info-note" *ngIf="selectedPayment === 'COD'">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <span>Please keep exact change ready for the delivery partner</span>
+  </div>
+
 </ion-content>
 
-<ion-footer>
-  <!-- <ion-toolbar> -->
-  <div class="submit-btn">
-    <ion-button expand="block" color="secondary" fill="solid" (click)="confirm()" [routerLink]="['/tabs']">Confirm</ion-button>
+<!-- Footer -->
+<ion-footer class="ion-no-border">
+  <div class="confirm-footer">
+    <div class="footer-top">
+      <span class="footer-total-label">Total</span>
+      <span class="footer-total-amount">$ {{ totalAmount.toFixed(2) }}</span>
+    </div>
+    <button
+      class="confirm-btn"
+      [class.placing]="isPlacing"
+      [disabled]="isPlacing"
+      (click)="confirmOrder()">
+      <span *ngIf="!isPlacing">Confirm & Place Order</span>
+      <span *ngIf="isPlacing" class="placing-text">
+        <ion-spinner name="crescent" class="btn-spinner"></ion-spinner>
+        Placing order...
+      </span>
+    </button>
   </div>
-  <!-- </ion-toolbar> -->
 </ion-footer>

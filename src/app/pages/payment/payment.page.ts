@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
 @Component({
@@ -8,50 +8,54 @@ import { ModalController } from '@ionic/angular';
   standalone: false,
 })
 export class PaymentPage implements OnInit {
+  @Input() totalAmount: number = 0;
+  @Input() totalItems: number = 0;
+  @Input() totalSaved: number = 0;
+  @Input() deliveryAddress: string = '';
+
+  selectedPayment: string = 'COD';
+  isPlacing = false;
 
   paymentOptions = [
     {
-      id: 1,
-      name: 'Payment Gateway(soon...)',
-      type: 'PG',
+      id: 'COD',
+      name: 'Cash on Delivery',
+      description: 'Pay when your order arrives',
+      icon: 'cash-outline',
+      enabled: true
     },
     {
-      id: 2,
-      name: 'Cash On Delevery',
-      type: 'COD',
-    },
-
+      id: 'PG',
+      name: 'Payment Gateway',
+      description: 'Coming soon',
+      icon: 'card-outline',
+      enabled: false
+    }
   ];
 
+  constructor(private modalCtrl: ModalController) {}
 
+  ngOnInit() {}
 
-  constructor(private modalCtrl: ModalController) { }
-
-  ngOnInit() {
+  selectPayment(id: string) {
+    const option = this.paymentOptions.find(o => o.id === id);
+    if (option?.enabled) {
+      this.selectedPayment = id;
+    }
   }
 
   cancel() {
     return this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  confirm() {
-    return this.modalCtrl.dismiss('data', 'confirm');
-  }
-
-  handleInput(ev: any) {
-
-  }
-
-  compareWith(o1, o2) {
-    return o1.id === o2.id;
-  }
-
-  handleChange(ev) {
-    console.log('Current value:', JSON.stringify(ev.target.value));
-  }
-
-  trackItems(index: number, item: any) {
-    return item.id;
+  confirmOrder() {
+    this.isPlacing = true;
+    // Brief visual feedback then dismiss to order status screen
+    setTimeout(() => {
+      this.modalCtrl.dismiss(
+        { paymentMethod: this.selectedPayment, totalAmount: this.totalAmount },
+        'confirm'
+      );
+    }, 400);
   }
 }
-
