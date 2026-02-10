@@ -647,6 +647,15 @@ ion-accordion.accordion-expanded ion-item[slot='header'] {
   font-family: 'latoBold';
 }
 
+// ==========================================
+// ITEM CUSTOMISE SHEET MODAL
+// ==========================================
+ion-modal.item-customise-sheet {
+  --border-radius: 20px 20px 0 0;
+  --background: #ffffff;
+  --box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+}
+
 .box {
   background: lightblue;
   position: relative;

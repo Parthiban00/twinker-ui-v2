@@ -68,6 +68,24 @@ export class HomeMainPage implements OnInit {
     { name: 'Desserts', count: 891, color: '#2DBCB6' }
   ];
 
+  dummyDefaultAddress: any = {
+    _id: 'addr_001',
+    fullAddress: '123 MG Road, Madurai, Tamil Nadu 625001',
+    addressType: 'Home',
+    defaultAddress: true,
+    coords: { lat: 9.9252, lng: 78.1198 },
+    locality: { _id: 'loc_001', name: 'Madurai Central' }
+  };
+
+  dummyCategories: any[] = [
+    { _id: 'cat_01', categoryName: 'Restaurants', imageUrl: '' },
+    { _id: 'cat_02', categoryName: 'Groceries', imageUrl: '' },
+    { _id: 'cat_03', categoryName: 'Sea Foods', imageUrl: '' },
+    { _id: 'cat_04', categoryName: 'Bakery', imageUrl: '' },
+    { _id: 'cat_05', categoryName: 'Fruits & Veggies', imageUrl: '' },
+    { _id: 'cat_06', categoryName: 'Pharmacy', imageUrl: '' }
+  ];
+
   constructor(
     public router: Router,
     private modalCtrl: ModalController,
@@ -117,17 +135,20 @@ export class HomeMainPage implements OnInit {
             this.defaultAddress = null;
           }
         } else {
-          this.commonService.presentToast('bottom', resdata.message, 'danger');
+          this.useDummyData();
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching default address!', 'danger');
-        if (err.error.message && err.error.message === 'Address not found') {
-          this.router.navigate(['/shared/location-setup']);
-        }
+      error: (_err: any) => {
+        // Dummy mode fallback
+        this.useDummyData();
       },
       complete: () => {},
     });
+  }
+
+  private useDummyData() {
+    this.defaultAddress = this.dummyDefaultAddress;
+    this.categories = this.dummyCategories;
   }
 
   getAllCategoriesByLocality() {
@@ -145,13 +166,14 @@ export class HomeMainPage implements OnInit {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
-        error: (err: any) => {
-          this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching default address!', 'danger');
+        error: (_err: any) => {
+          // Dummy mode fallback
+          this.categories = this.dummyCategories;
         },
         complete: () => {},
       });
     } else {
-      this.commonService.presentToast('bottom', 'Delivery address not found!', 'danger');
+      this.categories = this.dummyCategories;
     }
   }
 

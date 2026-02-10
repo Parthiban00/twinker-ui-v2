@@ -1,5 +1,5 @@
 {
   "appId": "com.parthitechs.starter",
   "appName": "E-Commerce",
-  "webDir": "www"
+  "webDir": "www/browser"
 }

@@ -39,8 +39,10 @@ export class LoginPage implements OnInit {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
-        error: (err: any) => {
-          this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while login!', 'danger');
+        error: (_err: any) => {
+          // Dummy mode: skip API, proceed with entered number
+          this.commonService.presentToast('bottom', 'OTP sent (demo mode)', 'success');
+          this.router.navigate(['/otp-verification'], { queryParams: { mobileNo: data.mobileNo } });
         },
         complete: () => {
         },

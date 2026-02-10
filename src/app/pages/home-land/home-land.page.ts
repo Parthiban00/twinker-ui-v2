@@ -97,6 +97,15 @@ export class HomeLandPage implements OnInit {
     }
   ];
 
+  dummyDefaultAddress: any = {
+    _id: 'addr_001',
+    fullAddress: '123 MG Road, Madurai, Tamil Nadu 625001',
+    addressType: 'Home',
+    defaultAddress: true,
+    coords: { lat: 9.9252, lng: 78.1198 },
+    locality: { _id: 'loc_001', name: 'Madurai Central' }
+  };
+
   filters = [
     { name: 'Filter', active: false },
     { name: 'Discount promo', active: false },
@@ -126,12 +135,11 @@ export class HomeLandPage implements OnInit {
         this.pageTitle = params.title;
       }
 
-      if (this.categoryId && this.localityId && userData) {
-        // eslint-disable-next-line no-underscore-dangle
+      if (userData?._id && (this.categoryId || this.localityId)) {
         this.getDefaultAddressByUserId(userData._id);
-      } else if (this.localityId && userData) {
-        // eslint-disable-next-line no-underscore-dangle
-        this.getDefaultAddressByUserId(userData._id);
+      } else {
+        // Dummy mode: use fallback address so dummy vendors display
+        this.defaultAddress = this.dummyDefaultAddress;
       }
 
       if (this.categoryId) {
@@ -151,14 +159,15 @@ export class HomeLandPage implements OnInit {
               this.getAllByLocalityAndCategory(this.localityId, this.categoryId);
             }
           } else {
-            this.defaultAddress = null;
+            this.defaultAddress = this.dummyDefaultAddress;
           }
         } else {
-          this.commonService.presentToast('bottom', resdata.message, 'danger');
+          this.defaultAddress = this.dummyDefaultAddress;
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching default address!', 'danger');
+      error: (_err: any) => {
+        // Dummy mode fallback
+        this.defaultAddress = this.dummyDefaultAddress;
       },
       complete: () => {},
     });
@@ -177,8 +186,8 @@ export class HomeLandPage implements OnInit {
           this.commonService.presentToast('bottom', resdata.message, 'danger');
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching popular cuisines!', 'danger');
+      error: (_err: any) => {
+        this.popularCuisines = [];
       },
       complete: () => {},
     });
@@ -197,8 +206,8 @@ export class HomeLandPage implements OnInit {
           this.commonService.presentToast('bottom', resdata.message, 'danger');
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching featured items!', 'danger');
+      error: (_err: any) => {
+        this.featuredItems = [];
       },
       complete: () => {},
     });
@@ -225,8 +234,8 @@ export class HomeLandPage implements OnInit {
           this.commonService.presentToast('bottom', resdata.message, 'danger');
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching vendor details!', 'danger');
+      error: (_err: any) => {
+        this.vendorDetails = [];
       },
       complete: () => {},
     });
@@ -253,8 +262,8 @@ export class HomeLandPage implements OnInit {
           this.commonService.presentToast('bottom', resdata.message, 'danger');
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching vendor details!', 'danger');
+      error: (_err: any) => {
+        this.vendorDetails = [];
       },
       complete: () => {},
     });

@@ -85,13 +85,21 @@ export class LocationSetupPage implements OnInit {
         if (resdata.status) {
           this.localities = resdata.data ? resdata.data : [];
         } else {
-          this.commonService.presentToast('bottom', resdata.message, 'danger');
+          this.useDummyLocalities();
         }
       },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while fetching localities!', 'danger');
+      error: (_err: any) => {
+        this.useDummyLocalities();
       },
     });
+  }
+
+  private useDummyLocalities() {
+    this.localities = [
+      { _id: 'loc_001', locality: 'Madurai Central' },
+      { _id: 'loc_002', locality: 'Anna Nagar' },
+      { _id: 'loc_003', locality: 'KK Nagar' }
+    ];
   }
 
   // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
@@ -259,8 +267,26 @@ export class LocationSetupPage implements OnInit {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
-        error: (err: any) => {
-          this.commonService.presentToast('bottom', err.error.message ? err.error.message : 'Error while create address!', 'danger');
+        error: (_err: any) => {
+          // Dummy mode: save address locally and proceed
+          const currentUser = this.storageService.getUser() || {};
+          const selectedLocality = this.localities.find(l => l._id === reqData.locality);
+          const dummyAddress = {
+            _id: 'addr_' + Date.now(),
+            fullAddress: reqData.fullAddress || this.formattedAddress || 'Demo Address',
+            addressType: reqData.addressType,
+            defaultAddress: true,
+            coords: reqData.coords,
+            locality: selectedLocality ? { _id: selectedLocality._id, name: selectedLocality.locality } : { _id: 'loc_001', name: 'Madurai Central' }
+          };
+          currentUser.addresses = currentUser.addresses || [];
+          currentUser.addresses.push(dummyAddress);
+          this.storageService.saveUser(currentUser);
+          this.commonService.presentToast('bottom', 'Address saved (demo mode)', 'success');
+          if (!this.fromPage) {
+            this.router.navigate(['/tabs/']);
+            this.emitEvent();
+          }
         },
       });
     } else {

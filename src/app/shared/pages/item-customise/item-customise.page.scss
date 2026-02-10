@@ -1,131 +1,244 @@
-.ion-list{
-  ion-list{
-    ion-thumbnail{
-      height: fit-content;
-      .item-img-not-present{
-        bottom: -18px;
+// ==========================================
+// CONTENT
+// ==========================================
+.customise-content {
+  --background: #ffffff;
+}
+
+// ==========================================
+// ITEM HEADER
+// ==========================================
+.item-header {
+  padding: 20px 20px 16px;
+
+  .item-type-icon {
+    margin-bottom: 8px;
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .item-name {
+    font-family: 'latoBold';
+    font-size: 20px;
+    color: #1a1a1a;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .item-base-price {
+    font-family: 'latoBold';
+    font-size: 15px;
+    color: #1a1a1a;
+    margin: 0 0 8px;
+  }
+
+  .item-description {
+    font-family: 'latoRegular';
+    font-size: 13px;
+    color: #888888;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// ==========================================
+// DIVIDER
+// ==========================================
+.divider {
+  height: 8px;
+  background: #f5f5f5;
+}
+
+// ==========================================
+// GROUP
+// ==========================================
+.group {
+  .group-header {
+    padding: 16px 20px 8px;
+
+    .group-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .group-name {
+      font-family: 'latoBold';
+      font-size: 16px;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    .group-badge {
+      font-family: 'latoBold';
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+
+      &.required {
+        background: rgba(248, 92, 112, 0.1);
+        color: #F85C70;
+      }
+
+      &.optional {
+        background: #f0f0f0;
+        color: #888;
       }
     }
-    .item-details{
-      padding: 0;
+
+    .group-subtitle {
+      font-family: 'latoRegular';
+      font-size: 12px;
+      color: #999;
+      margin: 0;
     }
+  }
+
+  .option-list {
+    padding: 0 20px 8px;
   }
 }
 
-.submit-btn {
-  margin-top: 20px;
-  padding: 5px;
+// ==========================================
+// OPTION ROW
+// ==========================================
+.option-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 
-  ion-button {
-    color: #ffffff;
-    height: 50px;
-    font-weight: 500;
-    --box-shadow: none;
-    --border-radius: 10px;
-  }
-}
-
-.cart-item-details{
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
-  padding: 7px;
-
-  .item-type{
-    img{
-      width: 15px;
-    }
+  &:last-child {
+    border-bottom: none;
   }
 
-  .item-details{
-    padding: 0;
+  &.unavailable {
+    opacity: 0.4;
+    pointer-events: none;
   }
 
-  .item-name{
+  .option-name {
+    flex: 1;
+    font-family: 'latoRegular';
     font-size: 14px;
-    font-family: "latoBold";
+    color: #1a1a1a;
   }
 
-  .item-description{
-    font-size: 14px;
-    font-family: "latoRegular";
-    color: var(--ion-color-medium);
-  }
-
-  .item-price{
-    color: var(--ion-color-secondary);
-    font-size: 14px;
-    font-family: "latoBold";
-  }
-
-  .customize-btn{
-    ion-button {
-    height: fit-content;
-    font-size: 14px;
-
-  .button-native{
-    padding: 0;
-  }
-    }
-  }
-
-
-
-.item-qty-adjust-parent{
-  padding: 0;
-
-  .item-qty-adjust{
-    .qty-selector{
-      display: flex;
-
-
-    // position: absolute;
-  //  bottom:16px;
-   right: 10px;
-   height: 30px;
-      justify-content: center;
-      align-items: center;
-      background: #ffffff;
-      border: 1px solid rgb(248, 120, 14);
-      border-radius:2px;
-      // margin-top:10px;
-      width:fit-content;
-
-
-  ion-button{
-    width: 30px;
-  }
-
-  .ion-label{
-    font-size: 12px;
-  }
-  }
-  }
-
-  .item-total{
+  .option-price {
     font-family: 'latoBold';
+    font-size: 13px;
+    color: #1a1a1a;
+    margin-left: 12px;
+
+    &.free {
+      color: #2ecc71;
+      font-size: 12px;
+    }
+  }
+}
+
+// ==========================================
+// RADIO CIRCLE
+// ==========================================
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+
+  .radio-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #F85C70;
+  }
+}
+
+.option-row:has(.radio-dot) .radio-circle {
+  border-color: #F85C70;
+}
+
+// ==========================================
+// CHECKBOX
+// ==========================================
+.checkbox-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+
+  ion-icon {
+    font-size: 14px;
+    color: #fff;
   }
 
+  &.checked {
+    background: #F85C70;
+    border-color: #F85C70;
+  }
 }
 
-}
+// ==========================================
+// FOOTER
+// ==========================================
+.customise-footer {
+  padding: 12px 20px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: #ffffff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
 
-.trending-tag {
-  ion-col {
+  .add-item-btn {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #F85C70, #FC5C7D);
     display: flex;
-    .tag {
-      height: 18px;
-      width: fit-content;
-      background-color: var(--ion-color-secondary);
-      border-radius: 5px;
-      margin-left: 5px;
-      padding: 0 5px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
 
-    .item-type {
-      height: 18px;
-      width: 18px;
+    .btn-label {
+      font-family: 'latoBold';
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .btn-divider {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 16px;
+    }
+
+    .btn-price {
+      font-family: 'latoBold';
+      font-size: 16px;
+      color: #fff;
     }
   }
 }

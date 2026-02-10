@@ -1,107 +1,62 @@
-<!-- <ion-content> -->
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
-    </ion-buttons>
-    <!-- <ion-title>Welcome</ion-title> -->
-    <ion-buttons slot="end">
-      <ion-button (click)="confirm()" [strong]="true">Apply</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="customise-content" *ngIf="productData">
 
-<ion-content>
-  <div class="ion-list">
-    <div>
-      <!-- <div class="submit-btn">
-          <ion-button expand="block" color="secondary" fill="solid">Apply</ion-button>
-        </div> -->
-      <ion-card class="cart-item-details" *ngIf="productData">
-
-        <ion-row class="trending-tag">
-          <ion-col size="12">
-            <div class="item-type">
-              <img *ngIf="productData.type==='non-veg'" src="assets/non-veg.png" />
-              <img *ngIf="productData.type==='veg'" src="assets/veg.png" />
-              <img *ngIf="productData.type==='egg'" src="assets/egg.png" />
-            </div>
-            <div class="tag" *ngIf="productData.tag !== 'none'">
-              <p style="font-size: 10px; color: white">{{productData.tag | uppercase}}</p>
-            </div>
-          </ion-col>
-          <ion-col size="8" class="item-details">
-            <ion-row>
-              <ion-col size="12" class="item-name">
-                {{productData.productName}}
-              </ion-col>
-              <ion-col size="12" class="item-description">
-                {{productData.description}}
-              </ion-col>
-              <ion-col size="12" class="item-price">
-                Rs: {{productData.price}}
-              </ion-col>
-            </ion-row>
-          </ion-col>
-          <ion-col size="3" class="item-qty-adjust-parent">
-            <ion-row>
-              <ion-col size="12" class="item-qty-adjust">
-                <div class="qty-selector">
-                  <ion-button fill="clear">-</ion-button>
-                  <ion-label>{{productData.itemCount}}</ion-label>
-                  <ion-button fill="clear">+</ion-button>
-
-                </div>
-              </ion-col>
-              <ion-col size="12" class="item-total">
-                Rs: {{productData.price*productData.itemCount}}
-              </ion-col>
-            </ion-row>
-
-          </ion-col>
-        </ion-row>
-      </ion-card>
-
-
-
-      <ion-list lines="none" *ngIf="productData.customizable">
-        <ion-card class="item-list-card">
-          <ion-item style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-            margin: 10px;
-            border-radius: 10px;" *ngFor="let list of productData.customizable">
-
-            <ion-thumbnail slot="end">
-              <ion-button class="item-img-not-present"
-                *ngIf="list.isAvailable&& list.itemCount <=0 ">Add</ion-button>
-              <div class="qty-selector-notimage" *ngIf="list.isAvailable&& list.itemCount">
-                <ion-button fill="clear" [disabled]="!list.itemCount">-</ion-button>
-                <ion-label>{{list.itemCount}}</ion-label>
-                <ion-button fill="clear">+</ion-button>
-              </div>
-            </ion-thumbnail>
-
-            <ion-label class="item-details">
-              <ion-row class="item-name">
-                <ion-col size="12">{{list.productName}} </ion-col>
-              </ion-row>
-              <ion-row class="item-description">
-                  <ion-col size="12"> {{list.description}}</ion-col>
-                </ion-row>
-              <ion-row class="item-price">
-                <ion-col size="12"> Rs. {{list.price}} </ion-col>
-              </ion-row>
-
-              <ion-row *ngIf="!list.isAvailable" class="item-not-available">
-                  <ion-col size="12"> Currently Not Available </ion-col>
-                </ion-row>
-
-
-            </ion-label>
-          </ion-item>
-        </ion-card>
-      </ion-list>
+  <!-- Item Header -->
+  <div class="item-header">
+    <div class="item-type-icon">
+      <img *ngIf="productData.type==='non-veg'" src="assets/non-veg.png" />
+      <img *ngIf="productData.type==='veg'" src="assets/veg.png" />
+      <img *ngIf="productData.type==='egg'" src="assets/egg.png" />
     </div>
+    <h2 class="item-name">{{ productData.productName }}</h2>
+    <p class="item-base-price">$ {{ productData.price.toFixed(2) }}</p>
+    <p class="item-description" *ngIf="productData.description">{{ productData.description }}</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Customization Groups -->
+  <div class="group" *ngFor="let group of productData.customizationGroups">
+    <div class="group-header">
+      <div class="group-title-row">
+        <h3 class="group-name">{{ group.groupName }}</h3>
+        <span class="group-badge required" *ngIf="group.required">Required</span>
+        <span class="group-badge optional" *ngIf="!group.required">Optional</span>
+      </div>
+      <p class="group-subtitle">{{ getGroupSubtitle(group) }}</p>
+    </div>
+
+    <div class="option-list">
+      <div class="option-row"
+           *ngFor="let option of group.options"
+           [class.unavailable]="option.isAvailable === false"
+           (click)="option.isAvailable !== false && (group.type === 'single' ? onSingleSelect(group._id, option._id) : onMultiToggle(group, option._id))">
+
+        <!-- Radio (single) -->
+        <div class="radio-circle" *ngIf="group.type === 'single'">
+          <div class="radio-dot" *ngIf="isSelected(group._id, option._id)"></div>
+        </div>
+
+        <!-- Checkbox (multi) -->
+        <div class="checkbox-box" *ngIf="group.type === 'multi'" [class.checked]="isSelected(group._id, option._id)">
+          <ion-icon name="checkmark" *ngIf="isSelected(group._id, option._id)"></ion-icon>
+        </div>
+
+        <span class="option-name">{{ option.name }}</span>
+        <span class="option-price" *ngIf="option.price > 0">+ $ {{ option.price.toFixed(2) }}</span>
+        <span class="option-price free" *ngIf="option.price === 0">FREE</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
   </div>
 
 </ion-content>
-<!-- </ion-content> -->
+
+<!-- Sticky Footer -->
+<ion-footer class="customise-footer" *ngIf="productData">
+  <button class="add-item-btn" [class.disabled]="!isValid" (click)="confirm()">
+    <span class="btn-label">Add item</span>
+    <span class="btn-divider">|</span>
+    <span class="btn-price">$ {{ totalPrice.toFixed(2) }}</span>
+  </button>
+</ion-footer>

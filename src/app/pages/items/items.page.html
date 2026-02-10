@@ -116,16 +116,29 @@
         <div class="popular-card" *ngFor="let item of filteredPopularItems">
           <div class="popular-img-wrap">
             <img [src]="getItemImage(item)" [alt]="item.productName" />
-            <button class="add-btn" *ngIf="!item.itemCount" (click)="addItem(item)">Add</button>
-            <div class="qty-control" *ngIf="item.itemCount">
-              <button class="qty-btn" (click)="removeItem(item)">-</button>
-              <span class="qty-count">{{ item.itemCount }}</span>
-              <button class="qty-btn" (click)="addItem(item)">+</button>
-            </div>
+
+            <!-- Customizable: always show Add button -->
+            <ng-container *ngIf="isCustomizable(item)">
+              <div class="add-btn-wrap">
+                <button class="add-btn" (click)="addItem(item)">Add</button>
+                <span class="customise-badge" *ngIf="getDisplayCount(item)">{{ getDisplayCount(item) }}</span>
+              </div>
+            </ng-container>
+
+            <!-- Non-customizable: standard +/- -->
+            <ng-container *ngIf="!isCustomizable(item)">
+              <button class="add-btn" *ngIf="!item.itemCount" (click)="addItem(item)">Add</button>
+              <div class="qty-control" *ngIf="item.itemCount">
+                <button class="qty-btn" (click)="removeItem(item)">-</button>
+                <span class="qty-count">{{ item.itemCount }}</span>
+                <button class="qty-btn" (click)="addItem(item)">+</button>
+              </div>
+            </ng-container>
           </div>
           <p class="popular-name">{{ item.productName }}</p>
           <p class="popular-desc">{{ item.description }}</p>
           <p class="popular-price">$ {{ item.price }}</p>
+          <span class="customisable-tag" *ngIf="isCustomizable(item)">Customisable</span>
         </div>
       </div>
     </div>
@@ -148,16 +161,29 @@
             <h4 class="item-name">{{ product.productName }}</h4>
             <p class="item-desc">{{ product.description }}</p>
             <p class="item-price">$ {{ product.price }}</p>
+            <span class="customisable-tag" *ngIf="isCustomizable(product)">Customisable</span>
           </div>
 
           <div class="item-img-wrap">
             <img [src]="getItemImage(product)" [alt]="product.productName" class="item-img" />
-            <button class="add-btn" *ngIf="!product.itemCount" (click)="addItem(product)">Add</button>
-            <div class="qty-control" *ngIf="product.itemCount">
-              <button class="qty-btn" (click)="removeItem(product)">-</button>
-              <span class="qty-count">{{ product.itemCount }}</span>
-              <button class="qty-btn" (click)="addItem(product)">+</button>
-            </div>
+
+            <!-- Customizable: always show Add button with badge -->
+            <ng-container *ngIf="isCustomizable(product)">
+              <div class="add-btn-wrap">
+                <button class="add-btn" (click)="addItem(product)">Add</button>
+                <span class="customise-badge" *ngIf="getDisplayCount(product)">{{ getDisplayCount(product) }}</span>
+              </div>
+            </ng-container>
+
+            <!-- Non-customizable: standard +/- -->
+            <ng-container *ngIf="!isCustomizable(product)">
+              <button class="add-btn" *ngIf="!product.itemCount" (click)="addItem(product)">Add</button>
+              <div class="qty-control" *ngIf="product.itemCount">
+                <button class="qty-btn" (click)="removeItem(product)">-</button>
+                <span class="qty-count">{{ product.itemCount }}</span>
+                <button class="qty-btn" (click)="addItem(product)">+</button>
+              </div>
+            </ng-container>
           </div>
         </div>
 

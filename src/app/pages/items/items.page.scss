@@ -873,3 +873,61 @@ ion-header {
     }
   }
 }
+
+// ==========================================
+// CUSTOMISABLE TAG
+// ==========================================
+.customisable-tag {
+  font-family: 'latoRegular';
+  font-size: 10px;
+  color: #F85C70;
+  display: block;
+  margin-top: 2px;
+}
+
+// ==========================================
+// ADD BUTTON WRAP (for customizable items)
+// ==========================================
+.add-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  .add-btn {
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+  }
+}
+
+.popular-img-wrap .add-btn-wrap {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.item-img-wrap .add-btn-wrap {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.customise-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #F85C70;
+  color: #fff;
+  font-family: 'latoBold';
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}

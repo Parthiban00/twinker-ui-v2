@@ -73,7 +73,28 @@ export class ItemsPage implements OnInit {
     {
       category: { _id: 'main-courses', categoryName: 'Main Courses' },
       products: [
-        { _id: 'm1', productName: "Bottega's Fried Rice", description: 'Orange beans, chicken, tomato, lemon, mushroom, peas pilaf', price: 9.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'popular', dummyImg: 'assets/fried-rice.jpg', customizable: [], itemCount: 0 },
+        {
+          _id: 'm1', productName: "Bottega's Fried Rice", description: 'Orange beans, chicken, tomato, lemon, mushroom, peas pilaf', price: 9.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'popular', dummyImg: 'assets/fried-rice.jpg', customizable: [], itemCount: 0,
+          customizationGroups: [
+            {
+              _id: 'cg-m1-size', groupName: 'Choose Size', type: 'single', required: true,
+              options: [
+                { _id: 'cg-m1-s1', name: 'Regular', price: 0, isDefault: true },
+                { _id: 'cg-m1-s2', name: 'Medium', price: 2.00 },
+                { _id: 'cg-m1-s3', name: 'Large', price: 4.00 },
+              ]
+            },
+            {
+              _id: 'cg-m1-extras', groupName: 'Add Extras', type: 'multi', required: false, maxSelect: 3,
+              options: [
+                { _id: 'cg-m1-e1', name: 'Extra Egg', price: 1.50 },
+                { _id: 'cg-m1-e2', name: 'Extra Chicken', price: 2.50 },
+                { _id: 'cg-m1-e3', name: 'Mushrooms', price: 1.00 },
+                { _id: 'cg-m1-e4', name: 'Spicy Sauce', price: 0 },
+              ]
+            }
+          ]
+        },
         { _id: 'm2', productName: 'Salmon with Bacon', description: 'Fresh salmon fillet wrapped in crispy bacon with herbs', price: 12.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'popular', dummyImg: 'assets/fish.jpg', customizable: [], itemCount: 0 },
         { _id: 'm3', productName: 'Saut\u00e9 Olio With Sambal Matah', description: 'Tuna fish mixed, olive oil, garlic, ginger, chili, rice', price: 8.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/biriyani.jpg', customizable: [], itemCount: 0 },
         { _id: 'm4', productName: 'Chicken Parmigiana', description: 'Breaded chicken cutlet with marinara and mozzarella', price: 10.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'popular', dummyImg: 'assets/chicken.jpg', customizable: [], itemCount: 0 },
@@ -84,7 +105,19 @@ export class ItemsPage implements OnInit {
       products: [
         { _id: 'a1', productName: 'Chicken Lollipop', description: 'Crispy chicken drumettes with sweet chili sauce', price: 6.50, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/chicken.jpg', customizable: [], itemCount: 0 },
         { _id: 'a2', productName: 'Calamari', description: 'Deep fried calamari rings with tartar sauce', price: 7.00, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'popular', dummyImg: 'assets/sea-foods.jpg', customizable: [], itemCount: 0 },
-        { _id: 'a3', productName: 'French Fries with Grated Parmesan', description: 'Crispy fries topped with grated parmesan cheese', price: 5.50, imageUrl: '', isAvailable: true, type: 'veg', tag: 'none', dummyImg: 'assets/meals.jpg', customizable: [], itemCount: 0 },
+        {
+          _id: 'a3', productName: 'French Fries with Grated Parmesan', description: 'Crispy fries topped with grated parmesan cheese', price: 5.50, imageUrl: '', isAvailable: true, type: 'veg', tag: 'none', dummyImg: 'assets/meals.jpg', customizable: [], itemCount: 0,
+          customizationGroups: [
+            {
+              _id: 'cg-a3-portion', groupName: 'Choose Portion', type: 'single', required: true,
+              options: [
+                { _id: 'cg-a3-p1', name: 'Small', price: 0, isDefault: true },
+                { _id: 'cg-a3-p2', name: 'Regular', price: 1.50 },
+                { _id: 'cg-a3-p3', name: 'Large', price: 3.00 },
+              ]
+            }
+          ]
+        },
         { _id: 'a4', productName: 'Nachos Chili Con Carne', description: 'Tortilla chips with spiced beef, cheese, jalapenos', price: 8.00, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/beaf.jpeg', customizable: [], itemCount: 0 },
       ]
     },
@@ -92,7 +125,28 @@ export class ItemsPage implements OnInit {
       category: { _id: 'pizza-pasta', categoryName: 'Pizza & Pasta' },
       products: [
         { _id: 'p1', productName: 'Spaghetti Aglio Olio with Chili', description: 'Spaghetti with garlic, olive oil, chili flakes and grilled chicken', price: 9.00, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/parotta.jpeg', customizable: [], itemCount: 0 },
-        { _id: 'p2', productName: 'Beef Pepperoni Pizza', description: 'Classic pizza with beef pepperoni and mozzarella', price: 11.00, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/beaf.jpeg', customizable: [], itemCount: 0 },
+        {
+          _id: 'p2', productName: 'Beef Pepperoni Pizza', description: 'Classic pizza with beef pepperoni and mozzarella', price: 11.00, imageUrl: '', isAvailable: true, type: 'non-veg', tag: 'none', dummyImg: 'assets/beaf.jpeg', customizable: [], itemCount: 0,
+          customizationGroups: [
+            {
+              _id: 'cg-p2-crust', groupName: 'Choose Crust', type: 'single', required: true,
+              options: [
+                { _id: 'cg-p2-c1', name: 'Classic Hand Tossed', price: 0, isDefault: true },
+                { _id: 'cg-p2-c2', name: 'Thin Crust', price: 0 },
+                { _id: 'cg-p2-c3', name: 'Cheese Burst', price: 3.00 },
+              ]
+            },
+            {
+              _id: 'cg-p2-toppings', groupName: 'Extra Toppings', type: 'multi', required: false, maxSelect: 4,
+              options: [
+                { _id: 'cg-p2-t1', name: 'Extra Cheese', price: 2.00 },
+                { _id: 'cg-p2-t2', name: 'Jalapenos', price: 1.00 },
+                { _id: 'cg-p2-t3', name: 'Olives', price: 1.00 },
+                { _id: 'cg-p2-t4', name: 'Onions', price: 0.50 },
+              ]
+            }
+          ]
+        },
         { _id: 'p3', productName: 'Sauce Mac & Cheese', description: 'Creamy macaroni and cheese baked to perfection', price: 7.50, imageUrl: '', isAvailable: true, type: 'veg', tag: 'none', dummyImg: 'assets/meals.jpg', customizable: [], itemCount: 0 },
       ]
     }
@@ -232,6 +286,10 @@ export class ItemsPage implements OnInit {
     return this.dummyDiscounts;
   }
 
+  isCustomizable(product: any): boolean {
+    return product.customizationGroups?.length > 0;
+  }
+
   selectCategory(categoryId: string) {
     this.selectedCategory = categoryId;
     const el = document.getElementById('section-' + categoryId);
@@ -255,7 +313,7 @@ export class ItemsPage implements OnInit {
   }
 
   addItem(product: any) {
-    if (product.customizable?.length) {
+    if (this.isCustomizable(product)) {
       this.openModal(product);
     } else {
       product.itemCount = (product.itemCount || 0) + 1;
@@ -264,17 +322,40 @@ export class ItemsPage implements OnInit {
   }
 
   removeItem(product: any) {
-    if (product.itemCount > 0) {
-      product.itemCount--;
-      this.syncCart();
+    if (this.isCustomizable(product)) {
+      // Remove last customized cart entry for this product
+      const idx = this.cartItems.map(c => c._id).lastIndexOf(product._id);
+      if (idx > -1) {
+        this.cartItems.splice(idx, 1);
+        this.saveCartToStorage();
+      }
+    } else {
+      if (product.itemCount > 0) {
+        product.itemCount--;
+        this.syncCart();
+      }
     }
+  }
+
+  getCustomizedItemCount(productId: string): number {
+    return this.cartItems.filter(c => c._id === productId && c.cartItemId).reduce((sum, c) => sum + c.itemCount, 0);
+  }
+
+  getDisplayCount(product: any): number {
+    if (this.isCustomizable(product)) {
+      return this.getCustomizedItemCount(product._id);
+    }
+    return product.itemCount || 0;
   }
 
   // --- Cart ---
 
   syncCart() {
     const allProducts = this.displayProducts.flatMap((s: any) => s.products);
-    this.cartItems = allProducts.filter((p: any) => p.itemCount > 0);
+    const simpleItems = allProducts.filter((p: any) => p.itemCount > 0 && !this.isCustomizable(p));
+    // Keep customized entries separately
+    const customizedItems = this.cartItems.filter(c => c.cartItemId);
+    this.cartItems = [...simpleItems, ...customizedItems];
     this.saveCartToStorage();
   }
 
@@ -293,12 +374,16 @@ export class ItemsPage implements OnInit {
   saveCartToStorage() {
     const data = this.cartItems.map((p: any) => ({
       _id: p._id,
+      cartItemId: p.cartItemId || null,
       productName: p.productName,
       price: p.price,
+      basePrice: p.basePrice || p.price,
       itemCount: p.itemCount,
       imageUrl: p.imageUrl,
       dummyImg: p.dummyImg,
-      type: p.type
+      type: p.type,
+      customizations: p.customizations || null,
+      customizationSummary: p.customizationSummary || null
     }));
     localStorage.setItem('cart-items', JSON.stringify(data));
   }
@@ -309,13 +394,20 @@ export class ItemsPage implements OnInit {
     try {
       const saved: any[] = JSON.parse(raw);
       const allProducts = this.displayProducts.flatMap((s: any) => s.products);
-      saved.forEach((item: any) => {
+
+      // Restore simple items
+      saved.filter(item => !item.cartItemId).forEach((item: any) => {
         const match = allProducts.find((p: any) => p._id === item._id);
         if (match) {
           match.itemCount = item.itemCount;
         }
       });
-      this.cartItems = allProducts.filter((p: any) => p.itemCount > 0);
+
+      // Restore customized items
+      const customizedItems = saved.filter(item => item.cartItemId);
+
+      const simpleItems = allProducts.filter((p: any) => p.itemCount > 0 && !this.isCustomizable(p));
+      this.cartItems = [...simpleItems, ...customizedItems];
     } catch (_) {}
   }
 
@@ -475,16 +567,36 @@ export class ItemsPage implements OnInit {
   async openModal(product: any) {
     const modal = await this.modalCtrl.create({
       component: ItemCustomisePage,
-      componentProps: { data: product }
+      componentProps: { data: product },
+      breakpoints: [0, 0.5, 0.85],
+      initialBreakpoint: 0.85,
+      cssClass: 'item-customise-sheet',
+      handle: true,
+      handleBehavior: 'cycle'
     });
     modal.present();
-    const { data } = await modal.onWillDismiss();
-    if (data?.role === 'confirm' && data?.data) {
-      this.handleModalData(data.data);
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'confirm' && data) {
+      this.handleModalData(data);
     }
   }
 
-  handleModalData(productData: any) {
-    console.log('Product data:', productData);
+  handleModalData(modalData: any) {
+    const product = modalData.product;
+    const cartEntry = {
+      _id: product._id,
+      cartItemId: `${product._id}_${Date.now()}`,
+      productName: product.productName,
+      basePrice: product.price,
+      price: modalData.totalPrice,
+      itemCount: 1,
+      imageUrl: product.imageUrl,
+      dummyImg: product.dummyImg,
+      type: product.type,
+      customizations: modalData.customizations,
+      customizationSummary: modalData.customizationSummary
+    };
+    this.cartItems.push(cartEntry);
+    this.saveCartToStorage();
   }
 }
