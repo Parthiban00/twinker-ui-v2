@@ -27,6 +27,22 @@ export class StorageService {
     return {};
   }
 
+  public getItem(key: string): any {
+    const item = window.localStorage.getItem(key);
+    if (item) {
+      try {
+        return JSON.parse(item);
+      } catch {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public setItem(key: string, value: any): void {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  }
+
   public isLoggedIn(): boolean {
     const user = window.localStorage.getItem(USER_KEY);
     if (user) {

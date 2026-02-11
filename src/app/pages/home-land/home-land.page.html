@@ -1,100 +1,254 @@
-<ion-header class="ion-no-border">
+<!-- ============================================ -->
+<!-- 1. CATEGORY-THEMED GRADIENT HEADER           -->
+<!-- ============================================ -->
+<ion-header class="ion-no-border gradient-header"
+  [style.--header-bg]="'linear-gradient(135deg, ' + theme.gradientStart + ', ' + theme.gradientEnd + ')'">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home-main" color="primary"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/home-main" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ pageTitle }}</ion-title>
+    <ion-title color="light">{{ pageTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="light">
+        <ion-icon slot="icon-only" name="heart-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+  <!-- Location indicator -->
+  <div class="location-bar">
+    <ion-icon name="location" class="loc-icon"></ion-icon>
+    <span class="loc-text">{{ defaultAddress?.fullAddress || 'Set your location' }}</span>
+  </div>
+  <!-- Fixed search bar in header -->
+  <div class="header-search-wrap">
+    <div class="search-bar">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input type="text" [placeholder]="theme.searchPlaceholder"
+        [(ngModel)]="searchTerm" (input)="handleSearchInput($event)" />
+      <ion-icon name="close-circle" class="clear-icon"
+        *ngIf="searchTerm" (click)="clearSearch()"></ion-icon>
+    </div>
+  </div>
+  <!-- Fixed filter chips in header -->
+  <div class="header-filter-section">
+    <div class="filter-chips">
+      <div class="chip sort-chip" [class.active]="activeSort !== ''"
+        [style.--accent]="theme.accentColor"
+        (click)="openSortSheet()">
+        <ion-icon name="funnel-outline"></ion-icon>
+        <span>Sort</span>
+      </div>
+      <div class="chip" *ngFor="let chip of theme.filterChips"
+        [class.active]="isFilterActive(chip)"
+        [style.--accent]="theme.accentColor"
+        (click)="toggleFilter(chip)">
+        {{ chip }}
+      </div>
+    </div>
+    <div class="active-filter-bar" *ngIf="hasActiveFilters">
+      <span class="filter-count">{{ activeFilters.length + (activeSort ? 1 : 0) + (selectedCuisine ? 1 : 0) }} active</span>
+      <span class="clear-all" (click)="clearFilters()" [style.color]="theme.accentColor">Clear all</span>
+    </div>
+  </div>
 </ion-header>
 
 <ion-content>
 
-  <!-- Page Intro -->
-  <div class="page-intro">
-    <h1>Dishes near me</h1>
-    <p>Catch delicious eats near you</p>
-  </div>
-
-  <!-- Filter Chips -->
-  <div class="filter-chips">
-    <div class="chip" *ngFor="let filter of filters"
-      [class.active]="filter.active" (click)="selectFilter(filter)">
-      {{ filter.name }}
+  <!-- ============================================ -->
+  <!-- 2. HERO BANNER                                -->
+  <!-- ============================================ -->
+  <div class="hero-section" [style.background]="theme.bgTint">
+    <div class="hero-content">
+      <ion-icon [name]="theme.icon" class="hero-icon" [style.color]="theme.accentColor"></ion-icon>
+      <h1 class="hero-title">{{ theme.heroTitle }}</h1>
+      <p class="hero-subtitle">{{ theme.heroSubtitle }}</p>
     </div>
   </div>
 
-  <!-- Restaurant List (API data) -->
-  <div class="restaurant-list" *ngIf="vendorDetails?.length; else showDummy">
-    <div class="restaurant-card" *ngFor="let vendor of vendorDetails"
-      [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
-
-      <div class="restaurant-image">
-        <img [src]="imgBaseUrl + vendor.profileImgUrl" [alt]="vendor.name" />
-        <div class="rating-badge">
-          <ion-icon name="star"></ion-icon>
-          <span class="rating-num">4.6</span>
-          <span class="rating-count">(456)</span>
+  <!-- ============================================ -->
+  <!-- 3. CUISINE / SUB-CATEGORY QUICK SCROLL       -->
+  <!-- ============================================ -->
+  <div class="cuisine-scroll">
+    <div class="cuisine-list">
+      <ng-container *ngIf="popularCuisines.length; else dummyCuisineList">
+        <div class="cuisine-chip" *ngFor="let cuisine of popularCuisines"
+          [class.active]="selectedCuisine === cuisine.name"
+          [style.--accent]="theme.accentColor"
+          (click)="selectCuisine(cuisine.name)">
+          <div class="cuisine-icon-wrap">
+            <img [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name"
+              *ngIf="cuisine.imageUrl" class="cuisine-img" />
+            <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji">{{ theme.cuisines[0]?.icon || '🍽️' }}</span>
+          </div>
+          <span class="cuisine-name">{{ cuisine.name }}</span>
         </div>
-      </div>
-
-      <div class="restaurant-info">
-        <div class="info-top">
-          <h3>{{ vendor.name }}</h3>
-          <ion-icon name="heart-outline" class="fav-icon"></ion-icon>
+      </ng-container>
+      <ng-template #dummyCuisineList>
+        <div class="cuisine-chip" *ngFor="let cuisine of theme.cuisines"
+          [class.active]="selectedCuisine === cuisine.name"
+          [style.--accent]="theme.accentColor"
+          (click)="selectCuisine(cuisine.name)">
+          <div class="cuisine-icon-wrap">
+            <span class="cuisine-emoji">{{ cuisine.icon }}</span>
+          </div>
+          <span class="cuisine-name">{{ cuisine.name }}</span>
         </div>
-        <p class="description">{{ vendor.description }}</p>
-        <p class="meta">
-          Start from 49rb
-          <span class="dot"></span>
-          {{ vendor.distance }}Km Distance
-          <span class="dot"></span>
-          Delivery in {{ vendor.approxDeliveryTime }} min
-        </p>
-        <div class="tags">
-          <span class="tag tag-orange">Extra discount</span>
-          <span class="tag tag-pink">Free delivery</span>
-        </div>
-      </div>
-
+      </ng-template>
     </div>
   </div>
 
-  <!-- Dummy Restaurant List -->
-  <ng-template #showDummy>
-    <div class="restaurant-list">
-      <div class="restaurant-card" *ngFor="let vendor of dummyVendors" [routerLink]="['/items']">
+  <!-- ============================================ -->
+  <!-- 5. PROMO DEALS BANNER CAROUSEL               -->
+  <!-- ============================================ -->
+  <div class="deals-section">
+    <div class="deals-scroll">
+      <div class="deal-card" *ngFor="let deal of theme.deals"
+        [style.background]="'linear-gradient(135deg, ' + deal.color + ', ' + deal.color + 'cc)'">
+        <div class="deal-badge">{{ deal.badge }}</div>
+        <h3 class="deal-title">{{ deal.title }}</h3>
+        <p class="deal-subtitle">{{ deal.subtitle }}</p>
+      </div>
+    </div>
+  </div>
 
-        <div class="restaurant-image">
-          <img [src]="vendor.dummyImg" [alt]="vendor.name" />
+  <!-- ============================================ -->
+  <!-- 6. TRENDING VENDORS HORIZONTAL CAROUSEL      -->
+  <!-- ============================================ -->
+  <div class="section-block" *ngIf="trendingVendors.length">
+    <div class="section-header">
+      <h2>Trending near you</h2>
+      <span class="see-all" [style.color]="theme.accentColor">See all</span>
+    </div>
+    <div class="trending-scroll">
+      <div class="trending-card" *ngFor="let vendor of trendingVendors"
+        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
+        <div class="trending-img-wrap">
+          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : vendor.dummyImg"
+            [alt]="vendor.name" />
+          <div class="trending-tag" [style.background]="theme.accentColor">Popular</div>
+        </div>
+        <div class="trending-info">
+          <h4>{{ vendor.name }}</h4>
+          <div class="trending-meta">
+            <ion-icon name="star" class="star-icon"></ion-icon>
+            <span>{{ vendor.rating || '4.5' }}</span>
+            <span class="dot"></span>
+            <span>{{ vendor.approxDeliveryTime || '20' }} min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 7. FEATURED ITEMS QUICK-ADD STRIP            -->
+  <!-- ============================================ -->
+  <div class="section-block" *ngIf="featuredItems.length">
+    <div class="section-header">
+      <h2>Today's specials</h2>
+      <span class="see-all" [style.color]="theme.accentColor" (click)="openFeaturedItemsMoal()">See all</span>
+    </div>
+    <div class="featured-scroll">
+      <div class="featured-card" *ngFor="let item of featuredItems">
+        <div class="featured-img-wrap">
+          <img [src]="imgBaseUrl + item.imageUrl" [alt]="item.name" />
+        </div>
+        <div class="featured-info">
+          <h4>{{ item.name }}</h4>
+          <p class="featured-vendor">{{ item.vendorName || 'Local vendor' }}</p>
+          <div class="featured-bottom">
+            <span class="featured-price">{{ item.price | currency:'INR':'symbol':'1.0-0' }}</span>
+            <button class="add-btn" [style.color]="theme.accentColor"
+              [style.border-color]="theme.accentColor">ADD</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 8. MAIN VENDOR LIST — REDESIGNED CARDS       -->
+  <!-- ============================================ -->
+  <div class="vendor-list-section">
+    <div class="section-header" *ngIf="!isLoading">
+      <h2>All {{ pageTitle }}</h2>
+      <span class="result-count">{{ displayVendors.length }} found</span>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <ng-container *ngIf="isLoading">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3]">
+        <div class="skeleton-img shimmer"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-line w70 shimmer"></div>
+          <div class="skeleton-line w50 shimmer"></div>
+          <div class="skeleton-line w90 shimmer"></div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Vendor cards -->
+    <ng-container *ngIf="!isLoading && displayVendors.length">
+      <div class="vendor-card" *ngFor="let vendor of displayVendors"
+        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
+
+        <!-- Cover image -->
+        <div class="vendor-cover">
+          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : vendor.dummyImg"
+            [alt]="vendor.name" />
+          <!-- Delivery time pill -->
+          <div class="delivery-pill">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ vendor.approxDeliveryTime || '20' }} min</span>
+          </div>
+          <!-- Rating badge -->
           <div class="rating-badge">
             <ion-icon name="star"></ion-icon>
-            <span class="rating-num">{{ vendor.rating }}</span>
-            <span class="rating-count">({{ vendor.ratingCount }})</span>
+            <span>{{ vendor.rating || '4.5' }}</span>
           </div>
+          <!-- Favorite icon -->
+          <ion-icon name="heart-outline" class="fav-heart"></ion-icon>
         </div>
 
-        <div class="restaurant-info">
-          <div class="info-top">
+        <!-- Info below image -->
+        <div class="vendor-info">
+          <div class="vendor-name-row">
             <h3>{{ vendor.name }}</h3>
-            <ion-icon name="heart-outline" class="fav-icon"></ion-icon>
+            <span class="vendor-distance">{{ vendor.distance || '2.5' }} km</span>
           </div>
-          <p class="description">{{ vendor.description }}</p>
-          <p class="meta">
-            Start from {{ vendor.startPrice }}rb
-            <span class="dot"></span>
-            {{ vendor.distance }}Km Distance
-            <span class="dot"></span>
-            Delivery in {{ vendor.approxDeliveryTime }} min
-          </p>
-          <div class="tags">
+          <p class="vendor-desc">{{ vendor.description }}</p>
+          <div class="vendor-tags" *ngIf="vendor.tags?.length">
             <ng-container *ngFor="let tag of vendor.tags">
-              <span class="tag" [ngClass]="tag === 'Free delivery' ? 'tag-pink' : 'tag-orange'">{{ tag }}</span>
+              <span class="vtag" [ngClass]="{
+                'vtag-green': tag.toLowerCase().includes('free'),
+                'vtag-orange': tag.toLowerCase().includes('discount') || tag.toLowerCase().includes('extra'),
+                'vtag-blue': tag.toLowerCase().includes('recommended')
+              }">{{ tag }}</span>
             </ng-container>
           </div>
+          <div class="vendor-offer-strip" *ngIf="vendor.tags?.length"
+            [style.background]="theme.bgTint">
+            <ion-icon name="pricetag-outline" [style.color]="theme.accentColor"></ion-icon>
+            <span [style.color]="theme.accentColor">{{ vendor.tags[0] }}</span>
+          </div>
         </div>
-
       </div>
+    </ng-container>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && !displayVendors.length">
+      <ion-icon [name]="theme.icon" class="empty-icon" [style.color]="theme.accentColor"></ion-icon>
+      <h3 *ngIf="searchTerm">No results for "{{ searchTerm }}"</h3>
+      <h3 *ngIf="!searchTerm">No {{ pageTitle.toLowerCase() }} found nearby</h3>
+      <p>Try adjusting your filters or search</p>
+      <button class="clear-filters-btn" (click)="clearFilters()"
+        [style.background]="theme.accentColor" *ngIf="hasActiveFilters">
+        Clear all filters
+      </button>
     </div>
-  </ng-template>
+  </div>
+
+  <!-- Bottom spacer -->
+  <div style="height: 30px;"></div>
 
 </ion-content>
