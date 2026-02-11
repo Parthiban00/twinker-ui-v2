@@ -1,0 +1,184 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="search-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <div class="search-input-wrap">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <input
+          #searchInput
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchInput()"
+          placeholder="Search food, groceries, medicines..."
+          class="search-input"
+        />
+        <button class="clear-btn" *ngIf="searchTerm" (click)="clearSearch()">
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- ========== INITIAL STATE ========== -->
+  <ng-container *ngIf="!hasSearched && !isLoading">
+
+    <!-- Recent Searches -->
+    <div class="recent-section" *ngIf="recentSearches.length">
+      <div class="section-row">
+        <span class="section-title">Recent searches</span>
+        <span class="clear-all" (click)="clearAllRecent()">Clear all</span>
+      </div>
+      <div class="recent-list">
+        <div class="recent-item" *ngFor="let term of recentSearches; let i = index" (click)="tapRecentSearch(term)">
+          <ion-icon name="time-outline" class="recent-icon"></ion-icon>
+          <span class="recent-text">{{ term }}</span>
+          <button class="recent-remove" (click)="removeRecentSearch(i); $event.stopPropagation()">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browse Categories -->
+    <div class="browse-section">
+      <span class="section-title">Browse categories</span>
+      <div class="pillars-scroll">
+        <div class="pillar-chip" *ngFor="let pillar of servicePillars" (click)="navigatePillar(pillar)">
+          <div class="pillar-chip-icon" [ngStyle]="{'background-color': pillar.bgColor}">
+            <ion-icon [name]="pillar.icon" [ngStyle]="{'color': pillar.accentColor}"></ion-icon>
+          </div>
+          <span class="pillar-chip-name">{{ pillar.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Cuisines -->
+    <div class="cuisine-section">
+      <span class="section-title">Popular cuisines</span>
+      <div class="cuisine-grid">
+        <div class="cuisine-item" *ngFor="let cuisine of cuisineGrid" (click)="navigateCuisine(cuisine)">
+          <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
+            <ion-icon [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+          </div>
+          <span class="cuisine-label">{{ cuisine.name }}</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ========== LOADING STATE ========== -->
+  <ng-container *ngIf="isLoading">
+    <div class="skeleton-section">
+      <div class="skeleton-chips">
+        <div class="skeleton-chip" *ngFor="let i of [1,2,3]"></div>
+      </div>
+      <div class="skeleton-cards">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+          <div class="skeleton-card-img"></div>
+          <div class="skeleton-card-lines">
+            <div class="skeleton-line long"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-rows">
+        <div class="skeleton-row" *ngFor="let i of [1,2]">
+          <div class="skeleton-row-img"></div>
+          <div class="skeleton-row-lines">
+            <div class="skeleton-line long"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ========== RESULTS STATE ========== -->
+  <ng-container *ngIf="hasSearched && !isLoading">
+
+    <!-- Has results -->
+    <ng-container *ngIf="hasResults">
+
+      <!-- Categories Group -->
+      <div class="result-group" *ngIf="matchedCategories.length">
+        <span class="group-title">Categories</span>
+        <div class="category-result" *ngFor="let cat of matchedCategories" (click)="navigateCategory(cat)">
+          <div class="category-result-icon" [ngStyle]="{'background-color': cat.bgColor}">
+            <ion-icon [name]="cat.icon" [ngStyle]="{'color': cat.accentColor}"></ion-icon>
+          </div>
+          <span class="category-result-name">{{ cat.name }}</span>
+          <ion-icon name="chevron-forward-outline" class="result-chevron"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Restaurants Group -->
+      <div class="result-group" *ngIf="matchedVendors.length">
+        <span class="group-title">Restaurants</span>
+        <div class="vendor-result" *ngFor="let vendor of matchedVendors" (click)="navigateVendor(vendor)">
+          <div class="vendor-img">
+            <img *ngIf="vendor.imageUrl" [src]="vendor.imageUrl" alt="" />
+            <ion-icon *ngIf="!vendor.imageUrl" name="storefront-outline" class="vendor-placeholder"></ion-icon>
+          </div>
+          <div class="vendor-info">
+            <span class="vendor-name">{{ vendor.vendorName }}</span>
+            <span class="vendor-meta">{{ vendor.cuisine || '' }}
+              <ng-container *ngIf="vendor.distance"> &bull; {{ vendor.distance }}</ng-container>
+              <ng-container *ngIf="vendor.deliveryTime"> &bull; {{ vendor.deliveryTime }}</ng-container>
+            </span>
+          </div>
+          <div class="vendor-rating" *ngIf="vendor.rating">
+            <ion-icon name="star" class="star-icon"></ion-icon>
+            <span>{{ vendor.rating }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dishes Group -->
+      <div class="result-group" *ngIf="matchedProducts.length">
+        <span class="group-title">Dishes</span>
+        <div class="product-result" *ngFor="let product of matchedProducts" (click)="navigateProduct(product)">
+          <div class="product-img">
+            <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="" />
+            <ion-icon *ngIf="!product.imageUrl" name="fast-food-outline" class="product-placeholder"></ion-icon>
+          </div>
+          <div class="product-info">
+            <span class="product-name">{{ product.productName }}</span>
+            <span class="product-vendor">{{ product.vendorName || product.vendor?.vendorName || '' }}</span>
+          </div>
+          <span class="product-price" *ngIf="product.price">${{ product.price.toFixed(2) }}</span>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- Empty State -->
+    <ng-container *ngIf="!hasResults">
+      <div class="empty-state">
+        <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+        <span class="empty-title">No results for "{{ searchTerm }}"</span>
+        <span class="empty-subtitle">Try a different search or browse popular cuisines</span>
+      </div>
+
+      <!-- Fallback cuisine grid -->
+      <div class="cuisine-section fallback-cuisines">
+        <span class="section-title">Popular cuisines</span>
+        <div class="cuisine-grid">
+          <div class="cuisine-item" *ngFor="let cuisine of cuisineGrid" (click)="navigateCuisine(cuisine)">
+            <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
+              <ion-icon [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+            </div>
+            <span class="cuisine-label">{{ cuisine.name }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+  </ng-container>
+
+  <div style="height: 24px;"></div>
+</ion-content>

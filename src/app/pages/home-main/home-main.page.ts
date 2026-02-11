@@ -235,7 +235,9 @@ export class HomeMainPage implements OnInit {
 
   navigateEssential(type: string) {
     if (type === 'groceries') {
-      this.router.navigate(['/groceries-home']);
+     this.router.navigate(['/home-land'], {
+        queryParams: { title: 'Groceries', localityId: this.defaultAddress?.locality?._id }
+      });
     } else if (type === 'medicine') {
       this.router.navigate(['/home-land'], {
         queryParams: { title: 'Medicine', localityId: this.defaultAddress?.locality?._id }
@@ -320,6 +322,12 @@ export class HomeMainPage implements OnInit {
       default:
         return 'assets/default.png';
     }
+  }
+
+  navigateToSearch() {
+    this.router.navigate(['/search'], {
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
+    });
   }
 
   goToHome(category: string) {

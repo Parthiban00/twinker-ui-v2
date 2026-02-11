@@ -1,0 +1,606 @@
+/* ===== Header ===== */
+ion-toolbar {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: auto;
+  --background: #fff;
+  padding: calc(var(--ion-safe-area-top, 20px) + 8px) 16px 12px;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 22px;
+    color: #1a1a1a;
+  }
+}
+
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 25px;
+  padding: 10px 16px;
+  gap: 10px;
+
+  .search-icon {
+    font-size: 20px;
+    color: #aaa;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "latoRegular";
+    font-size: 15px;
+    color: #1a1a1a;
+
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+
+  .clear-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 20px;
+      color: #bbb;
+    }
+  }
+}
+
+/* ===== Content ===== */
+ion-content {
+  --background: #fff;
+}
+
+/* ===== Shared ===== */
+.section-title {
+  font-family: "latoBold";
+  font-size: 17px;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ===== Recent Searches ===== */
+.recent-section {
+  padding: 20px 16px 8px;
+}
+
+.section-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+
+  .section-title {
+    margin-bottom: 0;
+  }
+
+  .clear-all {
+    font-family: "latoBold";
+    font-size: 13px;
+    color: #F85C70;
+    cursor: pointer;
+  }
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: #fafafa;
+  }
+
+  .recent-icon {
+    font-size: 18px;
+    color: #bbb;
+    flex-shrink: 0;
+  }
+
+  .recent-text {
+    flex: 1;
+    font-family: "latoRegular";
+    font-size: 15px;
+    color: #333;
+  }
+
+  .recent-remove {
+    border: none;
+    background: transparent;
+    padding: 4px;
+    display: flex;
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 18px;
+      color: #ccc;
+    }
+  }
+}
+
+/* ===== Browse Categories ===== */
+.browse-section {
+  padding: 20px 16px 8px;
+}
+
+.pillars-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.pillar-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 30px;
+  padding: 8px 16px 8px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.pillar-chip-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+.pillar-chip-name {
+  font-family: "latoBold";
+  font-size: 14px;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+
+/* ===== Popular Cuisines ===== */
+.cuisine-section {
+  padding: 20px 16px 8px;
+}
+
+.cuisine-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 12px;
+}
+
+.cuisine-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.93);
+  }
+}
+
+.cuisine-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+.cuisine-label {
+  font-size: 12px;
+  color: #555;
+  font-family: "latoBold";
+  text-align: center;
+}
+
+/* ===== Loading Skeletons ===== */
+.skeleton-section {
+  padding: 20px 16px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+%shimmer-base {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+.skeleton-chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .skeleton-chip {
+    @extend %shimmer-base;
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
+  }
+}
+
+.skeleton-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+
+  .skeleton-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    .skeleton-card-img {
+      @extend %shimmer-base;
+      width: 80px;
+      height: 80px;
+      border-radius: 14px;
+      flex-shrink: 0;
+    }
+
+    .skeleton-card-lines {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+}
+
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  .skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .skeleton-row-img {
+      @extend %shimmer-base;
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .skeleton-row-lines {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}
+
+.skeleton-line {
+  @extend %shimmer-base;
+  height: 14px;
+
+  &.long { width: 75%; }
+  &.short { width: 45%; }
+}
+
+/* ===== Result Groups ===== */
+.result-group {
+  padding: 16px 16px 8px;
+
+  & + .result-group {
+    padding-top: 8px;
+  }
+}
+
+.group-title {
+  font-family: "latoBold";
+  font-size: 13px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Category Results */
+.category-result {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: #fafafa;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.category-result-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.category-result-name {
+  flex: 1;
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.result-chevron {
+  font-size: 18px;
+  color: #ccc;
+}
+
+/* Vendor Results */
+.vendor-result {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: #fafafa;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vendor-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .vendor-placeholder {
+    font-size: 32px;
+    color: #ccc;
+  }
+}
+
+.vendor-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.vendor-name {
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vendor-meta {
+  font-family: "latoRegular";
+  font-size: 12px;
+  color: #888;
+}
+
+.vendor-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #F0FFF4;
+  padding: 4px 8px;
+  border-radius: 12px;
+  flex-shrink: 0;
+
+  .star-icon {
+    font-size: 13px;
+    color: #FF8C42;
+  }
+
+  span {
+    font-family: "latoBold";
+    font-size: 12px;
+    color: #1a1a1a;
+  }
+}
+
+/* Product Results */
+.product-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: #fafafa;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.product-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-placeholder {
+    font-size: 24px;
+    color: #ccc;
+  }
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.product-name {
+  font-family: "latoBold";
+  font-size: 14px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-vendor {
+  font-family: "latoRegular";
+  font-size: 12px;
+  color: #888;
+}
+
+.product-price {
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #F85C70;
+  flex-shrink: 0;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 32px 24px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-family: "latoBold";
+    font-size: 18px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+
+  .empty-subtitle {
+    font-family: "latoRegular";
+    font-size: 14px;
+    color: #888;
+  }
+}
+
+.fallback-cuisines {
+  padding-top: 24px;
+}

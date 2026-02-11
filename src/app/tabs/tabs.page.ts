@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { EventBusService } from '../services/event-bus.service';
 
 @Component({
   selector: 'app-tabs',
@@ -6,17 +8,44 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./tabs.page.scss'],
   standalone: false,
 })
-export class TabsPage implements OnInit {
+export class TabsPage implements OnInit, OnDestroy {
+  cartBadgeCount = 0;
+  private cartSub!: Subscription;
 
-  constructor() { }
+  constructor(private eventBus: EventBusService) {}
 
   ngOnInit() {
     const list = document.querySelectorAll('.list');
-    const nav = document.querySelector('.navigation');
     list.forEach(item => item.addEventListener('click', (e: any) => {
       list.forEach(li => li.classList.remove('active'));
       e.currentTarget.classList.add('active');
     }));
+
+    this.updateCartBadge();
+    this.cartSub = this.eventBus.on('cart:updated').subscribe(() => {
+      this.updateCartBadge();
+    });
   }
 
+  ionViewWillEnter() {
+    this.updateCartBadge();
+  }
+
+  updateCartBadge() {
+    try {
+      const raw = localStorage.getItem('cart-items');
+      if (raw) {
+        const items: any[] = JSON.parse(raw);
+        this.cartBadgeCount = items.reduce((sum: number, item: any) => sum + (item.itemCount || 0), 0);
+      } else {
+        this.cartBadgeCount = 0;
+      }
+    } catch {
+      this.cartBadgeCount = 0;
+    }
+  }
+
+  ngOnDestroy() {
+    this.cartSub?.unsubscribe();
+  }
 }

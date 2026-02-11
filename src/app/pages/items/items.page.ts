@@ -352,10 +352,19 @@ export class ItemsPage implements OnInit {
 
   syncCart() {
     const allProducts = this.displayProducts.flatMap((s: any) => s.products);
-    const simpleItems = allProducts.filter((p: any) => p.itemCount > 0 && !this.isCustomizable(p));
-    // Keep customized entries separately
+    // Deduplicate by _id — popular section shares object refs with category sections
+    const seen = new Set<string>();
+    const simpleItems = allProducts.filter((p: any) => {
+      if (p.itemCount > 0 && !this.isCustomizable(p) && !seen.has(p._id)) {
+        seen.add(p._id);
+        return true;
+      }
+      return false;
+    });
+    // Keep customized entries and other-vendor items
     const customizedItems = this.cartItems.filter(c => c.cartItemId);
-    this.cartItems = [...simpleItems, ...customizedItems];
+    const otherVendorItems = this.cartItems.filter(c => !c.cartItemId && c.vendorId && c.vendorId !== this.vendorId);
+    this.cartItems = [...simpleItems, ...customizedItems, ...otherVendorItems];
     this.saveCartToStorage();
   }
 
@@ -391,6 +400,7 @@ export class ItemsPage implements OnInit {
       vendorCuisine: p.vendorCuisine || vendor.cuisine || vendor.slogan
     }));
     localStorage.setItem('cart-items', JSON.stringify(data));
+    this.eventBus.emit('cart:updated', data.length);
   }
 
   loadCartFromStorage() {
@@ -399,8 +409,9 @@ export class ItemsPage implements OnInit {
     try {
       const saved: any[] = JSON.parse(raw);
       const allProducts = this.displayProducts.flatMap((s: any) => s.products);
+      const currentProductIds = new Set(allProducts.map((p: any) => p._id));
 
-      // Restore simple items
+      // Restore simple item counts for products on this vendor's page
       saved.filter(item => !item.cartItemId).forEach((item: any) => {
         const match = allProducts.find((p: any) => p._id === item._id);
         if (match) {
@@ -408,11 +419,23 @@ export class ItemsPage implements OnInit {
         }
       });
 
-      // Restore customized items
+      // Customized items (from any vendor)
       const customizedItems = saved.filter(item => item.cartItemId);
 
-      const simpleItems = allProducts.filter((p: any) => p.itemCount > 0 && !this.isCustomizable(p));
-      this.cartItems = [...simpleItems, ...customizedItems];
+      // Other-vendor simple items (not in this vendor's product list)
+      const otherVendorItems = saved.filter(item => !item.cartItemId && !currentProductIds.has(item._id));
+
+      // Deduplicate current vendor simple items (popular section shares refs)
+      const seen = new Set<string>();
+      const simpleItems = allProducts.filter((p: any) => {
+        if (p.itemCount > 0 && !this.isCustomizable(p) && !seen.has(p._id)) {
+          seen.add(p._id);
+          return true;
+        }
+        return false;
+      });
+
+      this.cartItems = [...simpleItems, ...customizedItems, ...otherVendorItems];
     } catch (_) {}
   }
 

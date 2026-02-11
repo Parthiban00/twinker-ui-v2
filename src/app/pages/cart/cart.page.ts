@@ -4,6 +4,7 @@ import { ModalController, NavController } from '@ionic/angular';
 import { PaymentPage } from '../payment/payment.page';
 import { OrderStatusComponent } from 'src/app/shared/components/order-status/order-status.component';
 import { environment } from 'src/environments/environment';
+import { EventBusService } from 'src/app/services/event-bus.service';
 
 interface CartItem {
   _id: string;
@@ -46,7 +47,8 @@ export class CartPage implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private router: Router,
-    private navController: NavController
+    private navController: NavController,
+    private eventBus: EventBusService
   ) {}
 
   ngOnInit() {}
@@ -139,6 +141,7 @@ export class CartPage implements OnInit {
 
   private saveAndRefresh() {
     localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
+    this.eventBus.emit('cart:updated', this.cartItems.length);
     this.buildVendorGroups();
   }
 
@@ -173,6 +176,7 @@ export class CartPage implements OnInit {
     localStorage.removeItem('cart-items');
     this.cartItems = [];
     this.vendorGroups = [];
+    this.eventBus.emit('cart:updated', 0);
   }
 
   browsRestaurants() {

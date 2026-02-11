@@ -63,6 +63,24 @@ body {
 	font-size: 1.5em;
 	transition: 0.5s;
 	transition-delay: 0s;
+
+	.cart-badge {
+		position: absolute;
+		top: 2px;
+		right: 0px;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 5px;
+		border-radius: 9px;
+		background: #F85C70;
+		color: #fff;
+		font-size: 11px;
+		font-family: 'latoBold', sans-serif;
+		line-height: 18px;
+		text-align: center;
+		z-index: 10;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+	}
 }
 
 .navigation ul li.active a .icon {
