@@ -1,0 +1,148 @@
+<!-- Gradient Header -->
+<ion-header class="ion-no-border gradient-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home-main" color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title color="light">Popular Items</ion-title>
+  </ion-toolbar>
+
+  <!-- Search Bar -->
+  <div class="header-search-wrap">
+    <div class="search-bar">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input type="text" placeholder="Search popular items..."
+        [value]="searchTerm" (input)="onSearchInput($event)" />
+      <ion-icon name="close-circle" class="clear-icon"
+        *ngIf="searchTerm" (click)="clearSearch()"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Filter Chips -->
+  <div class="header-filter-section">
+    <div class="filter-chips">
+      <!-- Sort chip -->
+      <div class="chip sort-chip" [class.active]="activeSort !== ''"
+        (click)="openSortSheet()">
+        <ion-icon name="funnel-outline"></ion-icon>
+        <span>Sort</span>
+      </div>
+      <!-- Tag chips -->
+      <div class="chip" *ngFor="let tag of tagOptions"
+        [class.active]="activeTag === tag"
+        (click)="selectTag(tag)">
+        {{ tag }}
+      </div>
+      <!-- Veg only chip -->
+      <div class="chip veg-chip" [class.active]="vegOnly"
+        (click)="toggleVegOnly()">
+        <span class="veg-dot"></span>
+        Veg only
+      </div>
+    </div>
+    <div class="active-filter-bar" *ngIf="hasActiveFilters">
+      <span class="filter-count">Filters active</span>
+      <span class="clear-all" (click)="clearAllFilters()">Clear all</span>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="skeleton-wrapper">
+    <div class="skeleton-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton-img shimmer"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-line w70 shimmer"></div>
+          <div class="skeleton-line w50 shimmer"></div>
+          <div class="skeleton-line w40 shimmer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="!isLoading">
+
+    <!-- Result count -->
+    <div class="result-bar" *ngIf="items.length">
+      <span class="result-count">{{ totalCount }} item{{ totalCount !== 1 ? 's' : '' }} found</span>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" *ngIf="items.length">
+      <div class="product-card" *ngFor="let item of items" (click)="navigateToVendor(item)">
+        <!-- Image -->
+        <div class="product-img-wrap">
+          <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" [alt]="item.productName" />
+          <div class="img-placeholder" *ngIf="!item.imageUrl">
+            <ion-icon name="restaurant-outline"></ion-icon>
+          </div>
+          <!-- Discount badge -->
+          <div class="discount-badge" *ngIf="item.discount">{{ getDiscountLabel(item) }}</div>
+          <!-- Tag badge -->
+          <div class="tag-badge" *ngIf="item.tag && item.tag !== 'none'">{{ item.tag }}</div>
+          <!-- Veg/non-veg indicator -->
+          <div class="type-indicator" *ngIf="item.type && item.type !== 'none'"
+            [style.border-color]="getVegTypeColor(item.type)">
+            <span class="type-dot" [style.background]="getVegTypeColor(item.type)"></span>
+          </div>
+        </div>
+        <!-- Info -->
+        <div class="product-info">
+          <span class="product-name">{{ item.productName }}</span>
+          <span class="vendor-name" *ngIf="item.vendor">{{ item.vendor.name }}</span>
+          <div class="price-row">
+            <div class="price-group">
+              <span class="price">&#8377;{{ item.price }}</span>
+              <span class="actual-price" *ngIf="item.actualPrice > item.price">&#8377;{{ item.actualPrice }}</span>
+            </div>
+            <button class="add-btn" (click)="addToCart(item); $event.stopPropagation()">
+              <ion-icon name="add-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!items.length">
+      <ion-icon name="flame-outline" class="empty-icon"></ion-icon>
+      <h3>No popular items found</h3>
+      <p *ngIf="hasActiveFilters">Try adjusting your filters or search</p>
+      <p *ngIf="!hasActiveFilters">Popular items will appear here soon</p>
+      <button class="clear-filters-btn" *ngIf="hasActiveFilters"
+        (click)="clearAllFilters()">
+        Clear all filters
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll [disabled]="!hasMore" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="crescent"
+      loadingText="Loading more items...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Bottom spacer for cart bar -->
+  <div [style.height.px]="cartItems.length ? 90 : 20"></div>
+
+</ion-content>
+
+<!-- Cart Bar -->
+<div class="cart-bar" *ngIf="cartItems.length" (click)="navigateToCart()">
+  <div class="cart-bar-left">
+    <ion-icon name="cart"></ion-icon>
+    <span class="cart-bar-count">{{ cartItemCount }} item{{ cartItemCount > 1 ? 's' : '' }}</span>
+    <span class="cart-bar-separator">|</span>
+    <span class="cart-bar-total">&#8377;{{ cartTotal.toFixed(2) }}</span>
+  </div>
+  <div class="cart-bar-right">
+    <span>View Cart</span>
+    <ion-icon name="arrow-forward"></ion-icon>
+  </div>
+</div>

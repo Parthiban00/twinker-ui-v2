@@ -1,0 +1,136 @@
+<!-- Gradient Header -->
+<ion-header class="ion-no-border gradient-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home-main" color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title color="light">Popular near you</ion-title>
+  </ion-toolbar>
+
+  <!-- Search Bar -->
+  <div class="header-search-wrap">
+    <div class="search-bar">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input type="text" placeholder="Search popular restaurants..."
+        [value]="searchTerm" (input)="onSearchInput($event)" />
+      <ion-icon name="close-circle" class="clear-icon"
+        *ngIf="searchTerm" (click)="clearSearch()"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Filter Chips -->
+  <div class="header-filter-section">
+    <div class="filter-chips">
+      <!-- Sort chip -->
+      <div class="chip sort-chip" [class.active]="activeSort !== ''"
+        (click)="openSortSheet()">
+        <ion-icon name="funnel-outline"></ion-icon>
+        <span>Sort</span>
+      </div>
+      <!-- Dynamic category chips -->
+      <div class="chip" *ngFor="let cat of availableCategories"
+        [class.active]="activeCategory === cat._id"
+        (click)="selectCategory(cat._id)">
+        {{ cat.categoryName }}
+      </div>
+      <!-- Static filter chips -->
+      <div class="chip" *ngFor="let f of filterChips"
+        [class.active]="activeFilters.includes(f)"
+        (click)="toggleFilter(f)">
+        {{ f }}
+      </div>
+    </div>
+    <div class="active-filter-bar" *ngIf="hasActiveFilters">
+      <span class="filter-count">Filters active</span>
+      <span class="clear-all" (click)="clearAllFilters()">Clear all</span>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="skeleton-wrapper">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+      <div class="skeleton-img shimmer"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line w70 shimmer"></div>
+        <div class="skeleton-line w50 shimmer"></div>
+        <div class="skeleton-line w90 shimmer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="!isLoading">
+
+    <!-- Result count -->
+    <div class="result-bar" *ngIf="vendors.length">
+      <span class="result-count">{{ totalCount }} restaurant{{ totalCount !== 1 ? 's' : '' }} found</span>
+    </div>
+
+    <!-- Vendor List -->
+    <div class="vendor-list" *ngIf="vendors.length">
+      <div class="vendor-card" *ngFor="let vendor of vendors" (click)="navigateToVendor(vendor)">
+
+        <!-- Cover image -->
+        <div class="vendor-cover">
+          <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" [alt]="vendor.name" />
+          <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
+            <ion-icon name="storefront-outline"></ion-icon>
+          </div>
+          <!-- Popular tag -->
+          <div class="popular-tag">Popular</div>
+          <!-- Delivery time pill -->
+          <div class="delivery-pill" *ngIf="vendor.approxDeliveryTime">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ vendor.approxDeliveryTime }} min</span>
+          </div>
+          <!-- Rating badge -->
+          <div class="rating-badge">
+            <ion-icon name="star"></ion-icon>
+            <span>{{ vendor.rating || '4.5' }}</span>
+          </div>
+          <!-- Favorite icon -->
+          <ion-icon name="heart-outline" class="fav-heart"></ion-icon>
+        </div>
+
+        <!-- Info below image -->
+        <div class="vendor-info">
+          <div class="vendor-name-row">
+            <h3>{{ vendor.name }}</h3>
+            <span class="vendor-distance" *ngIf="vendor.distance != null">{{ vendor.distance }} km</span>
+          </div>
+          <p class="vendor-desc" *ngIf="vendor.description">{{ vendor.description }}</p>
+          <div class="vendor-categories" *ngIf="vendor.categories?.length">
+            <span class="category-chip" *ngFor="let cat of vendor.categories.slice(0, 3)">{{ cat.categoryName }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!vendors.length">
+      <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
+      <h3>No popular restaurants found</h3>
+      <p *ngIf="hasActiveFilters">Try adjusting your filters or search</p>
+      <p *ngIf="!hasActiveFilters">Popular restaurants will appear here soon</p>
+      <button class="clear-filters-btn" *ngIf="hasActiveFilters"
+        (click)="clearAllFilters()">
+        Clear all filters
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll [disabled]="!hasMore" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="crescent"
+      loadingText="Loading more restaurants...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Bottom spacer -->
+  <div style="height: 20px;"></div>
+
+</ion-content>

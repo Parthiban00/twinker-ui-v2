@@ -30,4 +30,8 @@ export class HomeMainService {
   checkServiceArea(coords: { lat: number; lng: number }): Observable<any> {
     return this.webservice.post('locality/checkServiceArea', coords);
   }
+
+  getDashboard(localityId: string): Observable<any> {
+    return this.webservice.get(`home/dashboard/${localityId}`);
+  }
 }

@@ -81,6 +81,16 @@ const routes: Routes = [
     canLoad: [AuthGuard]
   },
   {
+    path: 'popular-items',
+    loadChildren: () => import('./pages/popular-items/popular-items.module').then( m => m.PopularItemsPageModule),
+    canLoad: [AuthGuard]
+  },
+  {
+    path: 'popular-vendors',
+    loadChildren: () => import('./pages/popular-vendors/popular-vendors.module').then( m => m.PopularVendorsPageModule),
+    canLoad: [AuthGuard]
+  },
+  {
     path: 'search',
     loadChildren: () => import('./pages/search/search.module').then( m => m.SearchPageModule),
     canLoad: [AuthGuard]

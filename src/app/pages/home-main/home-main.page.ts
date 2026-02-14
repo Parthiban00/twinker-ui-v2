@@ -28,111 +28,21 @@ export class HomeMainPage implements OnInit {
   greeting: string = '';
   userName: string = '';
 
-  // Service Pillars
-  servicePillars = [
-    { name: 'Food', icon: 'restaurant-outline', deliveryTime: '30 min', bgColor: '#FFF0F0', accentColor: '#F85C70', route: '/home-land', queryTitle: 'Food' },
-    { name: 'Groceries', icon: 'cart-outline', deliveryTime: '45 min', bgColor: '#F0FFF4', accentColor: '#2ecc71', route: '/groceries-home', queryTitle: 'Groceries' },
-    { name: 'Medicine', icon: 'medkit-outline', deliveryTime: '20 min', bgColor: '#F0F4FF', accentColor: '#4A5BF5', route: '/home-land', queryTitle: 'Medicine' },
-    { name: 'Desserts', icon: 'ice-cream-outline', deliveryTime: '25 min', bgColor: '#FFF0F8', accentColor: '#FC5C7D', route: '/home-land', queryTitle: 'Desserts' },
-    { name: 'Beverages', icon: 'cafe-outline', deliveryTime: '15 min', bgColor: '#FFF5F0', accentColor: '#FF8C42', route: '/home-land', queryTitle: 'Beverages' }
-  ];
+  // Dynamic dashboard data
+  deals: any[] = [];
+  popularItems: any[] = [];
+  cuisines: any[] = [];
+  popularVendors: any[] = [];
+  isLoading = true;
 
-  // Promo Banner Deals
-  deals = [
-    {
-      title: "Today's Best Deals",
-      subtitle: 'Off up to 75%',
-      tag: 'Food',
-      overlayColor: 'rgba(248, 92, 112, 0.85)',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      title: 'Flat 50% on Groceries',
-      subtitle: 'Fresh produce & essentials',
-      tag: 'Grocery',
-      overlayColor: 'rgba(46, 204, 113, 0.85)',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      title: 'Free Delivery on Medicines',
-      subtitle: 'Order above $10',
-      tag: 'Medicine',
-      overlayColor: 'rgba(74, 91, 245, 0.85)',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      title: 'Buy 1 Get 1 Desserts',
-      subtitle: 'Weekend special!',
-      tag: 'Desserts',
-      overlayColor: 'rgba(252, 92, 125, 0.85)',
-      image: 'assets/announcement-banner.jpg'
-    }
-  ];
+  // Cart bar
+  cartItems: any[] = [];
+  cartTotal = 0;
+  cartItemCount = 0;
 
-  // Order Again / Popular in your area
-  orderAgainItems: any[] = [];
-  hasOrderHistory = false;
-
-  // What's on your mind - Cuisine/Category Grid
-  cuisineGrid = [
-    { name: 'Pizza', icon: 'pizza-outline', bgColor: '#FFF0F0', accentColor: '#F85C70' },
-    { name: 'Burger', icon: 'fast-food-outline', bgColor: '#FFF5F0', accentColor: '#FF8C42' },
-    { name: 'Salad', icon: 'leaf-outline', bgColor: '#F0FFF4', accentColor: '#2ecc71' },
-    { name: 'Noodles', icon: 'restaurant-outline', bgColor: '#FFF0F8', accentColor: '#FC5C7D' },
-    { name: 'Cakes', icon: 'ice-cream-outline', bgColor: '#FFF0F5', accentColor: '#E91E8C' },
-    { name: 'Juice', icon: 'cafe-outline', bgColor: '#FFF5F0', accentColor: '#FF8C42' },
-    { name: 'Pharma', icon: 'medkit-outline', bgColor: '#F0F4FF', accentColor: '#4A5BF5' },
-    { name: 'Veggies', icon: 'nutrition-outline', bgColor: '#F0FFF4', accentColor: '#2DBCB6' }
-  ];
-
-  // Popular Restaurants
-  popularRestaurants = [
-    {
-      name: 'Bottega Ristorante',
-      cuisine: 'Italian',
-      rating: 4.6,
-      distance: '4.2 km',
-      deliveryTime: '30 min',
-      promoTag: 'Free delivery',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      name: 'SOULFOOD Kitchen',
-      cuisine: 'Indian',
-      rating: 4.3,
-      distance: '2.1 km',
-      deliveryTime: '25 min',
-      promoTag: '20% off',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      name: 'Dragon Palace',
-      cuisine: 'Chinese',
-      rating: 4.5,
-      distance: '3.8 km',
-      deliveryTime: '35 min',
-      promoTag: 'Free delivery',
-      image: 'assets/announcement-banner.jpg'
-    },
-    {
-      name: 'Le Quartier',
-      cuisine: 'French',
-      rating: 4.8,
-      distance: '5.0 km',
-      deliveryTime: '40 min',
-      promoTag: '',
-      image: 'assets/announcement-banner.jpg'
-    }
-  ];
-
-  // Popular items (shown when no order history)
-  popularItems = [
-    { name: 'Chicken Biryani', vendor: 'Spice Garden', price: 12.50, image: 'assets/announcement-banner.jpg' },
-    { name: 'Margherita Pizza', vendor: 'Pizza Hub', price: 9.99, image: 'assets/announcement-banner.jpg' },
-    { name: 'Fresh Milk 1L', vendor: 'FreshMart', price: 1.50, image: 'assets/announcement-banner.jpg' },
-    { name: 'Paracetamol', vendor: 'MedPlus', price: 2.00, image: 'assets/announcement-banner.jpg' },
-    { name: 'Chocolate Cake', vendor: 'Sweet Bites', price: 15.00, image: 'assets/announcement-banner.jpg' }
-  ];
+  // Feature flags
+  showWallet = false;
+  showBuddy = false;
 
   constructor(
     public router: Router,
@@ -147,7 +57,6 @@ export class HomeMainPage implements OnInit {
 
   ngOnInit() {
     this.setGreeting();
-    this.loadOrderHistory();
     this.eventSubscription = this.eventBus.on('address-updated').subscribe((payload) => {
       this.ionViewWillEnter();
     });
@@ -155,6 +64,7 @@ export class HomeMainPage implements OnInit {
 
   ionViewWillEnter() {
     this.setGreeting();
+    this.loadCart();
     const userData = this.storageService.getUser();
     if (userData.mobileNo) {
       if (userData.addresses && userData.addresses.length) {
@@ -186,21 +96,34 @@ export class HomeMainPage implements OnInit {
     }
   }
 
-  loadOrderHistory() {
+  loadCart() {
     const cartItems = this.storageService.getItem('cart-items');
     if (cartItems && cartItems.length > 0) {
-      this.hasOrderHistory = true;
-      this.orderAgainItems = cartItems.slice(0, 6);
+      this.cartItems = cartItems;
+      this.cartItemCount = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      this.cartTotal = cartItems.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
     } else {
-      this.hasOrderHistory = false;
-      this.orderAgainItems = this.popularItems;
+      this.cartItems = [];
+      this.cartItemCount = 0;
+      this.cartTotal = 0;
     }
   }
 
-  navigateService(pillar: any) {
-    this.router.navigate([pillar.route], {
-      queryParams: { title: pillar.queryTitle, localityId: this.defaultAddress?.locality?._id }
+  navigateToCart() {
+    this.router.navigate(['/cart']);
+  }
+
+  navigateService(category: any) {
+    const route = this.getCategoryRoute(category.categoryName);
+    this.router.navigate([route], {
+      queryParams: { title: category.categoryName, localityId: this.defaultAddress?.locality?._id }
     });
+  }
+
+  getCategoryRoute(categoryName: string): string {
+    const lower = categoryName?.toLowerCase() || '';
+    if (lower === 'groceries') return '/groceries-home';
+    return '/home-land';
   }
 
   navigateCuisine(cuisine: any) {
@@ -209,15 +132,35 @@ export class HomeMainPage implements OnInit {
     });
   }
 
-  navigateRestaurant(restaurant: any) {
+  navigateRestaurant(vendor: any) {
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: restaurant._id || '' }
+      queryParams: { vendorId: vendor._id || '' }
+    });
+  }
+
+  navigatePopularItem(item: any) {
+    if (item.vendor?._id) {
+      this.router.navigate(['/items'], {
+        queryParams: { vendorId: item.vendor._id }
+      });
+    }
+  }
+
+  navigateToPopularItems() {
+    this.router.navigate(['/popular-items'], {
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
+    });
+  }
+
+  navigateToPopularVendors() {
+    this.router.navigate(['/popular-vendors'], {
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
     });
   }
 
   navigateEssential(type: string) {
     if (type === 'groceries') {
-     this.router.navigate(['/home-land'], {
+      this.router.navigate(['/home-land'], {
         queryParams: { title: 'Groceries', localityId: this.defaultAddress?.locality?._id }
       });
     } else if (type === 'medicine') {
@@ -229,14 +172,25 @@ export class HomeMainPage implements OnInit {
 
   addToCart(item: any) {
     const cartItems = this.storageService.getItem('cart-items') || [];
-    const existing = cartItems.find((c: any) => c.name === item.name);
+    const existing = cartItems.find((c: any) => c._id === item._id);
     if (existing) {
       existing.quantity = (existing.quantity || 1) + 1;
     } else {
       cartItems.push({ ...item, quantity: 1 });
     }
     this.storageService.setItem('cart-items', cartItems);
-    this.commonService.presentToast('bottom', `${item.name} added to cart`, 'success');
+    this.loadCart();
+    this.commonService.presentToast('bottom', `${item.productName || item.name} added to cart`, 'success');
+  }
+
+  getDiscountLabel(deal: any): string {
+    if (!deal.discount) return '';
+    if (deal.discountType === 'in-percentage') {
+      return `${deal.discount}% OFF`;
+    } else if (deal.discountType === 'in-price') {
+      return `\u20B9${deal.discount} OFF`;
+    }
+    return '';
   }
 
   getRatingStars(rating: number): number[] {
@@ -249,22 +203,21 @@ export class HomeMainPage implements OnInit {
         if (resdata.status) {
           if (resdata.data) {
             this.defaultAddress = resdata.data;
-            // Check service area for default address
             if (this.defaultAddress.coords) {
               this.homeService.checkServiceArea(this.defaultAddress.coords).subscribe({
                 next: (saRes: any) => {
                   if (saRes.status && saRes.data && !saRes.data.serviceAvailable) {
                     this.router.navigate(['/service-not-available']);
                   } else {
-                    this.getAllCategoriesByLocality();
+                    this.loadDashboard();
                   }
                 },
                 error: () => {
-                  this.getAllCategoriesByLocality();
+                  this.loadDashboard();
                 }
               });
             } else {
-              this.getAllCategoriesByLocality();
+              this.loadDashboard();
             }
           } else {
             this.defaultAddress = null;
@@ -279,30 +232,44 @@ export class HomeMainPage implements OnInit {
     });
   }
 
-  getAllCategoriesByLocality() {
-    if (this.defaultAddress) {
-      this.homeService.getAllCategoriesByLocality(this.defaultAddress.locality._id).subscribe({
-        next: (resdata: any) => {
-          if (resdata.status) {
-            if (resdata.data) {
-              this.categories = resdata.data;
-            } else {
-              this.categories = [];
-            }
-          } else {
-            this.commonService.presentToast('bottom', resdata.message, 'danger');
-          }
-          this.cdr.detectChanges();
-        },
-        error: (_err: any) => {
-          this.categories = [];
-          this.cdr.detectChanges();
-        },
-        complete: () => {},
-      });
-    } else {
-      this.categories = [];
+  loadDashboard() {
+    if (!this.defaultAddress?.locality?._id) {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
     }
+
+    this.isLoading = true;
+    const localityId = this.defaultAddress.locality._id;
+
+    this.homeService.getDashboard(localityId).subscribe({
+      next: (resdata: any) => {
+        if (resdata.status && resdata.data) {
+          this.categories = resdata.data.categories || [];
+          this.deals = resdata.data.deals || [];
+          this.popularItems = resdata.data.popularItems || [];
+          this.cuisines = resdata.data.cuisines || [];
+          this.popularVendors = resdata.data.popularVendors || [];
+        } else {
+          this.categories = [];
+          this.deals = [];
+          this.popularItems = [];
+          this.cuisines = [];
+          this.popularVendors = [];
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (_err: any) => {
+        this.categories = [];
+        this.deals = [];
+        this.popularItems = [];
+        this.cuisines = [];
+        this.popularVendors = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   getImageSource(addressType: string): string {

@@ -28,192 +28,270 @@
 
 <ion-content>
 
-  <!-- Section 1: Service Pillars -->
-  <div class="service-pillars-section">
-    <div class="service-pillars-scroll">
-      <div class="service-pillar" *ngFor="let pillar of servicePillars" (click)="navigateService(pillar)">
-        <div class="pillar-icon-wrap" [ngStyle]="{'background-color': pillar.bgColor}">
-          <ion-icon [name]="pillar.icon" [ngStyle]="{'color': pillar.accentColor}"></ion-icon>
+  <!-- Loading Skeletons -->
+  <div *ngIf="isLoading" class="skeleton-wrapper">
+    <!-- Categories skeleton -->
+    <div class="service-pillars-section">
+      <div class="service-pillars-scroll">
+        <div class="service-pillar" *ngFor="let i of [1,2,3,4,5]">
+          <ion-skeleton-text [animated]="true" style="width: 64px; height: 64px; border-radius: 18px;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 50px; height: 12px; border-radius: 6px;"></ion-skeleton-text>
         </div>
-        <span class="pillar-name">{{ pillar.name }}</span>
-        <span class="pillar-time" [ngStyle]="{'color': pillar.accentColor}">{{ pillar.deliveryTime }}</span>
+      </div>
+    </div>
+    <!-- Banner skeleton -->
+    <div style="padding: 16px;">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 160px; border-radius: 16px;"></ion-skeleton-text>
+    </div>
+    <!-- Popular items skeleton -->
+    <div style="padding: 16px;">
+      <ion-skeleton-text [animated]="true" style="width: 180px; height: 22px; border-radius: 6px; margin-bottom: 14px;"></ion-skeleton-text>
+      <div style="display: flex; gap: 12px; overflow: hidden;">
+        <div *ngFor="let i of [1,2,3]" style="min-width: 148px;">
+          <ion-skeleton-text [animated]="true" style="width: 148px; height: 100px; border-radius: 14px 14px 0 0;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 120px; height: 14px; border-radius: 6px; margin-top: 10px;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 80px; height: 12px; border-radius: 6px; margin-top: 4px;"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+    <!-- Cuisine grid skeleton -->
+    <div style="padding: 16px;">
+      <ion-skeleton-text [animated]="true" style="width: 180px; height: 22px; border-radius: 6px; margin-bottom: 14px;"></ion-skeleton-text>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px;">
+        <div *ngFor="let i of [1,2,3,4,5,6,7,8]" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <ion-skeleton-text [animated]="true" style="width: 60px; height: 60px; border-radius: 50%;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 44px; height: 12px; border-radius: 6px;"></ion-skeleton-text>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Section 2: Promo Banner Carousel -->
-  <div class="banner-carousel">
-    <swiper-container slides-per-view="1.3" space-between="12" pagination="true" autoplay-delay="3000" loop="true">
-      <swiper-slide *ngFor="let deal of deals">
-        <div class="deal-card" [ngStyle]="{'background-image': 'linear-gradient(to right, ' + deal.overlayColor + ' 40%, transparent 100%), url(' + deal.image + ')'}">
-          <div class="deal-tag" *ngIf="deal.tag">{{ deal.tag }}</div>
-          <div class="deal-text">
-            <h3>{{ deal.title }}</h3>
-            <p>{{ deal.subtitle }}</p>
+  <!-- Loaded Content -->
+  <div *ngIf="!isLoading">
+
+    <!-- Section 1: Service Pillars / Categories -->
+    <div class="service-pillars-section" *ngIf="categories.length">
+      <div class="service-pillars-scroll">
+        <div class="service-pillar" *ngFor="let cat of categories" (click)="navigateService(cat)">
+          <div class="pillar-icon-wrap" [ngStyle]="{'background-color': '#FFF0F0'}">
+            <img *ngIf="cat.imageUrl" [src]="imgBaseUrl + cat.imageUrl" class="pillar-img" alt="{{ cat.categoryName }}" />
+            <ion-icon *ngIf="!cat.imageUrl" name="storefront-outline" style="color: #F85C70;"></ion-icon>
           </div>
+          <span class="pillar-name">{{ cat.categoryName }}</span>
+          <span class="pillar-time" *ngIf="cat.vendorDetails?.length" style="color: #F85C70;">{{ cat.vendorDetails.length }} stores</span>
         </div>
-      </swiper-slide>
-    </swiper-container>
-  </div>
+      </div>
+    </div>
 
-  <!-- Section 3: Wallet & Coins -->
-  <div class="wallet-section">
-    <div class="wallet-item">
-      <div class="wallet-icon wallet-bg">
-        <ion-icon name="wallet-outline"></ion-icon>
-      </div>
-      <div class="wallet-info">
-        <div class="wallet-title">Your Wallet</div>
-        <div class="wallet-value">Rp699.000</div>
-      </div>
-    </div>
-    <div class="wallet-divider"></div>
-    <div class="wallet-item">
-      <div class="wallet-icon coins-bg">
-        <ion-icon name="disc-outline"></ion-icon>
-      </div>
-      <div class="wallet-info">
-        <div class="wallet-title">Your Coins</div>
-        <div class="wallet-value">1.200</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Section 4: Order Again / Popular in your area -->
-  <div class="order-again-section">
-    <div class="section-header">
-      <h2>{{ hasOrderHistory ? 'Order again' : 'Popular in your area' }}</h2>
-      <span class="see-all">See all</span>
-    </div>
-    <div class="order-again-scroll">
-      <div class="order-again-card" *ngFor="let item of orderAgainItems">
-        <div class="order-again-img">
-          <img [src]="item.image" alt="{{ item.name }}" />
-        </div>
-        <div class="order-again-info">
-          <span class="order-item-name">{{ item.name }}</span>
-          <span class="order-item-vendor">{{ item.vendor }}</span>
-          <div class="order-item-bottom">
-            <span class="order-item-price">${{ item.price?.toFixed(2) }}</span>
-            <button class="add-btn" (click)="addToCart(item)">
-              <ion-icon name="add-outline"></ion-icon>
-            </button>
+    <!-- Section 2: Offers & Deals Swiper -->
+    <div class="banner-carousel" *ngIf="deals.length">
+      <swiper-container slides-per-view="1.3" space-between="12" pagination="true" autoplay-delay="3000" loop="true">
+        <swiper-slide *ngFor="let deal of deals">
+          <div class="deal-card" (click)="navigateRestaurant(deal.vendor)">
+            <div class="deal-img-wrap">
+              <img *ngIf="deal.imageUrl" [src]="imgBaseUrl + deal.imageUrl" alt="{{ deal.productName }}" />
+              <div class="deal-img-placeholder" *ngIf="!deal.imageUrl">
+                <ion-icon name="pricetag-outline"></ion-icon>
+              </div>
+            </div>
+            <div class="deal-overlay">
+              <div class="deal-discount-badge" *ngIf="deal.discount">{{ getDiscountLabel(deal) }}</div>
+              <div class="deal-text">
+                <h3>{{ deal.productName }}</h3>
+                <p *ngIf="deal.vendor">{{ deal.vendor.name }}</p>
+                <div class="deal-price-row">
+                  <span class="deal-price">&#8377;{{ deal.price }}</span>
+                  <span class="deal-actual-price" *ngIf="deal.actualPrice > deal.price">&#8377;{{ deal.actualPrice }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="deal-category-tag" *ngIf="deal.category">{{ deal.category.categoryName }}</div>
           </div>
+        </swiper-slide>
+      </swiper-container>
+    </div>
+
+    <!-- Section 3: Wallet & Coins (hidden for now) -->
+    <div class="wallet-section" *ngIf="showWallet">
+      <div class="wallet-item">
+        <div class="wallet-icon wallet-bg">
+          <ion-icon name="wallet-outline"></ion-icon>
+        </div>
+        <div class="wallet-info">
+          <div class="wallet-title">Your Wallet</div>
+          <div class="wallet-value">Rp699.000</div>
+        </div>
+      </div>
+      <div class="wallet-divider"></div>
+      <div class="wallet-item">
+        <div class="wallet-icon coins-bg">
+          <ion-icon name="disc-outline"></ion-icon>
+        </div>
+        <div class="wallet-info">
+          <div class="wallet-title">Your Coins</div>
+          <div class="wallet-value">1.200</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Section 5: What's on your mind? -->
-  <div class="cuisine-section">
-    <div class="section-header">
-      <h2>What's on your mind?</h2>
-    </div>
-    <div class="cuisine-grid">
-      <div class="cuisine-item" *ngFor="let cuisine of cuisineGrid" (click)="navigateCuisine(cuisine)">
-        <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
-          <ion-icon [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
-        </div>
-        <span class="cuisine-label">{{ cuisine.name }}</span>
+    <!-- Section 4: Popular in your area -->
+    <div class="order-again-section" *ngIf="popularItems.length">
+      <div class="section-header">
+        <h2>Popular in your area</h2>
+        <span class="see-all" (click)="navigateToPopularItems()">See all</span>
       </div>
-    </div>
-  </div>
-
-  <!-- Section 6: Popular Restaurants Near You -->
-  <div class="popular-restaurants-section">
-    <div class="section-header">
-      <h2>Popular near you</h2>
-      <span class="see-all">See all</span>
-    </div>
-    <div class="popular-scroll">
-      <div class="restaurant-card" *ngFor="let rest of popularRestaurants" (click)="navigateRestaurant(rest)">
-        <div class="restaurant-cover">
-          <img [src]="rest.image" alt="{{ rest.name }}" />
-          <div class="promo-tag" *ngIf="rest.promoTag">{{ rest.promoTag }}</div>
-        </div>
-        <div class="restaurant-info">
-          <div class="restaurant-name-row">
-            <span class="restaurant-name">{{ rest.name }}</span>
-            <div class="restaurant-rating">
-              <ion-icon name="star" class="star-icon"></ion-icon>
-              <span>{{ rest.rating }}</span>
+      <div class="order-again-scroll">
+        <div class="order-again-card" *ngFor="let item of popularItems" (click)="navigatePopularItem(item)">
+          <div class="order-again-img">
+            <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" alt="{{ item.productName }}" />
+            <div class="img-placeholder" *ngIf="!item.imageUrl">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+            <div class="item-tag" *ngIf="item.tag && item.tag !== 'none'">{{ item.tag }}</div>
+          </div>
+          <div class="order-again-info">
+            <span class="order-item-name">{{ item.productName }}</span>
+            <span class="order-item-vendor" *ngIf="item.vendor">{{ item.vendor.name }}</span>
+            <div class="order-item-bottom">
+              <span class="order-item-price">&#8377;{{ item.price }}</span>
+              <button class="add-btn" (click)="addToCart(item); $event.stopPropagation()">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
             </div>
           </div>
-          <span class="restaurant-meta">{{ rest.cuisine }} &bull; {{ rest.distance }} &bull; {{ rest.deliveryTime }}</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Section 7: Essentials at your doorstep -->
-  <div class="essentials-section">
-    <div class="section-header">
-      <h2>Essentials at your doorstep</h2>
-    </div>
-    <div class="essentials-grid">
-      <div class="essential-card essential-groceries" (click)="navigateEssential('groceries')">
-        <div class="essential-content">
-          <div class="essential-icon-wrap">
-            <ion-icon name="cart-outline"></ion-icon>
+    <!-- Section 5: What's on your mind? -->
+    <div class="cuisine-section" *ngIf="cuisines.length">
+      <div class="section-header">
+        <h2>What's on your mind?</h2>
+      </div>
+      <div class="cuisine-grid">
+        <div class="cuisine-item" *ngFor="let cuisine of cuisines" (click)="navigateCuisine(cuisine)">
+          <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
+            <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" class="cuisine-img" alt="{{ cuisine.name }}" />
+            <ion-icon *ngIf="!cuisine.imageUrl && cuisine.icon" [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+            <ion-icon *ngIf="!cuisine.imageUrl && !cuisine.icon" name="restaurant-outline" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
           </div>
-          <h3>Groceries</h3>
-          <p>Fresh fruits, veggies & daily essentials</p>
-          <button class="essential-btn">Shop now</button>
+          <span class="cuisine-label">{{ cuisine.name }}</span>
         </div>
       </div>
-      <div class="essential-card essential-medicine" (click)="navigateEssential('medicine')">
-        <div class="essential-content">
-          <div class="essential-icon-wrap">
-            <ion-icon name="medkit-outline"></ion-icon>
+    </div>
+
+    <!-- Section 6: Popular Restaurants Near You -->
+    <div class="popular-restaurants-section" *ngIf="popularVendors.length">
+      <div class="section-header">
+        <h2>Popular near you</h2>
+        <span class="see-all" (click)="navigateToPopularVendors()">See all</span>
+      </div>
+      <div class="popular-scroll">
+        <div class="restaurant-card" *ngFor="let vendor of popularVendors" (click)="navigateRestaurant(vendor)">
+          <div class="restaurant-cover">
+            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
+            <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
+              <ion-icon name="storefront-outline"></ion-icon>
+            </div>
           </div>
-          <h3>Medicines</h3>
-          <p>Get it in 20 mins. Upload prescription</p>
-          <button class="essential-btn">Order now</button>
+          <div class="restaurant-info">
+            <div class="restaurant-name-row">
+              <span class="restaurant-name">{{ vendor.name }}</span>
+            </div>
+            <span class="restaurant-meta" *ngIf="vendor.address">{{ vendor.address }}</span>
+            <div class="restaurant-categories" *ngIf="vendor.categories?.length">
+              <span class="category-chip" *ngFor="let cat of vendor.categories.slice(0, 3)">{{ cat.categoryName }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Section 8: Buddy Services (Restyled) -->
-  <div class="buddy-section">
-    <div class="section-header">
-      <h2>MoMo Buddy Services</h2>
-    </div>
-    <div class="buddy-cards">
-      <div class="buddy-card">
-        <div class="buddy-card-icon">
-          <img src="assets/send-items.png" />
-        </div>
-        <div class="buddy-card-info">
-          <span class="buddy-card-title">Send/Receive Items</span>
-          <span class="buddy-card-desc">Quick delivery to anyone</span>
-        </div>
-        <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
+    <!-- Section 7: Essentials at your doorstep -->
+    <div class="essentials-section">
+      <div class="section-header">
+        <h2>Essentials at your doorstep</h2>
       </div>
-      <div class="buddy-card">
-        <div class="buddy-card-icon">
-          <img src="assets/your-needs.png" />
+      <div class="essentials-grid">
+        <div class="essential-card essential-groceries" (click)="navigateEssential('groceries')">
+          <div class="essential-content">
+            <div class="essential-icon-wrap">
+              <ion-icon name="cart-outline"></ion-icon>
+            </div>
+            <h3>Groceries</h3>
+            <p>Fresh fruits, veggies & daily essentials</p>
+            <button class="essential-btn">Shop now</button>
+          </div>
         </div>
-        <div class="buddy-card-info">
-          <span class="buddy-card-title">Your needs</span>
-          <span class="buddy-card-desc">Tell us what you need</span>
+        <div class="essential-card essential-medicine" (click)="navigateEssential('medicine')">
+          <div class="essential-content">
+            <div class="essential-icon-wrap">
+              <ion-icon name="medkit-outline"></ion-icon>
+            </div>
+            <h3>Medicines</h3>
+            <p>Get it in 20 mins. Upload prescription</p>
+            <button class="essential-btn">Order now</button>
+          </div>
         </div>
-        <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
-      </div>
-      <div class="buddy-card">
-        <div class="buddy-card-icon">
-          <img src="assets/buddy.png" />
-        </div>
-        <div class="buddy-card-info">
-          <span class="buddy-card-title">Buddy for you</span>
-          <span class="buddy-card-desc">Personal assistant service</span>
-        </div>
-        <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
       </div>
     </div>
-  </div>
 
-  <!-- Bottom Spacer -->
-  <div style="height: 20px;"></div>
+    <!-- Section 8: Buddy Services (hidden for now) -->
+    <div class="buddy-section" *ngIf="showBuddy">
+      <div class="section-header">
+        <h2>MoMo Buddy Services</h2>
+      </div>
+      <div class="buddy-cards">
+        <div class="buddy-card">
+          <div class="buddy-card-icon">
+            <img src="assets/send-items.png" />
+          </div>
+          <div class="buddy-card-info">
+            <span class="buddy-card-title">Send/Receive Items</span>
+            <span class="buddy-card-desc">Quick delivery to anyone</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
+        </div>
+        <div class="buddy-card">
+          <div class="buddy-card-icon">
+            <img src="assets/your-needs.png" />
+          </div>
+          <div class="buddy-card-info">
+            <span class="buddy-card-title">Your needs</span>
+            <span class="buddy-card-desc">Tell us what you need</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
+        </div>
+        <div class="buddy-card">
+          <div class="buddy-card-icon">
+            <img src="assets/buddy.png" />
+          </div>
+          <div class="buddy-card-info">
+            <span class="buddy-card-title">Buddy for you</span>
+            <span class="buddy-card-desc">Personal assistant service</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="buddy-card-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end !isLoading -->
+
+  <!-- Bottom Spacer (extra space for cart bar) -->
+  <div [style.height.px]="cartItems.length ? 90 : 20"></div>
 
 </ion-content>
+
+<!-- View Cart Bar -->
+<div class="cart-bar" *ngIf="cartItems.length" (click)="navigateToCart()">
+  <div class="cart-bar-left">
+    <ion-icon name="cart"></ion-icon>
+    <span class="cart-bar-count">{{ cartItemCount }} item{{ cartItemCount > 1 ? 's' : '' }}</span>
+    <span class="cart-bar-separator">|</span>
+    <span class="cart-bar-total">&#8377;{{ cartTotal.toFixed(2) }}</span>
+  </div>
+  <div class="cart-bar-right">
+    <span>View Cart</span>
+    <ion-icon name="arrow-forward"></ion-icon>
+  </div>
+</div>
