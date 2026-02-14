@@ -1,33 +1,63 @@
-<ion-content class="login-content">
-  <div class="login-wrapper">
-    <!-- Illustration -->
-    <div class="illustration">
-      <img src="assets/otp-illustration.svg" alt="OTP Verification" />
+<ion-content class="login-content" [scrollY]="false">
+
+  <!-- Top gradient hero -->
+  <div class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-decor">
+      <div class="circle c1"></div>
+      <div class="circle c2"></div>
+      <div class="circle c3"></div>
     </div>
+    <div class="hero-content">
+      <div class="logo-wrap">
+        <ion-icon name="bicycle-outline" class="logo-icon"></ion-icon>
+      </div>
+      <h1 class="brand-name">Twinker</h1>
+      <p class="brand-tag">Order Online</p>
+    </div>
+  </div>
 
-    <!-- Title & Subtitle -->
-    <h1 class="page-title">OTP Verification</h1>
-    <p class="page-subtitle">Enter phone number to send one time Password</p>
+  <!-- Form card -->
+  <div class="form-card">
+    <h2 class="form-title">Welcome</h2>
+    <p class="form-subtitle">Enter your phone number to get started</p>
 
-    <!-- Form -->
     <form [formGroup]="signInForm">
-      <div class="phone-input-container" [class.focused]="phoneInputFocused">
-        <label class="floating-label">Phone Number</label>
+      <!-- Phone field -->
+      <div class="phone-field" [class.focused]="phoneInputFocused" [class.has-value]="signInForm.get('mobileNo')?.value">
+        <div class="country-prefix">
+          <span>+91</span>
+        </div>
+        <div class="divider"></div>
         <ion-input
           formControlName="mobileNo"
           type="tel"
-          placeholder="+91 9999999999"
+          placeholder="Enter mobile number"
           [maxlength]="10"
+          inputmode="numeric"
           (ionFocus)="phoneInputFocused = true"
           (ionBlur)="phoneInputFocused = false"
         ></ion-input>
       </div>
-      <div class="invalid-div" *ngIf="signInForm.get('mobileNo')?.invalid && (signInForm.get('mobileNo')?.dirty || signInForm.get('mobileNo')?.touched)">
-        <small class="invalid-text" *ngIf="signInForm.get('mobileNo')?.errors?.['required']">Mobile number is required</small>
-        <small class="invalid-text" *ngIf="signInForm.get('mobileNo')?.errors?.['minlength']">Enter a valid 10-digit mobile number</small>
+
+      <!-- Validation error -->
+      <div class="error-row" *ngIf="signInForm.get('mobileNo')?.invalid && (signInForm.get('mobileNo')?.dirty || signInForm.get('mobileNo')?.touched)">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span *ngIf="signInForm.get('mobileNo')?.errors?.['required']">Mobile number is required</span>
+        <span *ngIf="signInForm.get('mobileNo')?.errors?.['minlength']">Enter a valid 10-digit number</span>
       </div>
 
-      <ion-button class="continue-btn" expand="block" (click)="requestOTP()">Continue</ion-button>
+      <!-- CTA -->
+      <button class="cta-btn" [class.disabled]="signInForm.invalid" [disabled]="loading" (click)="requestOTP()">
+        <span *ngIf="!loading">Get OTP</span>
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      </button>
     </form>
+
+    <p class="terms">
+      By continuing, you agree to our
+      <span class="link">Terms of Service</span> & <span class="link">Privacy Policy</span>
+    </p>
   </div>
+
 </ion-content>

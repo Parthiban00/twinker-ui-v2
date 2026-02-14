@@ -9,12 +9,21 @@ export class CommonService {
   constructor(private toastController: ToastController) { }
 
   async presentToast(position: 'top' | 'middle' | 'bottom', message: string, color: 'primary' | 'success' | 'danger' = 'primary') {
+    const iconMap: Record<string, string> = {
+      success: 'checkmark-circle',
+      danger: 'alert-circle',
+      primary: 'information-circle'
+    };
+
     const toast = await this.toastController.create({
       message,
-      duration: 1500,
-      position,
-      color,
-      cssClass: 'custom-toast'
+      duration: 2000,
+      position: 'bottom',
+      icon: iconMap[color] || 'information-circle',
+      cssClass: `custom-toast toast-${color}`,
+      buttons: [
+        { icon: 'close', role: 'cancel' }
+      ]
     });
 
     await toast.present();

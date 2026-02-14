@@ -2,10 +2,10 @@
 
 export const environment = {
   production: false,
-  baseUrl:'http://localhost:3000/api',
-  // baseUrl: 'https://momo-api-3z3q.onrender.com/api',
-  imageBaseUrl: 'http://localhost:3000/',
-  // imageBaseUrl: 'https://momo-api-3z3q.onrender.com/',
+  // baseUrl:'http://localhost:3000/api',
+  baseUrl: 'https://twinder-api-v2.onrender.com/api',
+  // imageBaseUrl: 'http://localhost:3000/',
+  imageBaseUrl: 'https://twinder-api-v2.onrender.com/',
   logoUrl:'',
   // googleMapApi:'AIzaSyDeZg09kSkBvFqa4eqfDSsfkL4gARcLQkk'
   googleMapApi: 'AIzaSyC6L2akY6Toq9E0jblJ3tOQCwNM-mjbxCo'

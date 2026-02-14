@@ -1,6 +1,6 @@
 // Colors
 $primary: #F85C70;
-$secondary: #FC5C7D;
+$secondary: #FC8C5C;
 $text-primary: #1a1a1a;
 $text-secondary: #888888;
 $text-muted: #999999;
@@ -62,13 +62,21 @@ ion-toolbar {
 }
 
 // Cart Content
+ion-content {
+  --background: #f5f5f5;
+}
+
 .cart-content {
   padding-bottom: 20px;
 }
 
 // Section Block
 .section-block {
+  background: #fff;
+  border-radius: 14px;
+  margin: 8px 16px;
   padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .section-heading {
@@ -160,8 +168,11 @@ ion-toolbar {
 
 // Vendor Group
 .vendor-group {
+  background: #fff;
+  border-radius: 14px;
+  margin: 8px 16px;
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
   &:last-child {
     border-bottom: none;

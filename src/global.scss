@@ -295,8 +295,78 @@ ion-col {
   font-family: 'latoBold';
 }
 
-.custom-toast{
-  color:#ffffff;
+// ── Enhanced Toast Styles ──
+
+.custom-toast {
+  --border-radius: 14px;
+  --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  --start: 16px;
+  --end: 16px;
+  --max-width: 420px;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+
+  &::part(container) {
+    padding: 10px 14px;
+    align-items: center;
+  }
+
+  &::part(message) {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    padding-inline-start: 8px;
+  }
+
+  &::part(icon) {
+    font-size: 22px;
+    margin-inline-end: 2px;
+  }
+
+  &::part(button) {
+    font-size: 16px;
+    opacity: 0.7;
+    padding: 0 4px;
+  }
+}
+
+.toast-success {
+  --background: #ecfdf5;
+  --color: #166534;
+
+  &::part(icon) {
+    color: #22c55e;
+  }
+
+  &::part(button) {
+    color: #166534;
+  }
+}
+
+.toast-danger {
+  --background: #fef2f2;
+  --color: #991b1b;
+
+  &::part(icon) {
+    color: #ef4444;
+  }
+
+  &::part(button) {
+    color: #991b1b;
+  }
+}
+
+.toast-primary {
+  --background: #eff6ff;
+  --color: #1e40af;
+
+  &::part(icon) {
+    color: #3b82f6;
+  }
+
+  &::part(button) {
+    color: #1e40af;
+  }
 }
 
 

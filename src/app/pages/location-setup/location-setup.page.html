@@ -1,46 +1,147 @@
+<!-- Header -->
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>Setup your location</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>My Addresses</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="address-list-container">
-    <ion-list>
-      <ion-item (click)="presentActionSheet(list._id)" *ngFor="let list of savedAddresses">
-        <ion-avatar aria-hidden="true" slot="start" [ngClass]="list.defaultAddress ? 'selected' : 'not-selected'">
-          <img [alt]="list.addressType" [src]="getImageSource(list.addressType)" />
-        </ion-avatar>
-        <ion-row style="width: 100%;" class="row-container">
-          <ion-col size="12">
-            <ion-label class="addr-title">{{ list.addressType }}</ion-label>
-          </ion-col>
-          <ion-col size="12">
-            <ion-label class="address-content">{{ list.fullAddress }}</ion-label>
-          </ion-col>
-        </ion-row>
-      </ion-item>
+<ion-content class="address-content">
 
-    </ion-list>
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
   </div>
 
-  <div class="add-fab-btn">
-    <ion-fab>
-      <ion-fab-button color="primary" [routerLink]="['/shared/location-setup']" style="--box-shadow: none;">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+  <div class="address-page" *ngIf="!loading">
+
+    <!-- Section: Home & Office -->
+    <div class="section">
+      <div class="section-label">Home & Office</div>
+
+      <!-- Home Card or Add Home -->
+      <div
+        *ngIf="homeAddress"
+        class="address-card"
+        [class.default]="homeAddress.defaultAddress"
+        (click)="setAsDefault(homeAddress)"
+      >
+        <div class="card-icon" [ngStyle]="{'background-color': getIconBg(homeAddress.addressType)}">
+          <ion-icon [name]="getIcon(homeAddress.addressType)" [ngStyle]="{'color': getIconColor(homeAddress.addressType)}"></ion-icon>
+        </div>
+        <div class="card-info">
+          <div class="card-top">
+            <span class="type-label">{{ getTypeLabel(homeAddress.addressType) }}</span>
+            <span class="default-badge" *ngIf="homeAddress.defaultAddress">DEFAULT</span>
+          </div>
+          <p class="card-address">{{ homeAddress.fullAddress }}</p>
+          <p class="card-landmark" *ngIf="homeAddress.landmark">Near: {{ homeAddress.landmark }}</p>
+        </div>
+        <div class="card-actions">
+          <ion-button fill="clear" class="edit-btn" (click)="editAddress(homeAddress, $event)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" class="delete-btn" (click)="confirmDelete(homeAddress, $event)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="!homeAddress" class="add-slot-card" (click)="addAddress('home')">
+        <div class="add-slot-icon">
+          <ion-icon name="home-outline"></ion-icon>
+        </div>
+        <span class="add-slot-text">+ Add Home Address</span>
+      </div>
+
+      <!-- Office Card or Add Office -->
+      <div
+        *ngIf="officeAddress"
+        class="address-card"
+        [class.default]="officeAddress.defaultAddress"
+        (click)="setAsDefault(officeAddress)"
+      >
+        <div class="card-icon" [ngStyle]="{'background-color': getIconBg(officeAddress.addressType)}">
+          <ion-icon [name]="getIcon(officeAddress.addressType)" [ngStyle]="{'color': getIconColor(officeAddress.addressType)}"></ion-icon>
+        </div>
+        <div class="card-info">
+          <div class="card-top">
+            <span class="type-label">{{ getTypeLabel(officeAddress.addressType) }}</span>
+            <span class="default-badge" *ngIf="officeAddress.defaultAddress">DEFAULT</span>
+          </div>
+          <p class="card-address">{{ officeAddress.fullAddress }}</p>
+          <p class="card-landmark" *ngIf="officeAddress.landmark">Near: {{ officeAddress.landmark }}</p>
+        </div>
+        <div class="card-actions">
+          <ion-button fill="clear" class="edit-btn" (click)="editAddress(officeAddress, $event)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" class="delete-btn" (click)="confirmDelete(officeAddress, $event)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="!officeAddress" class="add-slot-card" (click)="addAddress('officeWork')">
+        <div class="add-slot-icon">
+          <ion-icon name="briefcase-outline"></ion-icon>
+        </div>
+        <span class="add-slot-text">+ Add Office Address</span>
+      </div>
+    </div>
+
+    <!-- Section: Other Addresses -->
+    <div class="section">
+      <div class="section-label">Other Addresses</div>
+
+      <div
+        *ngFor="let addr of otherAddresses"
+        class="address-card"
+        [class.default]="addr.defaultAddress"
+        (click)="setAsDefault(addr)"
+      >
+        <div class="card-icon" [ngStyle]="{'background-color': getIconBg(addr.addressType)}">
+          <ion-icon [name]="getIcon(addr.addressType)" [ngStyle]="{'color': getIconColor(addr.addressType)}"></ion-icon>
+        </div>
+        <div class="card-info">
+          <div class="card-top">
+            <span class="type-label">{{ getTypeLabel(addr.addressType) }}</span>
+            <span class="default-badge" *ngIf="addr.defaultAddress">DEFAULT</span>
+          </div>
+          <p class="card-address">{{ addr.fullAddress }}</p>
+          <p class="card-landmark" *ngIf="addr.landmark">Near: {{ addr.landmark }}</p>
+        </div>
+        <div class="card-actions">
+          <ion-button fill="clear" class="edit-btn" (click)="editAddress(addr, $event)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" class="delete-btn" (click)="confirmDelete(addr, $event)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="add-slot-card" (click)="addAddress('others')">
+        <div class="add-slot-icon">
+          <ion-icon name="add-circle-outline"></ion-icon>
+        </div>
+        <span class="add-slot-text">+ Add Other Address</span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="savedAddresses.length === 0">
+      <div class="empty-icon">
+        <ion-icon name="location-outline"></ion-icon>
+      </div>
+      <h3>No addresses saved</h3>
+      <p>Add your first address to get started</p>
+    </div>
 
   </div>
-
 
 </ion-content>
-
-<ion-footer>
-  <!-- <ion-toolbar> -->
-  <div class="submit-btn">
-    <ion-button expand="block" color="secondary" fill="solid" (click)="navigateToHome()">Submit</ion-button>
-  </div>
-  <!-- </ion-toolbar> -->
-</ion-footer>
-

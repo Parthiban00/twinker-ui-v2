@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
 import { CategoryListPage } from 'src/app/modals/category-list/category-list.page';
@@ -141,7 +141,8 @@ export class HomeMainPage implements OnInit {
     private homeService: HomeMainService,
     private commonService: CommonService,
     private navController: NavController,
-    private eventBus: EventBusService
+    private eventBus: EventBusService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -269,8 +270,11 @@ export class HomeMainPage implements OnInit {
             this.defaultAddress = null;
           }
         }
+        this.cdr.detectChanges();
       },
-      error: (_err: any) => {},
+      error: (_err: any) => {
+        this.cdr.detectChanges();
+      },
       complete: () => {},
     });
   }
@@ -288,9 +292,11 @@ export class HomeMainPage implements OnInit {
           } else {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
+          this.cdr.detectChanges();
         },
         error: (_err: any) => {
           this.categories = [];
+          this.cdr.detectChanges();
         },
         complete: () => {},
       });

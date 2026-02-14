@@ -1,5 +1,39 @@
 <ion-content class="location-content" [scrollY]="false">
 
+  <!-- Location Permission Overlay -->
+  <div class="location-overlay" *ngIf="locationState !== 'ready'">
+
+    <!-- Checking -->
+    <div class="overlay-inner" *ngIf="locationState === 'checking'">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="overlay-text">Checking location...</p>
+    </div>
+
+    <!-- Permission Denied -->
+    <div class="overlay-inner" *ngIf="locationState === 'denied'">
+      <div class="overlay-icon denied">
+        <ion-icon name="location-outline"></ion-icon>
+      </div>
+      <h3 class="overlay-title">Location Permission Required</h3>
+      <p class="overlay-text">We need access to your location to show nearby restaurants and deliver to your address.</p>
+      <ion-button class="overlay-btn" expand="block" (click)="retryLocationPermission()">
+        Allow Location
+      </ion-button>
+    </div>
+
+    <!-- GPS Disabled -->
+    <div class="overlay-inner" *ngIf="locationState === 'disabled'">
+      <div class="overlay-icon disabled">
+        <ion-icon name="navigate-outline"></ion-icon>
+      </div>
+      <h3 class="overlay-title">Turn On Location</h3>
+      <p class="overlay-text">Your device's GPS seems to be turned off. Please enable location services to continue.</p>
+      <ion-button class="overlay-btn" expand="block" (click)="retryLocationPermission()">
+        Retry
+      </ion-button>
+    </div>
+  </div>
+
   <!-- Map -->
   <div class="map-container">
     <div class="map" #map></div>
@@ -11,7 +45,7 @@
   </div>
 
   <!-- Search Bar Overlay -->
-  <div class="search-overlay">
+  <div class="search-overlay" *ngIf="locationState === 'ready'">
     <ion-button class="back-btn" fill="clear" (click)="goBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
     </ion-button>
@@ -52,7 +86,7 @@
   </div>
 
   <!-- Bottom Sheet -->
-  <div class="bottom-sheet" [class.expanded]="sheetExpanded">
+  <div class="bottom-sheet" [class.expanded]="sheetExpanded" *ngIf="locationState === 'ready'">
     <!-- Drag Handle -->
     <div class="drag-handle" (click)="sheetExpanded = !sheetExpanded">
       <div class="handle-bar"></div>
@@ -89,7 +123,8 @@
             <div
               class="type-chip"
               [class.selected]="form.get('addressType')?.value === 'home'"
-              (click)="form.patchValue({ addressType: 'home' })"
+              [class.disabled]="isTypeTaken('home')"
+              (click)="selectAddressType('home')"
             >
               <ion-icon name="home-outline"></ion-icon>
               <span>Home</span>
@@ -97,7 +132,8 @@
             <div
               class="type-chip"
               [class.selected]="form.get('addressType')?.value === 'officeWork'"
-              (click)="form.patchValue({ addressType: 'officeWork' })"
+              [class.disabled]="isTypeTaken('officework')"
+              (click)="selectAddressType('officeWork')"
             >
               <ion-icon name="briefcase-outline"></ion-icon>
               <span>Office</span>
@@ -105,7 +141,7 @@
             <div
               class="type-chip"
               [class.selected]="form.get('addressType')?.value === 'others'"
-              (click)="form.patchValue({ addressType: 'others' })"
+              (click)="selectAddressType('others')"
             >
               <ion-icon name="navigate-outline"></ion-icon>
               <span>Other</span>
@@ -126,7 +162,8 @@
     <!-- Save Button -->
     <ion-button class="save-btn" expand="block" (click)="saveAddress()">
       <span *ngIf="!sheetExpanded">Confirm Location</span>
-      <span *ngIf="sheetExpanded">Save Address</span>
+      <span *ngIf="sheetExpanded && !editMode">Save Address</span>
+      <span *ngIf="sheetExpanded && editMode">Update Address</span>
     </ion-button>
   </div>
 

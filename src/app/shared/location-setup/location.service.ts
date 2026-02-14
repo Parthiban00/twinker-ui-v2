@@ -19,6 +19,10 @@ export class LocationService {
     return this.webservice.post('address/createAddress', data);
   }
 
+  updateAddress(addressId: string, data: any): Observable<any> {
+    return this.webservice.put(`address/updateAddressById/${addressId}`, data);
+  }
+
   checkServiceArea(coords: { lat: number; lng: number }): Observable<any> {
     return this.webservice.post('locality/checkServiceArea', coords);
   }

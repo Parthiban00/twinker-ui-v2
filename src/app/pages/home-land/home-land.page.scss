@@ -94,7 +94,7 @@ ion-toolbar {
 
 /* ===== Content ===== */
 ion-content {
-  --background: #ffffff;
+  --background: #f5f5f5;
 }
 
 /* ===== 2. Hero Section ===== */
@@ -685,6 +685,8 @@ ion-content {
   overflow: hidden;
   margin-bottom: 16px;
   background: #fff;
+
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
 
   .skeleton-img {
     width: 100%;

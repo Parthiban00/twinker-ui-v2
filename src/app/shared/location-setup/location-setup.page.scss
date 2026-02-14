@@ -1,6 +1,94 @@
 .location-content {
   --ion-background-color: #ffffff;
 
+  // ── Location Permission Overlay ──
+  .location-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .overlay-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px;
+
+      ion-spinner {
+        width: 44px;
+        height: 44px;
+        --color: #F85C70;
+        margin-bottom: 16px;
+      }
+    }
+
+    .overlay-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      ion-icon {
+        font-size: 36px;
+      }
+
+      &.denied {
+        background: #fff0e6;
+
+        ion-icon {
+          color: #F85C70;
+        }
+      }
+
+      &.disabled {
+        background: #e8f4fd;
+
+        ion-icon {
+          color: #4A5BF5;
+        }
+      }
+    }
+
+    .overlay-title {
+      font-family: "latoBold", sans-serif;
+      font-size: 18px;
+      color: #1a1a1a;
+      margin: 0 0 8px;
+    }
+
+    .overlay-text {
+      font-family: "latoRegular", sans-serif;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+
+    .overlay-btn {
+      --background: #F85C70;
+      --border-radius: 30px;
+      --box-shadow: none;
+      height: 48px;
+      width: 100%;
+      font-size: 15px;
+      font-family: "latoBold", sans-serif;
+      font-weight: 600;
+      text-transform: none;
+      --color: #ffffff;
+    }
+  }
+
   // ── Map ──
   .map-container {
     position: absolute;
@@ -79,8 +167,8 @@
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
       &.active {
-        border-color: #F5853F;
-        box-shadow: 0 2px 12px rgba(245, 133, 63, 0.15);
+        border-color: #F85C70;
+        box-shadow: 0 2px 12px rgba(248, 92, 112, 0.15);
       }
 
       .search-icon {
@@ -140,12 +228,12 @@
       }
 
       &:active {
-        background: #fff5ee;
+        background: #fff5f5;
       }
 
       .pred-icon {
         font-size: 20px;
-        color: #F5853F;
+        color: #F85C70;
         margin-right: 12px;
         flex-shrink: 0;
       }
@@ -331,17 +419,23 @@
           }
 
           &.selected {
-            border-color: #F5853F;
-            background: #fff5ee;
+            border-color: #F85C70;
+            background: #fff5f5;
 
             ion-icon {
-              color: #F5853F;
+              color: #F85C70;
             }
 
             span {
-              color: #F5853F;
+              color: #F85C70;
               font-family: "latoBold", sans-serif;
             }
+          }
+
+          &.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
           }
         }
       }
@@ -349,9 +443,9 @@
 
     // Save button
     .save-btn {
-      --background: #F5853F;
+      --background: linear-gradient(135deg, #F85C70, #FC8C5C);
       --border-radius: 30px;
-      --box-shadow: none;
+      --box-shadow: 0 4px 16px rgba(248, 92, 112, 0.3);
       height: 48px;
       font-size: 15px;
       font-family: "latoBold", sans-serif;

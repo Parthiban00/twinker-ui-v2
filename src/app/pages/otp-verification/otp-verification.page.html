@@ -1,58 +1,91 @@
-<ion-content class="otp-content">
-  <div class="otp-wrapper">
-    <!-- Back Button -->
-    <ion-button class="back-btn" fill="clear" routerLink="/login" routerDirection="back">
-      <ion-icon slot="icon-only" name="arrow-back-outline" color="medium"></ion-icon>
-    </ion-button>
+<ion-content class="otp-content" [scrollY]="false">
 
-    <!-- Title & Subtitle -->
-    <h1 class="page-title">Verification Code</h1>
-    <p class="page-subtitle">We have sent the verification code to your mobile number</p>
+  <!-- Top gradient strip -->
+  <div class="top-strip">
+    <div class="strip-bg"></div>
+    <div class="strip-decor">
+      <div class="circle c1"></div>
+      <div class="circle c2"></div>
+    </div>
+    <div class="strip-content">
+      <ion-button class="back-btn" fill="clear" (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+      <div class="shield-icon">
+        <ion-icon name="shield-checkmark"></ion-icon>
+      </div>
+    </div>
+  </div>
 
-    <!-- OTP Input Boxes -->
+  <!-- Main content -->
+  <div class="otp-card">
+    <h1 class="otp-title">Verify Your Number</h1>
+    <p class="otp-subtitle">
+      Enter the 4-digit code sent to<br />
+      <span class="phone-number">+91 {{ maskedPhone }}</span>
+    </p>
+
+    <!-- OTP Boxes -->
     <div class="otp-boxes">
-      <ion-input
-        class="otp-box"
-        #otp1
-        maxlength="1"
-        inputmode="numeric"
-        [(ngModel)]="otp.first"
-        (keyup)="otpController($event, otp2, otp1, '')"
-      ></ion-input>
-      <ion-input
-        class="otp-box"
-        #otp2
-        maxlength="1"
-        inputmode="numeric"
-        [(ngModel)]="otp.second"
-        (keyup)="otpController($event, otp3, otp1, otp1)"
-      ></ion-input>
-      <ion-input
-        class="otp-box"
-        #otp3
-        maxlength="1"
-        inputmode="numeric"
-        [(ngModel)]="otp.third"
-        (keyup)="otpController($event, otp4, otp2, otp2)"
-      ></ion-input>
-      <ion-input
-        class="otp-box"
-        #otp4
-        maxlength="1"
-        inputmode="numeric"
-        [(ngModel)]="otp.fourth"
-        (keyup)="otpController($event, '', otp3, otp3)"
-      ></ion-input>
+      <div class="otp-box-wrap" [class.filled]="otp.first">
+        <ion-input
+          class="otp-box"
+          #otp1
+          maxlength="1"
+          inputmode="numeric"
+          [(ngModel)]="otp.first"
+          (keyup)="otpController($event, otp2, null)"
+        ></ion-input>
+      </div>
+      <div class="otp-box-wrap" [class.filled]="otp.second">
+        <ion-input
+          class="otp-box"
+          #otp2
+          maxlength="1"
+          inputmode="numeric"
+          [(ngModel)]="otp.second"
+          (keyup)="otpController($event, otp3, otp1)"
+        ></ion-input>
+      </div>
+      <div class="otp-box-wrap" [class.filled]="otp.third">
+        <ion-input
+          class="otp-box"
+          #otp3
+          maxlength="1"
+          inputmode="numeric"
+          [(ngModel)]="otp.third"
+          (keyup)="otpController($event, otp4, otp2)"
+        ></ion-input>
+      </div>
+      <div class="otp-box-wrap" [class.filled]="otp.fourth">
+        <ion-input
+          class="otp-box"
+          #otp4
+          maxlength="1"
+          inputmode="numeric"
+          [(ngModel)]="otp.fourth"
+          (keyup)="otpController($event, null, otp3)"
+        ></ion-input>
+      </div>
     </div>
 
     <!-- Resend -->
-    <div class="resend-section">
-      <span class="resend-text">Didn't receive code? </span>
-      <span *ngIf="resendDisabled" class="resend-timer">Resend OTP in {{ resendCountdown }}s</span>
-      <span *ngIf="!resendDisabled" class="resend-link" (click)="resentOtp()">Resend OTP</span>
+    <div class="resend-row">
+      <span class="resend-text">Didn't receive code?</span>
+      <div class="resend-action">
+        <div *ngIf="resendDisabled" class="timer-badge">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ resendCountdown }}s</span>
+        </div>
+        <span *ngIf="!resendDisabled" class="resend-link" (click)="resentOtp()">Resend OTP</span>
+      </div>
     </div>
 
-    <!-- Confirm Button -->
-    <ion-button class="confirm-btn" expand="block" (click)="verifyOtpAndLogin()">Confirm</ion-button>
+    <!-- Verify Button -->
+    <button class="verify-btn" [class.disabled]="!isOtpComplete" [disabled]="loading || !isOtpComplete" (click)="verifyOtpAndLogin()">
+      <span *ngIf="!loading">Verify & Continue</span>
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+    </button>
   </div>
+
 </ion-content>

@@ -1,97 +1,239 @@
 .login-content {
-  --ion-background-color: #ffffff;
+  --ion-background-color: #f5f5f5;
+}
 
-  .login-wrapper {
-    padding: 60px 28px 28px;
-    max-width: 420px;
-    margin: 0 auto;
+// ── Hero Section ──
+.hero-section {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #F85C70 0%, #FC8C5C 100%);
+  border-radius: 0 0 40px 40px;
+}
+
+// Decorative circles
+.hero-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
   }
 
-  .illustration {
-    text-align: center;
-    margin-bottom: 30px;
-
-    img {
-      width: 220px;
-      height: 200px;
-      object-fit: contain;
-    }
+  .c1 {
+    width: 180px;
+    height: 180px;
+    top: -40px;
+    right: -30px;
   }
 
-  .page-title {
+  .c2 {
+    width: 120px;
+    height: 120px;
+    bottom: 30px;
+    left: -20px;
+  }
+
+  .c3 {
+    width: 60px;
+    height: 60px;
+    top: 60px;
+    left: 40px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.logo-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+
+  .logo-icon {
+    font-size: 38px;
+    color: #ffffff;
+  }
+}
+
+.brand-name {
+  font-family: "latoBold", sans-serif;
+  font-size: 32px;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.brand-tag {
+  font-family: "latoRegular", sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 4px 0 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+// ── Form Card ──
+.form-card {
+  position: relative;
+  z-index: 2;
+  margin: -40px 20px 0;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 24px 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.form-title {
+  font-family: "latoBold", sans-serif;
+  font-size: 24px;
+  color: #1a1a1a;
+  margin: 0 0 6px;
+}
+
+.form-subtitle {
+  font-family: "latoRegular", sans-serif;
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 28px;
+  line-height: 1.4;
+}
+
+// Phone field
+.phone-field {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 4px 14px;
+  height: 56px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &.focused {
+    border-color: #F85C70;
+    box-shadow: 0 0 0 3px rgba(248, 92, 112, 0.08);
+    background: #ffffff;
+  }
+
+  .country-prefix {
     font-family: "latoBold", sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 8px 0;
-  }
-
-  .page-subtitle {
-    font-family: "latoRegular", sans-serif;
-    font-size: 14px;
-    color: #888888;
-    margin: 0 0 32px 0;
-    line-height: 1.4;
-  }
-
-  .phone-input-container {
-    position: relative;
-    border: 1.5px solid #d0d0d0;
-    border-radius: 8px;
-    padding: 8px 12px;
-    transition: border-color 0.2s ease;
-
-    .floating-label {
-      position: absolute;
-      top: -9px;
-      left: 12px;
-      background: #ffffff;
-      padding: 0 6px;
-      font-size: 12px;
-      color: #888888;
-      font-family: "latoRegular", sans-serif;
-      transition: color 0.2s ease;
-    }
-
-    ion-input {
-      --padding-start: 0;
-      --padding-top: 4px;
-      --padding-bottom: 4px;
-      font-size: 16px;
-      font-family: "latoRegular", sans-serif;
-      color: #1a1a1a;
-    }
-
-    &.focused {
-      border-color: #F5853F;
-
-      .floating-label {
-        color: #F5853F;
-      }
-    }
-  }
-
-  .invalid-div {
-    padding: 4px 4px 0;
-
-    .invalid-text {
-      color: #e53935;
-      font-size: 12px;
-      font-family: "latoRegular", sans-serif;
-    }
-  }
-
-  .continue-btn {
-    margin-top: 32px;
-    --background: #F5853F;
-    --border-radius: 30px;
-    --box-shadow: none;
-    height: 50px;
     font-size: 16px;
-    font-family: "latoBold", sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: none;
+    color: #1a1a1a;
+    flex-shrink: 0;
+    padding-right: 10px;
+  }
+
+  .divider {
+    width: 1px;
+    height: 28px;
+    background: #d8d8d8;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+
+  ion-input {
+    --padding-start: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    font-size: 16px;
+    font-family: "latoRegular", sans-serif;
+    color: #1a1a1a;
+    flex: 1;
+  }
+}
+
+// Error
+.error-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding-left: 4px;
+
+  ion-icon {
+    font-size: 14px;
+    color: #ef4444;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-family: "latoRegular", sans-serif;
+    font-size: 12px;
+    color: #ef4444;
+  }
+}
+
+// CTA Button
+.cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 54px;
+  margin-top: 28px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #F85C70, #FC8C5C);
+  color: #ffffff;
+  font-family: "latoBold", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 16px rgba(248, 92, 112, 0.3);
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  ion-spinner {
+    width: 24px;
+    height: 24px;
     --color: #ffffff;
+  }
+}
+
+// Terms
+.terms {
+  font-family: "latoRegular", sans-serif;
+  font-size: 12px;
+  color: #aaa;
+  text-align: center;
+  margin: 24px 0 0;
+  line-height: 1.6;
+
+  .link {
+    color: #F85C70;
+    font-family: "latoBold", sans-serif;
   }
 }

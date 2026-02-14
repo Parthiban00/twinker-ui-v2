@@ -5,7 +5,7 @@
       <span class="greeting-text">{{ greeting }}<span *ngIf="userName">, {{ userName }}</span>!</span>
     </div>
     <div class="header-top">
-      <div class="address-section" [routerLink]="['/shared/location-setup']">
+      <div class="address-section" [routerLink]="['/location-setup']">
         <span class="address-label">Your current address</span>
         <div class="address-value" *ngIf="defaultAddress">
           <span class="elipsis">{{ defaultAddress.fullAddress }}</span>

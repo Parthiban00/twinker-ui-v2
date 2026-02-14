@@ -1,97 +1,238 @@
 .otp-content {
-  --ion-background-color: #ffffff;
+  --ion-background-color: #f5f5f5;
+}
 
-  .otp-wrapper {
-    padding: 20px 28px 28px;
-    max-width: 420px;
-    margin: 0 auto;
+// ── Top Gradient Strip ──
+.top-strip {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.strip-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #F85C70 0%, #FC8C5C 100%);
+  border-radius: 0 0 32px 32px;
+}
+
+.strip-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
   }
 
-  .back-btn {
+  .c1 {
+    width: 140px;
+    height: 140px;
+    top: -30px;
+    left: -30px;
+  }
+
+  .c2 {
+    width: 80px;
+    height: 80px;
+    bottom: 10px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.strip-content {
+  position: relative;
+  z-index: 1;
+  padding: 16px 16px 0;
+}
+
+.back-btn {
+  --color: #ffffff;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0 0 12px;
+  height: 40px;
+  width: 40px;
+  min-width: 40px;
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.shield-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+
+  ion-icon {
+    font-size: 34px;
+    color: #ffffff;
+  }
+}
+
+// ── OTP Card ──
+.otp-card {
+  position: relative;
+  z-index: 2;
+  margin: -32px 20px 0;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 24px 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.otp-title {
+  font-family: "latoBold", sans-serif;
+  font-size: 22px;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.otp-subtitle {
+  font-family: "latoRegular", sans-serif;
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 32px;
+  text-align: center;
+  line-height: 1.5;
+
+  .phone-number {
+    font-family: "latoBold", sans-serif;
+    color: #1a1a1a;
+    font-size: 15px;
+  }
+}
+
+// OTP Boxes
+.otp-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.otp-box-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: #f8f8f8;
+  border: 1.5px solid #e8e8e8;
+  transition: all 0.2s ease;
+  overflow: hidden;
+
+  &.filled {
+    border-color: #F85C70;
+    background: #fff5f5;
+    box-shadow: 0 2px 8px rgba(248, 92, 112, 0.1);
+  }
+
+  .otp-box {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-family: "latoBold", sans-serif;
+    color: #1a1a1a;
     --padding-start: 0;
     --padding-end: 0;
-    margin: 0 0 24px -8px;
-    height: 36px;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --background: transparent;
+
+    &.has-focus {
+      border: none;
+    }
+  }
+}
+
+// Resend
+.resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.resend-text {
+  font-family: "latoRegular", sans-serif;
+  font-size: 13px;
+  color: #888;
+}
+
+.resend-action {
+  .timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0f0f0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: "latoBold", sans-serif;
+    font-size: 13px;
+    color: #666;
 
     ion-icon {
-      font-size: 22px;
+      font-size: 14px;
     }
   }
 
-  .page-title {
+  .resend-link {
     font-family: "latoBold", sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 8px 0;
-  }
+    font-size: 13px;
+    color: #F85C70;
+    cursor: pointer;
+    padding: 4px 0;
 
-  .page-subtitle {
-    font-family: "latoRegular", sans-serif;
-    font-size: 14px;
-    color: #888888;
-    margin: 0 0 36px 0;
-    line-height: 1.4;
-  }
-
-  .otp-boxes {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 28px;
-
-    .otp-box {
-      width: 55px;
-      height: 55px;
-      min-width: 55px;
-      max-width: 55px;
-      border: 1.5px solid #d0d0d0;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 22px;
-      font-family: "latoBold", sans-serif;
-      color: #1a1a1a;
-      --padding-start: 0;
-      --padding-end: 0;
-      --padding-top: 0;
-      --padding-bottom: 0;
-      --background: #ffffff;
-      transition: border-color 0.2s ease;
-
-      &.has-focus {
-        border-color: #F5853F;
-      }
+    &:active {
+      opacity: 0.7;
     }
   }
+}
 
-  .resend-section {
-    text-align: center;
-    margin-bottom: 32px;
-    font-family: "latoRegular", sans-serif;
-    font-size: 14px;
+// Verify Button
+.verify-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #F85C70, #FC8C5C);
+  color: #ffffff;
+  font-family: "latoBold", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 16px rgba(248, 92, 112, 0.3);
 
-    .resend-text {
-      color: #888888;
-    }
-
-    .resend-link {
-      color: #F5853F;
-      font-family: "latoBold", sans-serif;
-      font-weight: 600;
-      cursor: pointer;
-    }
+  &:active {
+    transform: scale(0.98);
   }
 
-  .confirm-btn {
-    --background: #F5853F;
-    --border-radius: 30px;
-    --box-shadow: none;
-    height: 50px;
-    font-size: 16px;
-    font-family: "latoBold", sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: none;
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  ion-spinner {
+    width: 24px;
+    height: 24px;
     --color: #ffffff;
   }
 }

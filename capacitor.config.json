@@ -1,5 +1,14 @@
 {
   "appId": "com.parthitechs.starter",
-  "appName": "E-Commerce",
-  "webDir": "www/browser"
+  "appName": "Twinker",
+  "webDir": "www/browser",
+  "server": {
+    "allowNavigation": [
+      "maps.googleapis.com",
+      "maps.google.com",
+      "*.googleapis.com",
+      "*.gstatic.com",
+      "*.google.com"
+    ]
+  }
 }

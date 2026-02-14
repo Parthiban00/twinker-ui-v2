@@ -21,12 +21,16 @@ export class WebService {
     return this.http.post(`${this.rootURL}/${uri}`, payload);
   }
 
+  put(uri: string, payload: object) {
+    return this.http.put(`${this.rootURL}/${uri}`, payload);
+  }
+
   patch(uri: string, payload: object) {
     return this.http.patch(`${this.rootURL}/${uri}`, payload);
   }
 
-  delete(uri: string, payload: object) {
-    return this.http.get(`${this.rootURL}/${uri}`, payload);
+  delete(uri: string) {
+    return this.http.delete(`${this.rootURL}/${uri}`);
   }
 
 }

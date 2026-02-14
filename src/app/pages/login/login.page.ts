@@ -14,6 +14,7 @@ export class LoginPage implements OnInit {
 
   signInForm: FormGroup;
   phoneInputFocused = false;
+  loading = false;
 
   constructor(private router: Router, private fb: FormBuilder, private loginService: LoginService, private commonService: CommonService) {
     this.signInForm = this.fb.group({
@@ -28,10 +29,12 @@ export class LoginPage implements OnInit {
   ngOnInit() { }
 
   requestOTP() {
-    if (this.signInForm.valid) {
+    if (this.signInForm.valid && !this.loading) {
+      this.loading = true;
       const data = this.signInForm.getRawValue();
       this.loginService.requestOTP(data).subscribe({
         next: (resdata: any) => {
+          this.loading = false;
           if (resdata.status) {
             this.commonService.presentToast('bottom', resdata.message, 'success');
             this.router.navigate(['/otp-verification'], { queryParams: { mobileNo: data.mobileNo } });
@@ -40,12 +43,10 @@ export class LoginPage implements OnInit {
           }
         },
         error: (_err: any) => {
+          this.loading = false;
           this.commonService.presentToast('bottom', 'Failed to send OTP. Please try again.', 'danger');
-        },
-        complete: () => {
         },
       });
     }
   }
-
 }

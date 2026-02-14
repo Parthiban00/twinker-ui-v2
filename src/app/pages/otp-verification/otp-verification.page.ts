@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 import { OtpService } from './otp.service';
 import { CommonService } from 'src/app/services/common.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -13,21 +14,29 @@ import { StorageService } from 'src/app/services/storage.service';
 export class OtpVerificationPage implements OnInit, OnDestroy {
 
   mobileNo: string;
+  maskedPhone: string;
   otp: any = { first: '', second: '', third: '', fourth: '' };
 
   resendDisabled = true;
   resendCountdown = 20;
   private resendInterval: any;
+  loading = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private otpService: OtpService,
     private commonService: CommonService,
     private router: Router,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private navCtrl: NavController
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
       this.mobileNo = params.mobileNo;
+      if (this.mobileNo && this.mobileNo.length >= 4) {
+        this.maskedPhone = '******' + this.mobileNo.slice(-4);
+      } else {
+        this.maskedPhone = this.mobileNo || '';
+      }
     });
   }
 
@@ -59,42 +68,37 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
     }
   }
 
-  otpController(event: any, next: any, prev: any, index: any) {
+  get isOtpComplete(): boolean {
+    return !!(this.otp.first && this.otp.second && this.otp.third && this.otp.fourth);
+  }
+
+  otpController(event: any, next: any, prev: any) {
     if (event.target.value.length < 1 && prev) {
       prev.setFocus();
-    }
-    else if (next && event.target.value.length > 0) {
+    } else if (next && event.target.value.length > 0) {
       next.setFocus();
     }
-    else {
-      return 0;
-    }
+  }
+
+  goBack() {
+    this.navCtrl.back();
   }
 
   verifyOtpAndLogin() {
     const enteredOTP = `${this.otp.first}${this.otp.second}${this.otp.third}${this.otp.fourth}`;
-    if (this.mobileNo && (enteredOTP && enteredOTP.length === 4)) {
-      const data = {
-        mobileNo: this.mobileNo,
-        otp: enteredOTP
-      };
+    if (this.mobileNo && enteredOTP.length === 4 && !this.loading) {
+      this.loading = true;
+      const data = { mobileNo: this.mobileNo, otp: enteredOTP };
 
       this.otpService.login(data).subscribe({
         next: (resdata: any) => {
+          this.loading = false;
           if (resdata.status) {
             this.commonService.presentToast('bottom', resdata.message, 'success');
-
             if (resdata.data) {
-              // Save JWT token
-              if (resdata.data.token) {
-                this.storageService.saveToken(resdata.data.token);
-              }
-              // Save user data
-              if (resdata.data.user) {
-                this.storageService.saveUser(resdata.data.user);
-              }
+              if (resdata.data.token) this.storageService.saveToken(resdata.data.token);
+              if (resdata.data.user) this.storageService.saveUser(resdata.data.user);
 
-              // Route based on hasDefaultAddress
               if (resdata.data.hasDefaultAddress) {
                 this.router.navigate(['/tabs/']);
               } else {
@@ -106,9 +110,8 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
           }
         },
         error: (_err: any) => {
+          this.loading = false;
           this.commonService.presentToast('bottom', 'Invalid OTP or verification failed. Please try again.', 'danger');
-        },
-        complete: () => {
         },
       });
     }
@@ -116,10 +119,7 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
 
   resentOtp() {
     if (this.mobileNo && !this.resendDisabled) {
-      const data = {
-        mobileNo: this.mobileNo
-      };
-
+      const data = { mobileNo: this.mobileNo };
       this.otpService.resendOTP(data).subscribe({
         next: (resdata: any) => {
           if (resdata.status) {
@@ -132,10 +132,7 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
         error: (_err: any) => {
           this.commonService.presentToast('bottom', 'Failed to resend OTP. Please try again.', 'danger');
         },
-        complete: () => {
-        },
       });
     }
   }
-
 }
