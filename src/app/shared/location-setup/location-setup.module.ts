@@ -6,7 +6,6 @@ import { LocationSetupPageRoutingModule } from './location-setup-routing.module'
 import { LocationSetupPage } from './location-setup.page';
 
 import { WebService } from 'src/app/services/web.service';
-import { HttpClientModule } from '@angular/common/http';
 import { LocationService } from './location.service';
 import { StorageService } from 'src/app/services/storage.service';
 
@@ -16,7 +15,6 @@ import { StorageService } from 'src/app/services/storage.service';
     FormsModule,
     IonicModule,
     LocationSetupPageRoutingModule,
-    HttpClientModule,
     ReactiveFormsModule
   ],
   declarations: [LocationSetupPage],

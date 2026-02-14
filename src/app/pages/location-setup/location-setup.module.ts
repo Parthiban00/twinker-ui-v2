@@ -10,15 +10,13 @@ import { LocationSetupPage } from './location-setup.page';
 import { WebService } from 'src/app/services/web.service';
 import { LocationSetupService } from './location-setup.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    LocationSetupPageRoutingModule,
-    HttpClientModule
+    LocationSetupPageRoutingModule
   ],
   declarations: [LocationSetupPage],
   providers:[ WebService, LocationSetupService, StorageService ]

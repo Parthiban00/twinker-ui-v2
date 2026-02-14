@@ -1,0 +1,34 @@
+<ion-content class="not-available-content">
+  <div class="not-available-wrapper">
+
+    <!-- Icon Circle -->
+    <div class="icon-circle">
+      <ion-icon name="location-outline"></ion-icon>
+    </div>
+
+    <!-- Title -->
+    <h1 class="page-title">Service Not Available</h1>
+
+    <!-- Subtitle -->
+    <p class="page-subtitle">
+      We're not available in your area yet. Try adding a different address or check back later.
+    </p>
+
+    <!-- Buttons -->
+    <div class="actions">
+      <ion-button class="primary-btn" expand="block" (click)="addDifferentAddress()">
+        Add a Different Address
+      </ion-button>
+
+      <ion-button class="outline-btn" expand="block" fill="outline" (click)="manageSavedAddresses()">
+        Manage Saved Addresses
+      </ion-button>
+    </div>
+
+    <!-- Logout Link -->
+    <div class="logout-section">
+      <span class="logout-link" (click)="logout()">Logout</span>
+    </div>
+
+  </div>
+</ion-content>

@@ -18,4 +18,8 @@ export class LocationService {
   saveAddress(data: any): Observable<any> {
     return this.webservice.post('address/createAddress', data);
   }
+
+  checkServiceArea(coords: { lat: number; lng: number }): Observable<any> {
+    return this.webservice.post('locality/checkServiceArea', coords);
+  }
 }

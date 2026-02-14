@@ -48,7 +48,8 @@
     <!-- Resend -->
     <div class="resend-section">
       <span class="resend-text">Didn't receive code? </span>
-      <span class="resend-link" (click)="resentOtp()">Resend</span>
+      <span *ngIf="resendDisabled" class="resend-timer">Resend OTP in {{ resendCountdown }}s</span>
+      <span *ngIf="!resendDisabled" class="resend-link" (click)="resentOtp()">Resend OTP</span>
     </div>
 
     <!-- Confirm Button -->

@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { OtpVerificationPageRoutingModule } from './otp-verification-routing.module';
 import { OtpVerificationPage } from './otp-verification.page';
 import { WebService } from 'src/app/services/web.service';
-import { HttpClientModule } from '@angular/common/http';
 import { OtpService } from './otp.service';
 
 @NgModule({
@@ -13,7 +12,6 @@ import { OtpService } from './otp.service';
     CommonModule,
     FormsModule,
     IonicModule,
-    HttpClientModule,
     OtpVerificationPageRoutingModule,
     ReactiveFormsModule
   ],

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OtpService } from './otp.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -10,40 +10,56 @@ import { StorageService } from 'src/app/services/storage.service';
   styleUrls: ['./otp-verification.page.scss'],
   standalone: false,
 })
-export class OtpVerificationPage implements OnInit {
+export class OtpVerificationPage implements OnInit, OnDestroy {
 
   mobileNo: string;
-  otp: any = { first: '', second: '', third: '', forth: '' };
+  otp: any = { first: '', second: '', third: '', fourth: '' };
 
-  // eslint-disable-next-line max-len
-  constructor(private activatedRoute: ActivatedRoute, private otpService: OtpService, private commonService: CommonService, private router: Router, private storgeService: StorageService) {
+  resendDisabled = true;
+  resendCountdown = 20;
+  private resendInterval: any;
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private otpService: OtpService,
+    private commonService: CommonService,
+    private router: Router,
+    private storageService: StorageService
+  ) {
     this.activatedRoute.queryParams.subscribe(params => {
       this.mobileNo = params.mobileNo;
     });
   }
 
-  private getDummyUser() {
-    return {
-      _id: 'demo_user_001',
-      mobileNo: this.mobileNo || '9999999999',
-      name: 'Demo User',
-      email: 'demo@twinker.app',
-      addresses: [
-        {
-          _id: 'addr_001',
-          fullAddress: '123 MG Road, Madurai, Tamil Nadu 625001',
-          addressType: 'Home',
-          defaultAddress: true,
-          coords: { lat: 9.9252, lng: 78.1198 },
-          locality: { _id: 'loc_001', name: 'Madurai Central' }
-        }
-      ]
-    };
+  ngOnInit() {
+    this.startResendTimer();
   }
 
-  ngOnInit() { }
+  ngOnDestroy() {
+    this.clearResendTimer();
+  }
 
-  otpController(event, next, prev, index) {
+  startResendTimer() {
+    this.resendDisabled = true;
+    this.resendCountdown = 20;
+    this.clearResendTimer();
+    this.resendInterval = setInterval(() => {
+      this.resendCountdown--;
+      if (this.resendCountdown <= 0) {
+        this.resendDisabled = false;
+        this.clearResendTimer();
+      }
+    }, 1000);
+  }
+
+  private clearResendTimer() {
+    if (this.resendInterval) {
+      clearInterval(this.resendInterval);
+      this.resendInterval = null;
+    }
+  }
+
+  otpController(event: any, next: any, prev: any, index: any) {
     if (event.target.value.length < 1 && prev) {
       prev.setFocus();
     }
@@ -69,24 +85,28 @@ export class OtpVerificationPage implements OnInit {
             this.commonService.presentToast('bottom', resdata.message, 'success');
 
             if (resdata.data) {
-              this.storgeService.saveUser(resdata.data);
-            }
+              // Save JWT token
+              if (resdata.data.token) {
+                this.storageService.saveToken(resdata.data.token);
+              }
+              // Save user data
+              if (resdata.data.user) {
+                this.storageService.saveUser(resdata.data.user);
+              }
 
-            if (resdata.data && (resdata.data.addresses && resdata.data.addresses.length)) {
-              this.router.navigate(['/tabs/']);
-            } else {
-              this.router.navigate(['/shared/location-setup']);
+              // Route based on hasDefaultAddress
+              if (resdata.data.hasDefaultAddress) {
+                this.router.navigate(['/tabs/']);
+              } else {
+                this.router.navigate(['/shared/location-setup']);
+              }
             }
           } else {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
         error: (_err: any) => {
-          // Dummy mode: save demo user and proceed
-          const dummyUser = this.getDummyUser();
-          this.storgeService.saveUser(dummyUser);
-          this.commonService.presentToast('bottom', 'Logged in (demo mode)', 'success');
-          this.router.navigate(['/tabs/']);
+          this.commonService.presentToast('bottom', 'Invalid OTP or verification failed. Please try again.', 'danger');
         },
         complete: () => {
         },
@@ -95,7 +115,7 @@ export class OtpVerificationPage implements OnInit {
   }
 
   resentOtp() {
-    if (this.mobileNo) {
+    if (this.mobileNo && !this.resendDisabled) {
       const data = {
         mobileNo: this.mobileNo
       };
@@ -103,14 +123,14 @@ export class OtpVerificationPage implements OnInit {
       this.otpService.resendOTP(data).subscribe({
         next: (resdata: any) => {
           if (resdata.status) {
-
             this.commonService.presentToast('bottom', resdata.message, 'success');
+            this.startResendTimer();
           } else {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
         error: (_err: any) => {
-          this.commonService.presentToast('bottom', 'OTP resent (demo mode)', 'success');
+          this.commonService.presentToast('bottom', 'Failed to resend OTP. Please try again.', 'danger');
         },
         complete: () => {
         },

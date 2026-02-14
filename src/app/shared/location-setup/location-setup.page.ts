@@ -59,7 +59,7 @@ export class LocationSetupPage implements OnInit {
     this.form = this.fb.group({
       locality: ['', [Validators.required]],
       addressType: ['', [Validators.required]],
-      landmark: ['', [Validators.required]],
+      landmark: [''],
       fullAddress: ['', [Validators.required]],
       coords: [{}, [Validators.required]]
     });
@@ -85,21 +85,13 @@ export class LocationSetupPage implements OnInit {
         if (resdata.status) {
           this.localities = resdata.data ? resdata.data : [];
         } else {
-          this.useDummyLocalities();
+          this.localities = [];
         }
       },
       error: (_err: any) => {
-        this.useDummyLocalities();
+        this.localities = [];
       },
     });
-  }
-
-  private useDummyLocalities() {
-    this.localities = [
-      { _id: 'loc_001', locality: 'Madurai Central' },
-      { _id: 'loc_002', locality: 'Anna Nagar' },
-      { _id: 'loc_003', locality: 'KK Nagar' }
-    ];
   }
 
   // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
@@ -173,7 +165,7 @@ export class LocationSetupPage implements OnInit {
     });
   }
 
-  // ── Search / Autocomplete ──
+  // -- Search / Autocomplete --
 
   onSearchInput() {
     clearTimeout(this.searchDebounceTimer);
@@ -234,13 +226,13 @@ export class LocationSetupPage implements OnInit {
     }, 200);
   }
 
-  // ── Navigation ──
+  // -- Navigation --
 
   goBack() {
     this.navCtrl.back();
   }
 
-  // ── Save ──
+  // -- Save --
 
   saveAddress() {
     if (!this.sheetExpanded) {
@@ -260,38 +252,39 @@ export class LocationSetupPage implements OnInit {
               this.storageService.saveUser(resdata.data);
             }
             if (!this.fromPage) {
-              this.router.navigate(['/tabs/']);
-              this.emitEvent();
+              // Check service area after saving address
+              const coords = reqData.coords;
+              this.checkServiceAreaAndRoute(coords);
             }
           } else {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
         error: (_err: any) => {
-          // Dummy mode: save address locally and proceed
-          const currentUser = this.storageService.getUser() || {};
-          const selectedLocality = this.localities.find(l => l._id === reqData.locality);
-          const dummyAddress = {
-            _id: 'addr_' + Date.now(),
-            fullAddress: reqData.fullAddress || this.formattedAddress || 'Demo Address',
-            addressType: reqData.addressType,
-            defaultAddress: true,
-            coords: reqData.coords,
-            locality: selectedLocality ? { _id: selectedLocality._id, name: selectedLocality.locality } : { _id: 'loc_001', name: 'Madurai Central' }
-          };
-          currentUser.addresses = currentUser.addresses || [];
-          currentUser.addresses.push(dummyAddress);
-          this.storageService.saveUser(currentUser);
-          this.commonService.presentToast('bottom', 'Address saved (demo mode)', 'success');
-          if (!this.fromPage) {
-            this.router.navigate(['/tabs/']);
-            this.emitEvent();
-          }
+          this.commonService.presentToast('bottom', 'Failed to save address. Please try again.', 'danger');
         },
       });
     } else {
       this.commonService.presentToast('bottom', 'Please enter required data!', 'danger');
     }
+  }
+
+  private checkServiceAreaAndRoute(coords: { lat: number; lng: number }) {
+    this.locationService.checkServiceArea(coords).subscribe({
+      next: (resdata: any) => {
+        if (resdata.status && resdata.data?.serviceAvailable) {
+          this.router.navigate(['/tabs/']);
+          this.emitEvent();
+        } else {
+          this.router.navigate(['/service-not-available']);
+        }
+      },
+      error: (_err: any) => {
+        // If service area check fails, proceed to tabs
+        this.router.navigate(['/tabs/']);
+        this.emitEvent();
+      },
+    });
   }
 
   emitEvent() {

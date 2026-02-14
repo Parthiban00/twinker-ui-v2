@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 const USER_KEY = 'auth-user';
+const TOKEN_KEY = 'auth-token';
 
 @Injectable({
   providedIn: 'root'
@@ -43,12 +44,19 @@ export class StorageService {
     window.localStorage.setItem(key, JSON.stringify(value));
   }
 
-  public isLoggedIn(): boolean {
-    const user = window.localStorage.getItem(USER_KEY);
-    if (user) {
-      return true;
-    }
+  public saveToken(token: string): void {
+    window.localStorage.setItem(TOKEN_KEY, token);
+  }
 
-    return false;
+  public getToken(): string | null {
+    return window.localStorage.getItem(TOKEN_KEY);
+  }
+
+  public removeToken(): void {
+    window.localStorage.removeItem(TOKEN_KEY);
+  }
+
+  public isLoggedIn(): boolean {
+    return !!window.localStorage.getItem(TOKEN_KEY);
   }
 }

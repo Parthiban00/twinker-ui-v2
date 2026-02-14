@@ -125,31 +125,13 @@ export class HomeMainPage implements OnInit {
     }
   ];
 
-  // Dummy popular items (fallback when no order history)
+  // Popular items (shown when no order history)
   popularItems = [
     { name: 'Chicken Biryani', vendor: 'Spice Garden', price: 12.50, image: 'assets/announcement-banner.jpg' },
     { name: 'Margherita Pizza', vendor: 'Pizza Hub', price: 9.99, image: 'assets/announcement-banner.jpg' },
     { name: 'Fresh Milk 1L', vendor: 'FreshMart', price: 1.50, image: 'assets/announcement-banner.jpg' },
     { name: 'Paracetamol', vendor: 'MedPlus', price: 2.00, image: 'assets/announcement-banner.jpg' },
     { name: 'Chocolate Cake', vendor: 'Sweet Bites', price: 15.00, image: 'assets/announcement-banner.jpg' }
-  ];
-
-  dummyDefaultAddress: any = {
-    _id: 'addr_001',
-    fullAddress: '123 MG Road, Madurai, Tamil Nadu 625001',
-    addressType: 'Home',
-    defaultAddress: true,
-    coords: { lat: 9.9252, lng: 78.1198 },
-    locality: { _id: 'loc_001', name: 'Madurai Central' }
-  };
-
-  dummyCategories: any[] = [
-    { _id: 'cat_01', categoryName: 'Restaurants', imageUrl: '' },
-    { _id: 'cat_02', categoryName: 'Groceries', imageUrl: '' },
-    { _id: 'cat_03', categoryName: 'Sea Foods', imageUrl: '' },
-    { _id: 'cat_04', categoryName: 'Bakery', imageUrl: '' },
-    { _id: 'cat_05', categoryName: 'Fruits & Veggies', imageUrl: '' },
-    { _id: 'cat_06', categoryName: 'Pharmacy', imageUrl: '' }
   ];
 
   constructor(
@@ -174,9 +156,8 @@ export class HomeMainPage implements OnInit {
     this.setGreeting();
     const userData = this.storageService.getUser();
     if (userData.mobileNo) {
-      if (userData.addresses.length) {
-        this.userName = userData.name || '';
-        this.router.navigate(['/tabs']);
+      if (userData.addresses && userData.addresses.length) {
+        this.userName = userData.name || userData.fullName || '';
         this.getDefaultAddressByUserId(userData._id);
       } else {
         this.router.navigate(['/shared/location-setup']);
@@ -267,24 +248,31 @@ export class HomeMainPage implements OnInit {
         if (resdata.status) {
           if (resdata.data) {
             this.defaultAddress = resdata.data;
-            this.getAllCategoriesByLocality();
+            // Check service area for default address
+            if (this.defaultAddress.coords) {
+              this.homeService.checkServiceArea(this.defaultAddress.coords).subscribe({
+                next: (saRes: any) => {
+                  if (saRes.status && saRes.data && !saRes.data.serviceAvailable) {
+                    this.router.navigate(['/service-not-available']);
+                  } else {
+                    this.getAllCategoriesByLocality();
+                  }
+                },
+                error: () => {
+                  this.getAllCategoriesByLocality();
+                }
+              });
+            } else {
+              this.getAllCategoriesByLocality();
+            }
           } else {
             this.defaultAddress = null;
           }
-        } else {
-          this.useDummyData();
         }
       },
-      error: (_err: any) => {
-        this.useDummyData();
-      },
+      error: (_err: any) => {},
       complete: () => {},
     });
-  }
-
-  private useDummyData() {
-    this.defaultAddress = this.dummyDefaultAddress;
-    this.categories = this.dummyCategories;
   }
 
   getAllCategoriesByLocality() {
@@ -295,19 +283,19 @@ export class HomeMainPage implements OnInit {
             if (resdata.data) {
               this.categories = resdata.data;
             } else {
-              this.categories = null;
+              this.categories = [];
             }
           } else {
             this.commonService.presentToast('bottom', resdata.message, 'danger');
           }
         },
         error: (_err: any) => {
-          this.categories = this.dummyCategories;
+          this.categories = [];
         },
         complete: () => {},
       });
     } else {
-      this.categories = this.dummyCategories;
+      this.categories = [];
     }
   }
 

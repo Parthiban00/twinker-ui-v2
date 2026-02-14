@@ -1,0 +1,89 @@
+.not-available-content {
+  --background: #fafafa;
+}
+
+.not-available-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.icon-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F85C70, #FC5C7D);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+
+  ion-icon {
+    font-size: 44px;
+    color: #fff;
+  }
+}
+
+.page-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 22px;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.page-subtitle {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 15px;
+  color: #888;
+  line-height: 1.5;
+  margin: 0 0 36px 0;
+  max-width: 300px;
+}
+
+.actions {
+  width: 100%;
+  max-width: 320px;
+}
+
+.primary-btn {
+  --background: linear-gradient(135deg, #F85C70, #FC5C7D);
+  --border-radius: 30px;
+  --box-shadow: 0 4px 12px rgba(248, 92, 112, 0.3);
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  height: 50px;
+  margin-bottom: 14px;
+  text-transform: none;
+}
+
+.outline-btn {
+  --border-radius: 30px;
+  --border-color: #F85C70;
+  --color: #F85C70;
+  --border-width: 1.5px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  height: 50px;
+  margin-bottom: 14px;
+  text-transform: none;
+}
+
+.logout-section {
+  margin-top: 24px;
+}
+
+.logout-link {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:active {
+    color: #F85C70;
+  }
+}

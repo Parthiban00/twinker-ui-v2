@@ -8,7 +8,6 @@ import { LoginPageRoutingModule } from './login-routing.module';
 import { LoginPage } from './login.page';
 import { LoginService } from './login.service';
 import { WebService } from 'src/app/services/web.service';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -16,8 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     IonicModule,
     LoginPageRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule
+    ReactiveFormsModule
   ],
   providers:[WebService, LoginService],
   declarations: [LoginPage]

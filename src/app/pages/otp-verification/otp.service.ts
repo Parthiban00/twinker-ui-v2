@@ -18,4 +18,8 @@ export class OtpService {
   resendOTP(data: any): Observable<any> {
     return this.webservice.post('auth/requestOTP', data);
   }
+
+  validateToken(): Observable<any> {
+    return this.webservice.get('auth/validate');
+  }
 }

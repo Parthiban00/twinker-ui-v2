@@ -40,9 +40,7 @@ export class LoginPage implements OnInit {
           }
         },
         error: (_err: any) => {
-          // Dummy mode: skip API, proceed with entered number
-          this.commonService.presentToast('bottom', 'OTP sent (demo mode)', 'success');
-          this.router.navigate(['/otp-verification'], { queryParams: { mobileNo: data.mobileNo } });
+          this.commonService.presentToast('bottom', 'Failed to send OTP. Please try again.', 'danger');
         },
         complete: () => {
         },

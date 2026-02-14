@@ -11,7 +11,6 @@ import { SpecificItemListPageModule } from 'src/app/shared/pages/specific-item-l
 import { WebService } from 'src/app/services/web.service';
 import { VendorService } from './vendor.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { HttpClientModule } from '@angular/common/http';
 import { HomeMainService } from '../home-main/home-main.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -21,8 +20,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     FormsModule,
     IonicModule,
     HomeLandPageRoutingModule,
-    SpecificItemListPageModule,
-    HttpClientModule
+    SpecificItemListPageModule
   ],
   declarations: [HomeLandPage],
   providers:[ WebService, VendorService, StorageService, HomeMainService ],

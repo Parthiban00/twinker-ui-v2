@@ -26,4 +26,8 @@ export class HomeMainService {
   getPopularCuisines(categoryId: string): Observable<any> {
     return this.webservice.get(`product/popularCuisines/${categoryId}`);
   }
+
+  checkServiceArea(coords: { lat: number; lng: number }): Observable<any> {
+    return this.webservice.post('locality/checkServiceArea', coords);
+  }
 }

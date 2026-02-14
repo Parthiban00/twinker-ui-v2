@@ -10,7 +10,6 @@ import { HomeMainPage } from './home-main.page';
 import { StorageService } from 'src/app/services/storage.service';
 import { HomeMainService } from './home-main.service';
 import { WebService } from 'src/app/services/web.service';
-import { HttpClientModule } from '@angular/common/http';
 import { CategoryListPageModule } from 'src/app/modals/category-list/category-list.module';
 
 @NgModule({
@@ -19,7 +18,6 @@ import { CategoryListPageModule } from 'src/app/modals/category-list/category-li
     FormsModule,
     IonicModule,
     HomeMainPageRoutingModule,
-    HttpClientModule,
     CategoryListPageModule
   ],
   declarations: [HomeMainPage],

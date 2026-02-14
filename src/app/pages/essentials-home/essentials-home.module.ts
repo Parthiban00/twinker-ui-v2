@@ -10,14 +10,12 @@ import { EssentialsHomePage } from './essentials-home.page';
 import { ItemsService } from '../items/items.service';
 import { WebService } from 'src/app/services/web.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HttpClientModule,
     EssentialsHomePageRoutingModule
   ],
   declarations: [EssentialsHomePage],
