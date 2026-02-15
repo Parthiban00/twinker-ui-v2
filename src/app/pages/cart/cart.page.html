@@ -114,33 +114,132 @@
 
     <div class="divider"></div>
 
+    <!-- Apply Coupon Section -->
+    <div class="coupon-section" *ngIf="!appliedOffer">
+
+      <!-- Collapsed State -->
+      <div class="coupon-collapsed" *ngIf="!showOfferSheet" (click)="toggleOfferSheet()">
+        <div class="coupon-collapsed-left">
+          <ion-icon name="pricetag-outline" class="coupon-icon"></ion-icon>
+          <span class="coupon-label">Apply Coupon</span>
+        </div>
+        <ion-icon name="chevron-down-outline" class="coupon-toggle-icon"></ion-icon>
+      </div>
+
+      <!-- Best Offer Suggestion (collapsed) -->
+      <div class="best-offer-suggestion" *ngIf="!showOfferSheet && getBestOffer() && !isLoadingOffers" (click)="toggleOfferSheet()">
+        <div class="best-offer-info">
+          <ion-icon name="gift-outline" class="best-offer-icon"></ion-icon>
+          <span class="best-offer-text">
+            Best offer: <strong>{{ getBestOffer().code || getBestOffer().title }}</strong> saves
+            <strong>&#8377;{{ getOfferSavings(getBestOffer()) }}</strong>
+          </span>
+        </div>
+        <button class="best-offer-apply-btn" (click)="$event.stopPropagation(); applyOffer(getBestOffer())">APPLY</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="coupon-loading" *ngIf="!showOfferSheet && isLoadingOffers">
+        <ion-spinner name="dots" color="medium"></ion-spinner>
+        <span>Finding best offers...</span>
+      </div>
+
+      <!-- Expanded State -->
+      <div class="coupon-expanded" *ngIf="showOfferSheet">
+        <div class="coupon-expanded-header" (click)="toggleOfferSheet()">
+          <div class="coupon-collapsed-left">
+            <ion-icon name="pricetag-outline" class="coupon-icon"></ion-icon>
+            <span class="coupon-label">Apply Coupon</span>
+          </div>
+          <ion-icon name="chevron-up-outline" class="coupon-toggle-icon"></ion-icon>
+        </div>
+
+        <!-- Manual Code Input -->
+        <div class="coupon-input-row">
+          <input
+            type="text"
+            class="coupon-input"
+            placeholder="Enter coupon code"
+            [(ngModel)]="couponCode"
+            (keyup.enter)="applyCouponCode()"
+          />
+          <button class="coupon-apply-btn" (click)="applyCouponCode()" [disabled]="!couponCode.trim()">
+            APPLY
+          </button>
+        </div>
+
+        <!-- Available Offers -->
+        <div class="offers-list" *ngIf="applicableOffers.length > 0">
+          <h4 class="offers-list-title">Available Offers ({{ applicableOffers.length }})</h4>
+
+          <div class="offer-card-apply" *ngFor="let offer of applicableOffers">
+            <div class="offer-card-left">
+              <div class="offer-card-header">
+                <ion-icon [name]="offer.icon || 'pricetag-outline'" class="offer-card-icon"></ion-icon>
+                <span class="offer-card-title">{{ offer.title }}</span>
+                <span class="offer-card-badge">{{ getOfferLabel(offer) }}</span>
+              </div>
+              <p class="offer-card-desc" *ngIf="offer.description">{{ offer.description }}</p>
+              <div class="offer-card-meta">
+                <span *ngIf="offer.code" class="offer-code-tag">{{ offer.code }}</span>
+                <span *ngIf="offer.minOrderAmount > 0" class="offer-min">Min &#8377;{{ offer.minOrderAmount }}</span>
+                <span class="offer-saves">Saves &#8377;{{ getOfferSavings(offer) }}</span>
+                <span *ngIf="offer.vendor?.name" class="offer-vendor-badge">{{ offer.vendor.name }}</span>
+              </div>
+            </div>
+            <button class="offer-apply-btn" (click)="applyOffer(offer)">APPLY</button>
+          </div>
+        </div>
+
+        <!-- No Offers -->
+        <div class="no-offers" *ngIf="applicableOffers.length === 0 && !isLoadingOffers">
+          <p>No applicable offers for this order</p>
+          <button class="no-offers-link" (click)="goToDeals()">Browse all deals</button>
+        </div>
+
+        <!-- Loading inside expanded -->
+        <div class="offers-loading" *ngIf="isLoadingOffers">
+          <ion-spinner name="dots" color="medium"></ion-spinner>
+          <span>Loading offers...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applied Offer State -->
+    <div class="coupon-applied" *ngIf="appliedOffer">
+      <ion-icon name="checkmark-circle" class="applied-icon"></ion-icon>
+      <div class="applied-info">
+        <span class="applied-code">{{ appliedOffer.code || appliedOffer.title }}</span>
+        <span class="applied-savings">applied &mdash; you save &#8377;{{ couponDiscount }}</span>
+      </div>
+      <button class="applied-remove-btn" (click)="removeOffer()">REMOVE</button>
+    </div>
+
     <!-- Payment Summary -->
     <div class="section-block">
       <h3 class="section-heading">Payment summary</h3>
 
-      <div class="discount-banner">
-        <ion-icon name="pricetags-outline" class="discount-banner-icon"></ion-icon>
-        <span class="discount-banner-text">3 Discounts are applied</span>
-        <ion-icon name="chevron-forward-outline" class="discount-banner-arrow"></ion-icon>
-      </div>
-
       <div class="summary-row">
         <span>Price</span>
         <div class="summary-prices">
-          <span class="original-price" *ngIf="totalSaved > 0">$ {{ totalOriginalPrice.toFixed(2) }}</span>
-          <span>$ {{ totalDiscountedPrice.toFixed(2) }}</span>
+          <span class="original-price" *ngIf="totalOriginalPrice > totalDiscountedPrice">&#8377; {{ totalOriginalPrice.toFixed(2) }}</span>
+          <span>&#8377; {{ totalDiscountedPrice.toFixed(2) }}</span>
         </div>
+      </div>
+      <div class="summary-row coupon-savings-row" *ngIf="appliedOffer">
+        <span>Coupon discount ({{ appliedOffer.code || appliedOffer.title }})</span>
+        <span class="coupon-discount-amount">-&#8377;{{ couponDiscount.toFixed(2) }}</span>
       </div>
       <div class="summary-row">
         <span>Delivery fee</span>
         <div class="summary-prices">
-          <span class="original-price">$ 20.00</span>
+          <span class="original-price">&#8377; 20.00</span>
           <span class="free-text">Free</span>
         </div>
       </div>
       <div class="summary-row total-row">
         <span>Total payment</span>
-        <span class="total-amount">$ {{ totalPayment.toFixed(2) }}</span>
+        <span class="total-amount">&#8377; {{ totalPayment.toFixed(2) }}</span>
       </div>
       <button class="view-details-link">View details</button>
     </div>
@@ -151,11 +250,11 @@
       <span class="wallet-label">My wallet</span>
       <ion-icon name="chevron-down-outline" class="wallet-arrow"></ion-icon>
       <span class="wallet-dot">&middot;</span>
-      <span class="wallet-amount">$ {{ totalPayment.toFixed(2) }}</span>
+      <span class="wallet-amount">&#8377; {{ totalPayment.toFixed(2) }}</span>
     </div>
 
     <!-- Savings -->
-    <p class="savings-text" *ngIf="totalSaved > 0">You saved $ {{ totalSaved.toFixed(2) }}</p>
+    <p class="savings-text" *ngIf="totalSaved > 0">You saved &#8377; {{ totalSaved.toFixed(2) }}<span *ngIf="appliedOffer"> with {{ appliedOffer.code || appliedOffer.title }}</span></p>
 
   </div>
 

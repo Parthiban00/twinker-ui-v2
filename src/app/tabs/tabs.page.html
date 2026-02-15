@@ -1,23 +1,22 @@
 <ion-tabs>
-    <div class='navigation'>
-      <ul tab="home-main">
-          <li class="list active" style="--clr:#f44336" [routerLink]="['/tabs/home-main']" ><a><span class="icon">
-            <ion-icon name="home"></ion-icon>
-          </span></a></li>
-        <li class="list" style="--clr:#ffa117" [routerLink]="['/tabs/cart']"><a><span class="icon">
-          <ion-icon name="cart"></ion-icon>
-          <span class="cart-badge" *ngIf="cartBadgeCount > 0">{{ cartBadgeCount > 99 ? '99+' : cartBadgeCount }}</span>
-            </span></a></li>
-        <li class="list" style="--clr:#0fc70f" [routerLink]="['/tabs/orders']"><a><span class="icon">
-          <ion-icon name="bag-handle"></ion-icon>
-            </span></a></li>
-        <li class="list" style="--clr:#2196f3"><a><span class="icon">
-          <ion-icon name="chatbubbles"></ion-icon>
-            </span></a></li>
-        <li class="list" style="--clr:#b145e9"><a><span class="icon">
-          <ion-icon name="person-circle"></ion-icon>
-            </span></a></li>
-        <!-- <div class="indicator"></div> -->
-      </ul>
-    </div>
+  <nav class="tab-bar">
+    <a *ngFor="let tab of tabs"
+       class="tab-item"
+       [routerLink]="[tab.path]"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: false }">
+
+      <div class="tab-indicator"></div>
+
+      <div class="tab-icon-wrap">
+        <ion-icon [name]="tab.iconOutline" class="icon-outline"></ion-icon>
+        <ion-icon [name]="tab.icon" class="icon-filled"></ion-icon>
+        <span class="cart-badge" *ngIf="tab.badge && cartBadgeCount > 0">
+          {{ cartBadgeCount > 99 ? '99+' : cartBadgeCount }}
+        </span>
+      </div>
+
+      <span class="tab-label">{{ tab.label }}</span>
+    </a>
+  </nav>
 </ion-tabs>

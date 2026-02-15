@@ -1,0 +1,271 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="header-gradient">
+      <!-- Top row: Title + icons -->
+      <div class="header-top-row">
+        <div class="header-title-block">
+          <h1 class="header-title">Deals & Offers</h1>
+          <p class="header-subtitle" *ngIf="!isLoading && hasAnyOffers">
+            {{ totalOfferCount }} offers available near you
+          </p>
+          <p class="header-subtitle" *ngIf="isLoading">Finding best deals...</p>
+        </div>
+        <div class="header-actions">
+          <div class="header-icon-btn" (click)="navigateToNotifications()">
+            <ion-icon name="notifications-outline"></ion-icon>
+          </div>
+        </div>
+      </div>
+      <!-- Search bar -->
+      <div class="header-search" (click)="toggleSearch()">
+        <div class="search-bar">
+          <ion-icon name="search-outline"></ion-icon>
+          <span *ngIf="!isSearching">Search offers, coupons...</span>
+          <input
+            *ngIf="isSearching"
+            type="text"
+            placeholder="Search offers, coupons..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            autofocus
+          />
+          <ion-icon
+            *ngIf="isSearching && searchQuery"
+            name="close-circle"
+            class="search-clear"
+            (click)="clearSearch(); $event.stopPropagation()"
+          ></ion-icon>
+        </div>
+      </div>
+      <!-- Stats pills -->
+      <div class="header-stats" *ngIf="!isLoading && hasAnyOffers">
+        <div class="stat-pill" *ngIf="platformCoupons.length > 0">
+          <ion-icon name="ticket-outline"></ion-icon>
+          <span>{{ platformCoupons.length }} Coupons</span>
+        </div>
+        <div class="stat-pill" *ngIf="restaurantOffers.length > 0">
+          <ion-icon name="restaurant-outline"></ion-icon>
+          <span>{{ restaurantOffers.length }} Restaurant</span>
+        </div>
+        <div class="stat-pill" *ngIf="firstOrderOffers.length > 0">
+          <ion-icon name="gift-outline"></ion-icon>
+          <span>New User</span>
+        </div>
+        <div class="stat-pill" *ngIf="localityOffers.length > 0">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>Local Deals</span>
+        </div>
+      </div>
+      <!-- Decorative bg icon -->
+      <div class="header-bg-deco">
+        <ion-icon name="pricetag"></ion-icon>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Loading Skeletons -->
+  <div *ngIf="isLoading" class="skeleton-container">
+    <!-- Featured skeleton -->
+    <div class="skeleton-banner">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 170px; border-radius: 14px;"></ion-skeleton-text>
+    </div>
+    <!-- Chips skeleton -->
+    <div class="skeleton-chips">
+      <ion-skeleton-text *ngFor="let i of [1,2,3,4]" [animated]="true" style="width: 90px; height: 34px; border-radius: 20px;"></ion-skeleton-text>
+    </div>
+    <!-- Coupon skeleton -->
+    <div class="skeleton-coupons">
+      <ion-skeleton-text *ngFor="let i of [1,2]" [animated]="true" style="width: 260px; height: 110px; border-radius: 14px;"></ion-skeleton-text>
+    </div>
+    <!-- List skeleton -->
+    <div class="skeleton-list">
+      <ion-skeleton-text *ngFor="let i of [1,2,3]" [animated]="true" style="width: 100%; height: 90px; border-radius: 14px; margin-bottom: 12px;"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading" class="deals-content">
+
+    <!-- Empty State -->
+    <div *ngIf="!hasAnyOffers" class="empty-state">
+      <ion-icon name="pricetag-outline" class="empty-icon"></ion-icon>
+      <h3>No offers available</h3>
+      <p>Check back later for exciting deals and discounts!</p>
+    </div>
+
+    <!-- Section 1: Featured Banner Carousel -->
+    <div *ngIf="featured.length > 0 && !isSearching" class="section featured-section">
+      <swiper-container
+        [attr.slides-per-view]="1.15"
+        [attr.space-between]="12"
+        [attr.autoplay-delay]="3500"
+        [attr.autoplay-disable-on-interaction]="false"
+        [attr.loop]="featured.length > 1"
+        style="padding: 0 16px;"
+      >
+        <swiper-slide *ngFor="let offer of featured">
+          <div class="featured-card" [style.background]="'linear-gradient(135deg, ' + (offer.accentColor || '#F85C70') + ', ' + (offer.bgColor || '#FC8C5C') + ')'" (click)="navigateToVendor(offer)">
+            <div class="featured-content">
+              <div class="featured-badge" [style.background-color]="offer.badgeColor || '#F85C70'">
+                {{ offer.badgeText || getDiscountLabel(offer) }}
+              </div>
+              <h2 class="featured-title">{{ offer.title }}</h2>
+              <p class="featured-desc">{{ offer.description }}</p>
+              <div class="featured-bottom-row">
+                <div *ngIf="offer.code" class="featured-code" (click)="copyCode(offer.code); $event.stopPropagation()">
+                  <span class="code-text">{{ offer.code }}</span>
+                  <ion-icon name="copy-outline"></ion-icon>
+                </div>
+                <span class="featured-expiry">{{ getExpiryText(offer) }}</span>
+              </div>
+            </div>
+            <div class="featured-icon-wrap">
+              <ion-icon [name]="offer.icon || 'pricetag-outline'"></ion-icon>
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper-container>
+    </div>
+
+    <!-- Section 2: Filter Chips -->
+    <div *ngIf="hasAnyOffers && !isSearching" class="section filter-section">
+      <div class="filter-chips-scroll">
+        <div
+          *ngFor="let chip of filterChips"
+          class="filter-chip"
+          [class.active]="activeFilter === chip.key"
+          (click)="setFilter(chip.key)"
+        >
+          <ion-icon [name]="chip.icon"></ion-icon>
+          <span>{{ chip.label }}</span>
+          <span *ngIf="getFilterCount(chip.key) > 0" class="chip-count">{{ getFilterCount(chip.key) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Coupon Cards (horizontal scroll) -->
+    <div *ngIf="displayCoupons.length > 0 && (activeFilter === 'all' || activeFilter === 'platform_coupon') && !isSearching" class="section coupon-section">
+      <h3 class="section-title">
+        <ion-icon name="ticket-outline" class="section-title-icon"></ion-icon>
+        Coupon Codes
+      </h3>
+      <div class="coupon-scroll">
+        <div *ngFor="let coupon of displayCoupons" class="coupon-card" [style.border-left-color]="coupon.accentColor || '#4A5BF5'">
+          <div class="coupon-top">
+            <div class="coupon-icon" [style.background-color]="(coupon.bgColor || '#F0F2FF')">
+              <ion-icon [name]="coupon.icon || 'ticket-outline'" [style.color]="coupon.accentColor || '#4A5BF5'"></ion-icon>
+            </div>
+            <div class="coupon-info">
+              <h4>{{ coupon.title }}</h4>
+              <p>{{ coupon.description }}</p>
+            </div>
+          </div>
+          <div class="coupon-bottom">
+            <div class="coupon-code-box" (click)="copyCode(coupon.code)">
+              <span class="coupon-code-text">{{ coupon.code }}</span>
+              <span class="copy-btn">COPY</span>
+            </div>
+            <span class="coupon-expiry">{{ getExpiryText(coupon) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- First Order Special Banner (if available) -->
+    <div *ngIf="firstOrderOffers.length > 0 && (activeFilter === 'all' || activeFilter === 'first_order') && !isSearching" class="section first-order-section">
+      <div class="first-order-banner" *ngFor="let fo of firstOrderOffers">
+        <div class="fo-icon-wrap">
+          <ion-icon name="gift"></ion-icon>
+        </div>
+        <div class="fo-content">
+          <h4>{{ fo.title }}</h4>
+          <p>{{ fo.description }}</p>
+        </div>
+        <div class="fo-action" *ngIf="fo.code" (click)="copyCode(fo.code)">
+          <span class="fo-code">{{ fo.code }}</span>
+          <ion-icon name="copy-outline"></ion-icon>
+        </div>
+        <div class="fo-discount">
+          {{ fo.badgeText || getDiscountLabel(fo) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Offer List (filtered or search results) -->
+    <div *ngIf="displayOffers.length > 0" class="section offer-list-section">
+      <h3 class="section-title">
+        <ng-container *ngIf="isSearching">
+          <ion-icon name="search-outline" class="section-title-icon"></ion-icon>
+          {{ displayOffers.length }} result{{ displayOffers.length !== 1 ? 's' : '' }} found
+        </ng-container>
+        <ng-container *ngIf="!isSearching">
+          <ng-container [ngSwitch]="activeFilter">
+            <ng-container *ngSwitchCase="'all'">
+              <ion-icon name="flash-outline" class="section-title-icon"></ion-icon>
+              All Offers
+            </ng-container>
+            <ng-container *ngSwitchCase="'restaurant'">
+              <ion-icon name="restaurant-outline" class="section-title-icon"></ion-icon>
+              Restaurant Offers
+            </ng-container>
+            <ng-container *ngSwitchCase="'platform_coupon'">
+              <ion-icon name="ticket-outline" class="section-title-icon"></ion-icon>
+              Coupon Offers
+            </ng-container>
+            <ng-container *ngSwitchCase="'first_order'">
+              <ion-icon name="gift-outline" class="section-title-icon"></ion-icon>
+              New User Offers
+            </ng-container>
+            <ng-container *ngSwitchCase="'locality_based'">
+              <ion-icon name="location-outline" class="section-title-icon"></ion-icon>
+              Local Deals
+            </ng-container>
+            <ng-container *ngSwitchDefault></ng-container>
+          </ng-container>
+        </ng-container>
+      </h3>
+      <div *ngFor="let offer of displayOffers" class="offer-card" (click)="navigateToVendor(offer)">
+        <div class="offer-icon-wrap" [style.background-color]="offer.bgColor || '#FFF0F2'">
+          <ion-icon [name]="offer.icon || 'pricetag-outline'" [style.color]="offer.accentColor || '#F85C70'"></ion-icon>
+        </div>
+        <div class="offer-details">
+          <h4 class="offer-title">{{ offer.title }}</h4>
+          <p class="offer-desc">{{ offer.description }}</p>
+          <div class="offer-meta">
+            <span *ngIf="offer.vendor?.name" class="offer-vendor">
+              <ion-icon name="storefront-outline"></ion-icon> {{ offer.vendor.name }}
+            </span>
+            <span *ngIf="offer.minOrderAmount > 0" class="offer-min">
+              Min &#8377;{{ offer.minOrderAmount }}
+            </span>
+            <span *ngIf="offer.maxDiscountCap" class="offer-cap">
+              Up to &#8377;{{ offer.maxDiscountCap }}
+            </span>
+          </div>
+        </div>
+        <div class="offer-right">
+          <div class="offer-badge" [style.background-color]="offer.badgeColor || '#F85C70'">
+            {{ offer.badgeText || getDiscountLabel(offer) }}
+          </div>
+          <div *ngIf="offer.code" class="offer-code-tap" (click)="copyCode(offer.code); $event.stopPropagation()">
+            <ion-icon name="copy-outline"></ion-icon>
+            <span>{{ offer.code }}</span>
+          </div>
+          <span class="offer-expiry">{{ getExpiryText(offer) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty filter state -->
+    <div *ngIf="!isLoading && hasAnyOffers && displayOffers.length === 0 && displayCoupons.length === 0" class="empty-filter">
+      <ion-icon [name]="isSearching ? 'search-outline' : 'pricetag-outline'"></ion-icon>
+      <p *ngIf="isSearching">No offers matching "{{ searchQuery }}"</p>
+      <p *ngIf="!isSearching">No offers in this category</p>
+    </div>
+
+  </div>
+
+</ion-content>

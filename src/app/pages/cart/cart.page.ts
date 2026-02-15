@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
 import { PaymentPage } from '../payment/payment.page';
 import { OrderStatusComponent } from 'src/app/shared/components/order-status/order-status.component';
 import { environment } from 'src/environments/environment';
 import { EventBusService } from 'src/app/services/event-bus.service';
+import { DealsService } from '../deals/deals.service';
+import { HomeMainService } from '../home-main/home-main.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { CommonService } from 'src/app/services/common.service';
 
 interface CartItem {
   _id: string;
@@ -44,11 +48,25 @@ export class CartPage implements OnInit {
   vendorGroups: VendorGroup[] = [];
   imgBaseUrl: string = environment.imageBaseUrl;
 
+  // Coupon state
+  applicableOffers: any[] = [];
+  appliedOffer: any = null;
+  couponDiscount: number = 0;
+  showOfferSheet: boolean = false;
+  couponCode: string = '';
+  isLoadingOffers: boolean = false;
+  localityId: string = '';
+
   constructor(
     private modalCtrl: ModalController,
     private router: Router,
     private navController: NavController,
-    private eventBus: EventBusService
+    private eventBus: EventBusService,
+    private dealsService: DealsService,
+    private homeMainService: HomeMainService,
+    private storageService: StorageService,
+    private commonService: CommonService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {}
@@ -70,6 +88,7 @@ export class CartPage implements OnInit {
       this.cartItems = [];
     }
     this.buildVendorGroups();
+    this.loadApplicableOffers();
   }
 
   buildVendorGroups() {
@@ -95,6 +114,149 @@ export class CartPage implements OnInit {
     this.vendorGroups = Array.from(groupMap.values());
   }
 
+  loadApplicableOffers() {
+    if (this.isCartEmpty) return;
+
+    const user = this.storageService.getUser();
+    if (!user?._id) return;
+
+    this.isLoadingOffers = true;
+
+    this.homeMainService.getDefaultAddressByUserId(user._id).subscribe({
+      next: (res: any) => {
+        if (res?.status && res?.data?.locality) {
+          this.localityId = res.data.locality._id;
+          this.fetchOffers();
+        } else {
+          this.isLoadingOffers = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.isLoadingOffers = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private fetchOffers() {
+    const vendorIds = this.vendorGroups.map(g => g.vendorId).filter(id => id !== 'unknown');
+    const orderAmount = this.totalDiscountedPrice;
+    const vendorSubtotals: Record<string, number> = {};
+    this.vendorGroups.forEach(g => {
+      if (g.vendorId !== 'unknown') {
+        vendorSubtotals[g.vendorId] = g.subtotal;
+      }
+    });
+
+    this.dealsService.getApplicableOffers(this.localityId, vendorIds, orderAmount, vendorSubtotals).subscribe({
+      next: (res: any) => {
+        if (res?.status && res?.data) {
+          this.applicableOffers = res.data;
+        } else {
+          this.applicableOffers = [];
+        }
+        this.isLoadingOffers = false;
+        // If applied offer is no longer valid, auto-remove it
+        if (this.appliedOffer) {
+          this.revalidateAppliedOffer();
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.applicableOffers = [];
+        this.isLoadingOffers = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private revalidateAppliedOffer() {
+    if (!this.appliedOffer) return;
+    const stillValid = this.applicableOffers.some(o => o._id === this.appliedOffer._id);
+    if (!stillValid) {
+      const offerCode = this.appliedOffer.code || this.appliedOffer.title;
+      this.appliedOffer = null;
+      this.couponDiscount = 0;
+      this.commonService.presentToast('bottom', `Offer "${offerCode}" removed — order no longer meets requirements`, 'danger');
+      this.cdr.detectChanges();
+    } else {
+      // Recalculate discount with new amounts
+      const match = this.applicableOffers.find(o => o._id === this.appliedOffer._id);
+      if (match) {
+        this.couponDiscount = match.calculatedDiscount;
+        this.appliedOffer = match;
+      }
+    }
+  }
+
+  applyOffer(offer: any) {
+    this.appliedOffer = offer;
+    this.couponDiscount = offer.calculatedDiscount || 0;
+    this.showOfferSheet = false;
+    this.couponCode = '';
+    const name = offer.code || offer.title;
+    this.commonService.presentToast('bottom', `${name} applied — you save ₹${this.couponDiscount}`, 'success');
+    this.cdr.detectChanges();
+  }
+
+  removeOffer() {
+    this.appliedOffer = null;
+    this.couponDiscount = 0;
+    this.cdr.detectChanges();
+  }
+
+  applyCouponCode() {
+    if (!this.couponCode.trim()) return;
+
+    const now = new Date();
+    const clientTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    this.dealsService.validateCoupon({
+      code: this.couponCode.trim(),
+      localityId: this.localityId,
+      orderAmount: this.totalDiscountedPrice,
+      clientTime
+    }).subscribe({
+      next: (res: any) => {
+        if (res?.status && res?.data) {
+          this.appliedOffer = res.data.offer;
+          this.couponDiscount = res.data.discountAmount;
+          this.showOfferSheet = false;
+          this.couponCode = '';
+          this.commonService.presentToast('bottom', `${res.data.offer.code || res.data.offer.title} applied — you save ₹${this.couponDiscount}`, 'success');
+        } else {
+          this.commonService.presentToast('bottom', res?.message || 'Invalid coupon code', 'danger');
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        const msg = err?.error?.message || 'Invalid or expired coupon code';
+        this.commonService.presentToast('bottom', msg, 'danger');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  toggleOfferSheet() {
+    this.showOfferSheet = !this.showOfferSheet;
+  }
+
+  getOfferSavings(offer: any): number {
+    return offer.calculatedDiscount || 0;
+  }
+
+  getBestOffer(): any {
+    if (this.applicableOffers.length === 0) return null;
+    return this.applicableOffers[0]; // Already sorted by highest savings
+  }
+
+  getOfferLabel(offer: any): string {
+    if (offer.discountType === 'percentage') {
+      return `${offer.discountValue}% OFF`;
+    }
+    return `₹${offer.discountValue} OFF`;
+  }
+
   get isCartEmpty(): boolean {
     return this.cartItems.length === 0;
   }
@@ -115,11 +277,11 @@ export class CartPage implements OnInit {
   }
 
   get totalPayment(): number {
-    return this.totalDiscountedPrice;
+    return Math.max(0, this.totalDiscountedPrice - this.couponDiscount);
   }
 
   get totalSaved(): number {
-    return this.totalOriginalPrice - this.totalDiscountedPrice;
+    return (this.totalOriginalPrice - this.totalDiscountedPrice) + this.couponDiscount;
   }
 
   get totalItems(): number {
@@ -143,6 +305,10 @@ export class CartPage implements OnInit {
     localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
     this.eventBus.emit('cart:updated', this.cartItems.length);
     this.buildVendorGroups();
+    // Re-fetch offers (order amount may have changed)
+    if (this.localityId) {
+      this.fetchOffers();
+    }
   }
 
   getItemImage(item: CartItem): string {
@@ -176,11 +342,18 @@ export class CartPage implements OnInit {
     localStorage.removeItem('cart-items');
     this.cartItems = [];
     this.vendorGroups = [];
+    this.appliedOffer = null;
+    this.couponDiscount = 0;
+    this.applicableOffers = [];
     this.eventBus.emit('cart:updated', 0);
   }
 
   browsRestaurants() {
     this.router.navigate(['/home-land']);
+  }
+
+  goToDeals() {
+    this.router.navigate(['/tabs/deals']);
   }
 
   async openPaymentModal() {
@@ -189,7 +362,9 @@ export class CartPage implements OnInit {
       componentProps: {
         totalAmount: this.totalPayment,
         totalItems: this.totalItems,
-        totalSaved: this.totalSaved
+        totalSaved: this.totalSaved,
+        appliedOffer: this.appliedOffer,
+        couponDiscount: this.couponDiscount
       },
       cssClass: 'payment-confirm-modal'
     });
@@ -218,6 +393,8 @@ export class CartPage implements OnInit {
     // Order placed successfully — cart already cleared by component
     this.cartItems = [];
     this.vendorGroups = [];
+    this.appliedOffer = null;
+    this.couponDiscount = 0;
     if (data?.action === 'track') {
       this.router.navigate(['/orders']);
     } else {

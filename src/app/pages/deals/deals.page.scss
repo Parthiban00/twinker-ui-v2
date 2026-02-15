@@ -1,0 +1,782 @@
+// ─── Header ──────────────────────────────────────────────
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: auto;
+}
+
+.header-gradient {
+  background: linear-gradient(135deg, #F85C70 0%, #FC8C5C 100%);
+  padding: calc(var(--ion-safe-area-top, 20px) + 10px) 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.header-title-block {
+  flex: 1;
+
+  .header-title {
+    font-family: 'latoBold', sans-serif;
+    font-size: 24px;
+    color: #fff;
+    margin: 0 0 3px;
+    letter-spacing: 0.3px;
+  }
+
+  .header-subtitle {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.header-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  ion-icon {
+    font-size: 20px;
+    color: #fff;
+  }
+}
+
+// ─── Header Search Bar ──────────────────────────────────
+.header-search {
+  margin-bottom: 12px;
+
+  .search-bar {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    border-radius: 25px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: background 0.2s;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    ion-icon {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.9);
+      min-width: 18px;
+    }
+
+    span {
+      font-family: 'latoRegular', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'latoRegular', sans-serif;
+      font-size: 14px;
+      color: #fff;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    .search-clear {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+    }
+  }
+}
+
+// ─── Header Stats Pills ─────────────────────────────────
+.header-stats {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 13px;
+    color: #fff;
+  }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 0.2px;
+  }
+}
+
+// ─── Header Decoration ──────────────────────────────────
+.header-bg-deco {
+  position: absolute;
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-15deg);
+  opacity: 0.08;
+  pointer-events: none;
+
+  ion-icon {
+    font-size: 140px;
+    color: #fff;
+  }
+}
+
+// ─── Skeleton Loading ────────────────────────────────────
+.skeleton-container {
+  padding: 16px;
+}
+
+.skeleton-banner {
+  margin-bottom: 16px;
+}
+
+.skeleton-chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.skeleton-coupons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.skeleton-list {
+  margin-top: 8px;
+}
+
+// ─── Content ─────────────────────────────────────────────
+ion-content {
+  --background: #f5f5f5;
+}
+
+.deals-content {
+  padding-bottom: 20px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 16px;
+  color: #1a1a1a;
+  margin: 0 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-title-icon {
+  font-size: 18px;
+  color: #F85C70;
+}
+
+// ─── Featured Carousel ──────────────────────────────────
+.featured-section {
+  margin-top: 16px;
+}
+
+.featured-card {
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 170px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.featured-content {
+  flex: 1;
+  z-index: 1;
+}
+
+.featured-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 11px;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.featured-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 19px;
+  color: #fff;
+  margin: 0 0 6px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.featured-desc {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.featured-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.featured-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1.5px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .code-text {
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 1.5px;
+  }
+
+  ion-icon {
+    font-size: 14px;
+    color: #fff;
+  }
+}
+
+.featured-expiry {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.featured-icon-wrap {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  opacity: 0.12;
+
+  ion-icon {
+    font-size: 90px;
+    color: #fff;
+  }
+}
+
+// ─── Filter Chips ────────────────────────────────────────
+.filter-section {
+  padding: 0 16px;
+}
+
+.filter-chips-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 2px 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  ion-icon {
+    font-size: 15px;
+    color: #888;
+  }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .chip-count {
+    font-family: 'latoBold', sans-serif;
+    font-size: 11px;
+    color: #999;
+    background: #f0f0f0;
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #FFF0F2, #FFEDE8);
+    border-color: #F85C70;
+
+    ion-icon {
+      color: #F85C70;
+    }
+
+    span {
+      font-family: 'latoBold', sans-serif;
+      color: #F85C70;
+    }
+
+    .chip-count {
+      background: #F85C70;
+      color: #fff;
+    }
+  }
+}
+
+// ─── Coupon Cards ────────────────────────────────────────
+.coupon-section {
+  .coupon-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 16px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.coupon-card {
+  min-width: 270px;
+  max-width: 290px;
+  background: #fff;
+  border-radius: 14px;
+  border-left: 4px solid #4A5BF5;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.coupon-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.coupon-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.coupon-info {
+  flex: 1;
+
+  h4 {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: #1a1a1a;
+    margin: 0 0 3px;
+  }
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+    line-height: 1.3;
+  }
+}
+
+.coupon-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coupon-code-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px dashed #ddd;
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:active {
+    border-color: #F85C70;
+    background: #FFF5F5;
+  }
+}
+
+.coupon-code-text {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+}
+
+.copy-btn {
+  font-family: 'latoBold', sans-serif;
+  font-size: 11px;
+  color: #F85C70;
+}
+
+.coupon-expiry {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: #999;
+}
+
+// ─── First Order Banner ─────────────────────────────────
+.first-order-section {
+  padding: 0 16px;
+}
+
+.first-order-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+}
+
+.fo-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 22px;
+    color: #fff;
+  }
+}
+
+.fo-content {
+  flex: 1;
+  min-width: 0;
+
+  h4 {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: #fff;
+    margin: 0 0 2px;
+  }
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    line-height: 1.3;
+  }
+}
+
+.fo-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  .fo-code {
+    font-family: 'latoBold', sans-serif;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  ion-icon {
+    font-size: 12px;
+    color: #fff;
+  }
+}
+
+.fo-discount {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 10px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+// ─── Offer List ──────────────────────────────────────────
+.offer-list-section {
+  padding: 0;
+}
+
+.offer-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  margin: 0 16px 10px;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.15s;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.offer-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.offer-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.offer-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.offer-desc {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: #888;
+  margin: 0 0 5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.offer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.offer-vendor,
+.offer-min,
+.offer-cap {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  ion-icon {
+    font-size: 12px;
+  }
+}
+
+.offer-cap {
+  color: #2ecc71;
+}
+
+.offer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.offer-badge {
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.offer-code-tap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 2px 0;
+
+  ion-icon {
+    font-size: 12px;
+    color: #F85C70;
+  }
+
+  span {
+    font-family: 'latoBold', sans-serif;
+    font-size: 10px;
+    color: #F85C70;
+    letter-spacing: 0.5px;
+  }
+}
+
+.offer-expiry {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 10px;
+  color: #bbb;
+}
+
+// ─── Empty States ────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+
+  .empty-icon {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-family: 'latoBold', sans-serif;
+    font-size: 18px;
+    color: #1a1a1a;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+  }
+}
+
+.empty-filter {
+  text-align: center;
+  padding: 40px 24px;
+
+  ion-icon {
+    font-size: 40px;
+    color: #ddd;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+  }
+}

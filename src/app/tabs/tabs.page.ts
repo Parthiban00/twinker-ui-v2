@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { EventBusService } from '../services/event-bus.service';
 
@@ -12,23 +12,30 @@ export class TabsPage implements OnInit, OnDestroy {
   cartBadgeCount = 0;
   private cartSub!: Subscription;
 
-  constructor(private eventBus: EventBusService) {}
+  tabs = [
+    { path: '/tabs/home-main', icon: 'home', iconOutline: 'home-outline', label: 'Home' },
+    { path: '/tabs/deals', icon: 'pricetag', iconOutline: 'pricetag-outline', label: 'Deals' },
+    { path: '/tabs/cart', icon: 'cart', iconOutline: 'cart-outline', label: 'Cart', badge: true },
+    { path: '/tabs/orders', icon: 'receipt', iconOutline: 'receipt-outline', label: 'Orders' },
+    { path: '/tabs/profile', icon: 'person', iconOutline: 'person-outline', label: 'Profile' },
+  ];
+
+  constructor(
+    private eventBus: EventBusService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    const list = document.querySelectorAll('.list');
-    list.forEach(item => item.addEventListener('click', (e: any) => {
-      list.forEach(li => li.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-    }));
-
     this.updateCartBadge();
     this.cartSub = this.eventBus.on('cart:updated').subscribe(() => {
       this.updateCartBadge();
+      this.cdr.detectChanges();
     });
   }
 
   ionViewWillEnter() {
     this.updateCartBadge();
+    this.cdr.detectChanges();
   }
 
   updateCartBadge() {

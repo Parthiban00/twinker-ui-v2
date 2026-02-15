@@ -1,0 +1,34 @@
+<ion-content>
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="avatar">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </div>
+      <h2>{{ user?.name || 'User' }}</h2>
+      <p>{{ user?.mobile || '' }}</p>
+    </div>
+
+    <div class="profile-menu">
+      <div class="menu-item" routerLink="/location-setup">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>Manage Addresses</span>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
+      <div class="menu-item">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <span>Order History</span>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
+      <div class="menu-item">
+        <ion-icon name="help-circle-outline"></ion-icon>
+        <span>Help & Support</span>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
+      <div class="menu-item">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <span>About</span>
+        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
+      </div>
+    </div>
+  </div>
+</ion-content>

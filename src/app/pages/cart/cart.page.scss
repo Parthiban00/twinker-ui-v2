@@ -409,35 +409,382 @@ ion-content {
   }
 }
 
-// Payment Summary
-.discount-banner {
+// Coupon Section
+.coupon-section {
+  background: #fff;
+  border-radius: 14px;
+  margin: 8px 16px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.coupon-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+
+.coupon-collapsed-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #FFF0F1;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
+}
+
+.coupon-icon {
+  font-size: 20px;
+  color: $primary;
+}
+
+.coupon-label {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: $text-primary;
+}
+
+.coupon-toggle-icon {
+  font-size: 18px;
+  color: $text-muted;
+}
+
+.best-offer-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 14px;
   cursor: pointer;
 
-  .discount-banner-icon {
-    font-size: 20px;
-    color: $primary;
-  }
-
-  .discount-banner-text {
+  .best-offer-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex: 1;
-    font-family: 'latoRegular', sans-serif;
-    font-size: 14px;
-    color: $primary;
+    min-width: 0;
   }
 
-  .discount-banner-arrow {
+  .best-offer-icon {
     font-size: 18px;
+    color: #FF8C42;
+    flex-shrink: 0;
+  }
+
+  .best-offer-text {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    strong {
+      font-family: 'latoBold', sans-serif;
+      color: $text-primary;
+    }
+  }
+
+  .best-offer-apply-btn {
+    background: none;
+    border: 1.5px solid $primary;
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
     color: $primary;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 10px;
   }
 }
 
+.coupon-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 14px;
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $text-muted;
+  }
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.coupon-expanded {
+  .coupon-expanded-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+.coupon-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+
+  .coupon-input {
+    flex: 1;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: $text-primary;
+    outline: none;
+    text-transform: uppercase;
+
+    &::placeholder {
+      text-transform: none;
+      color: $text-muted;
+    }
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+
+  .coupon-apply-btn {
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+.offers-list {
+  padding: 0 16px 14px;
+
+  .offers-list-title {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: $text-secondary;
+    margin: 0 0 12px;
+  }
+}
+
+.offer-card-apply {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #fafafa;
+  border-radius: 12px;
+  border-left: 3px solid $primary;
+
+  .offer-card-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .offer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .offer-card-icon {
+    font-size: 18px;
+    color: $primary;
+    flex-shrink: 0;
+  }
+
+  .offer-card-title {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: $text-primary;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .offer-card-badge {
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+    font-family: 'latoBold', sans-serif;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .offer-card-desc {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: $text-secondary;
+    margin: 0 0 6px;
+    line-height: 1.4;
+  }
+
+  .offer-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .offer-code-tag {
+    background: #FFF0F1;
+    color: $primary;
+    font-family: 'latoBold', sans-serif;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .offer-min {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 11px;
+    color: $text-muted;
+  }
+
+  .offer-saves {
+    font-family: 'latoBold', sans-serif;
+    font-size: 11px;
+    color: $green;
+  }
+
+  .offer-vendor-badge {
+    background: #f0f0f0;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 10px;
+    color: $text-secondary;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .offer-apply-btn {
+    background: none;
+    border: 1.5px solid $primary;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
+    color: $primary;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+  }
+}
+
+.no-offers {
+  padding: 16px;
+  text-align: center;
+
+  p {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 14px;
+    color: $text-muted;
+    margin: 0 0 8px;
+  }
+
+  .no-offers-link {
+    background: none;
+    border: none;
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    color: $primary;
+    cursor: pointer;
+    padding: 0;
+  }
+}
+
+.offers-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 16px;
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $text-muted;
+  }
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Applied Offer Banner
+.coupon-applied {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 16px;
+  padding: 14px 16px;
+  background: #eafaf1;
+  border-radius: 14px;
+  border: 1px solid #d4edda;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .applied-icon {
+    font-size: 22px;
+    color: $green;
+    flex-shrink: 0;
+  }
+
+  .applied-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .applied-code {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: $text-primary;
+  }
+
+  .applied-savings {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $green;
+    margin-left: 4px;
+  }
+
+  .applied-remove-btn {
+    background: none;
+    border: none;
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
+    color: $primary;
+    cursor: pointer;
+    padding: 4px 8px;
+    flex-shrink: 0;
+  }
+}
+
+// Payment Summary
 .summary-row {
   display: flex;
   justify-content: space-between;
@@ -462,6 +809,17 @@ ion-content {
   .free-text {
     color: $green;
     font-family: 'latoBold', sans-serif;
+  }
+
+  &.coupon-savings-row {
+    color: $green;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+
+    .coupon-discount-amount {
+      font-family: 'latoBold', sans-serif;
+      color: $green;
+    }
   }
 
   &.total-row {

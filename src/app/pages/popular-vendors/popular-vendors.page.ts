@@ -140,7 +140,7 @@ export class PopularVendorsPage {
     return vendors.map(v => {
       if (v.coords?.lat && v.coords?.lng) {
         const dist = this.commonService.calculateDistance(userLat, userLng, v.coords.lat, v.coords.lng);
-        v.distance = parseFloat(dist).toFixed(1);
+        v.distance = Math.round(parseFloat(dist) * 10) / 10;
         v.approxDeliveryTime = (Math.ceil(v.distance) * 3) + 15;
       } else {
         v.distance = null;
