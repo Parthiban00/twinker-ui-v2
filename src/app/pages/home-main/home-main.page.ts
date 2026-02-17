@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
 import { CategoryListPage } from 'src/app/modals/category-list/category-list.page';
@@ -18,7 +18,7 @@ register();
   styleUrls: ['./home-main.page.scss'],
   standalone: false,
 })
-export class HomeMainPage implements OnInit {
+export class HomeMainPage implements OnInit, OnDestroy {
   defaultAddress: any;
   categories: any[] = [];
   imgBaseUrl = environment.imageBaseUrl;
@@ -33,7 +33,14 @@ export class HomeMainPage implements OnInit {
   popularItems: any[] = [];
   cuisines: any[] = [];
   popularVendors: any[] = [];
+  topRatedVendors: any[] = [];
+  flashDeals: any[] = [];
+  bestCoupon: any = null;
+  couponCopied = false;
   isLoading = true;
+
+  // Flash deal timer
+  private flashTimerInterval: any;
 
   // Cart bar
   cartItems: any[] = [];
@@ -78,10 +85,12 @@ export class HomeMainPage implements OnInit {
     }
   }
 
-  // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
   ngOnDestroy() {
     if (this.eventSubscription) {
       this.eventSubscription.unsubscribe();
+    }
+    if (this.flashTimerInterval) {
+      clearInterval(this.flashTimerInterval);
     }
   }
 
@@ -114,21 +123,24 @@ export class HomeMainPage implements OnInit {
   }
 
   navigateService(category: any) {
-    const route = this.getCategoryRoute(category.categoryName);
-    this.router.navigate([route], {
-      queryParams: { title: category.categoryName, localityId: this.defaultAddress?.locality?._id }
+    this.router.navigate(['/home-land'], {
+      queryParams: {
+        title: category.categoryName,
+        localityId: this.defaultAddress?.locality?._id,
+        categoryId: category._id
+      }
     });
   }
 
-  getCategoryRoute(categoryName: string): string {
-    const lower = categoryName?.toLowerCase() || '';
-    if (lower === 'groceries') return '/groceries-home';
-    return '/home-land';
-  }
-
   navigateCuisine(cuisine: any) {
+    const foodCat = this.categories.find((c: any) => c.categoryName?.toLowerCase() === 'food');
     this.router.navigate(['/home-land'], {
-      queryParams: { title: cuisine.name, localityId: this.defaultAddress?.locality?._id }
+      queryParams: {
+        title: 'Food',
+        localityId: this.defaultAddress?.locality?._id,
+        categoryId: foodCat?._id || '',
+        cuisineFilter: cuisine.name
+      }
     });
   }
 
@@ -159,15 +171,16 @@ export class HomeMainPage implements OnInit {
   }
 
   navigateEssential(type: string) {
-    if (type === 'groceries') {
-      this.router.navigate(['/home-land'], {
-        queryParams: { title: 'Groceries', localityId: this.defaultAddress?.locality?._id }
-      });
-    } else if (type === 'medicine') {
-      this.router.navigate(['/home-land'], {
-        queryParams: { title: 'Medicine', localityId: this.defaultAddress?.locality?._id }
-      });
-    }
+    const titleMap: Record<string, string> = { groceries: 'Groceries', medicine: 'Medicine' };
+    const title = titleMap[type] || type;
+    const cat = this.categories.find((c: any) => c.categoryName?.toLowerCase() === title.toLowerCase());
+    this.router.navigate(['/home-land'], {
+      queryParams: {
+        title,
+        localityId: this.defaultAddress?.locality?._id,
+        categoryId: cat?._id || ''
+      }
+    });
   }
 
   addToCart(item: any) {
@@ -250,22 +263,20 @@ export class HomeMainPage implements OnInit {
           this.popularItems = resdata.data.popularItems || [];
           this.cuisines = resdata.data.cuisines || [];
           this.popularVendors = resdata.data.popularVendors || [];
+          this.topRatedVendors = resdata.data.topRatedVendors || [];
+          this.flashDeals = (resdata.data.flashDeals || []).map((d: any) => ({ ...d, timeLeft: this.calcTimeLeft(d.endDate) }));
+          this.bestCoupon = resdata.data.bestCoupon || null;
+          this.enrichVendors(this.popularVendors);
+          this.enrichVendors(this.topRatedVendors);
+          this.startFlashTimer();
         } else {
-          this.categories = [];
-          this.deals = [];
-          this.popularItems = [];
-          this.cuisines = [];
-          this.popularVendors = [];
+          this.resetDashboard();
         }
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (_err: any) => {
-        this.categories = [];
-        this.deals = [];
-        this.popularItems = [];
-        this.cuisines = [];
-        this.popularVendors = [];
+        this.resetDashboard();
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -305,6 +316,63 @@ export class HomeMainPage implements OnInit {
     const { data, role } = await modal.onWillDismiss();
     if (role === 'confirm') {
       // handle confirmation
+    }
+  }
+
+  private resetDashboard() {
+    this.categories = [];
+    this.deals = [];
+    this.popularItems = [];
+    this.cuisines = [];
+    this.popularVendors = [];
+    this.topRatedVendors = [];
+    this.flashDeals = [];
+    this.bestCoupon = null;
+  }
+
+  enrichVendors(vendors: any[]) {
+    if (!this.defaultAddress?.coords) return;
+    const userLat = this.defaultAddress.coords.lat;
+    const userLng = this.defaultAddress.coords.lng;
+    vendors.forEach((v: any) => {
+      if (v.latitude && v.longitude) {
+        v.distance = this.commonService.calculateDistance(userLat, userLng, v.latitude, v.longitude);
+        v.approxDeliveryTime = (Math.ceil(parseFloat(v.distance)) * 3) + 15;
+      }
+    });
+  }
+
+  calcTimeLeft(endDate: string): string {
+    const diff = new Date(endDate).getTime() - Date.now();
+    if (diff <= 0) return 'Expired';
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0) return `${hours}h ${mins}m left`;
+    return `${mins}m left`;
+  }
+
+  startFlashTimer() {
+    if (this.flashTimerInterval) clearInterval(this.flashTimerInterval);
+    if (!this.flashDeals.length) return;
+    this.flashTimerInterval = setInterval(() => {
+      this.flashDeals = this.flashDeals
+        .map((d: any) => ({ ...d, timeLeft: this.calcTimeLeft(d.endDate) }))
+        .filter((d: any) => d.timeLeft !== 'Expired');
+      this.cdr.detectChanges();
+    }, 60000);
+  }
+
+  copyCode(code: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      this.couponCopied = true;
+      this.commonService.presentToast('bottom', `Code ${code} copied!`, 'success');
+      setTimeout(() => { this.couponCopied = false; this.cdr.detectChanges(); }, 2000);
+    });
+  }
+
+  navigateFlashDeal(deal: any) {
+    if (deal.vendor?._id) {
+      this.router.navigate(['/items'], { queryParams: { vendorId: deal.vendor._id } });
     }
   }
 }

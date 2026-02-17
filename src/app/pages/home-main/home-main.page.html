@@ -70,9 +70,11 @@
   <div *ngIf="!isLoading">
 
     <!-- Section 1: Service Pillars / Categories -->
-    <div class="service-pillars-section" *ngIf="categories.length">
+    <div class="service-pillars-section anim-section" *ngIf="categories.length" style="animation-delay: 0s;">
       <div class="service-pillars-scroll">
-        <div class="service-pillar" *ngFor="let cat of categories" (click)="navigateService(cat)">
+        <div class="service-pillar pulse-once" *ngFor="let cat of categories; let i = index"
+          [style.animation-delay]="(i * 0.05) + 's'"
+          (click)="navigateService(cat)">
           <div class="pillar-icon-wrap" [ngStyle]="{'background-color': '#FFF0F0'}">
             <img *ngIf="cat.imageUrl" [src]="imgBaseUrl + cat.imageUrl" class="pillar-img" alt="{{ cat.categoryName }}" />
             <ion-icon *ngIf="!cat.imageUrl" name="storefront-outline" style="color: #F85C70;"></ion-icon>
@@ -84,7 +86,7 @@
     </div>
 
     <!-- Section 2: Offers & Deals Swiper -->
-    <div class="banner-carousel" *ngIf="deals.length">
+    <div class="banner-carousel anim-section" *ngIf="deals.length" style="animation-delay: 0.1s;">
       <swiper-container slides-per-view="1.3" space-between="12" pagination="true" autoplay-delay="3000" loop="true">
         <swiper-slide *ngFor="let deal of deals">
           <div class="deal-card" (click)="navigateRestaurant(deal.vendor)">
@@ -104,11 +106,37 @@
                   <span class="deal-actual-price" *ngIf="deal.actualPrice > deal.price">&#8377;{{ deal.actualPrice }}</span>
                 </div>
               </div>
+              <span class="deal-cta">Tap to order</span>
             </div>
             <div class="deal-category-tag" *ngIf="deal.category">{{ deal.category.categoryName }}</div>
           </div>
         </swiper-slide>
       </swiper-container>
+    </div>
+
+    <!-- Section 2.5: Flash Deals (time-sensitive offers) -->
+    <div class="flash-deals-section anim-section" *ngIf="flashDeals.length" style="animation-delay: 0.15s;">
+      <div class="section-header">
+        <h2>
+          <ion-icon name="flash" class="flash-icon"></ion-icon>
+          Flash Deals
+        </h2>
+      </div>
+      <div class="flash-deals-scroll">
+        <div class="flash-deal-card" *ngFor="let deal of flashDeals" (click)="navigateFlashDeal(deal)">
+          <div class="flash-timer-chip">
+            <ion-icon name="time-outline"></ion-icon>
+            {{ deal.timeLeft }}
+          </div>
+          <div class="flash-deal-content">
+            <div class="flash-discount">{{ deal.discountType === 'percentage' ? deal.discountValue + '% OFF' : '&#8377;' + deal.discountValue + ' OFF' }}</div>
+            <h4 class="flash-title">{{ deal.title }}</h4>
+            <p class="flash-desc">{{ deal.description }}</p>
+            <span class="flash-code" *ngIf="deal.code">{{ deal.code }}</span>
+          </div>
+          <div class="flash-cta">Grab now</div>
+        </div>
+      </div>
     </div>
 
     <!-- Section 3: Wallet & Coins (hidden for now) -->
@@ -135,7 +163,7 @@
     </div>
 
     <!-- Section 4: Popular in your area -->
-    <div class="order-again-section" *ngIf="popularItems.length">
+    <div class="order-again-section anim-section" *ngIf="popularItems.length" style="animation-delay: 0.2s;">
       <div class="section-header">
         <h2>Popular in your area</h2>
         <span class="see-all" (click)="navigateToPopularItems()">See all</span>
@@ -163,8 +191,30 @@
       </div>
     </div>
 
+    <!-- Section 4.5: Offers For You (coupon banner) -->
+    <div class="coupon-banner anim-section" *ngIf="bestCoupon" style="animation-delay: 0.25s;">
+      <div class="coupon-inner">
+        <div class="coupon-left">
+          <ion-icon name="pricetag" class="coupon-icon"></ion-icon>
+        </div>
+        <div class="coupon-center">
+          <span class="coupon-label">Best offer for you</span>
+          <span class="coupon-value">{{ bestCoupon.discountType === 'percentage' ? bestCoupon.discountValue + '% OFF' : '&#8377;' + bestCoupon.discountValue + ' OFF' }}</span>
+          <span class="coupon-desc">{{ bestCoupon.title }}</span>
+        </div>
+        <div class="coupon-right">
+          <div class="coupon-code-box">
+            <span class="coupon-code">{{ bestCoupon.code }}</span>
+            <button class="copy-btn" (click)="copyCode(bestCoupon.code)">
+              {{ couponCopied ? 'Copied!' : 'COPY' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Section 5: What's on your mind? -->
-    <div class="cuisine-section" *ngIf="cuisines.length">
+    <div class="cuisine-section anim-section" *ngIf="cuisines.length" style="animation-delay: 0.3s;">
       <div class="section-header">
         <h2>What's on your mind?</h2>
       </div>
@@ -180,8 +230,8 @@
       </div>
     </div>
 
-    <!-- Section 6: Popular Restaurants Near You -->
-    <div class="popular-restaurants-section" *ngIf="popularVendors.length">
+    <!-- Section 6: Popular Restaurants Near You (Enhanced) -->
+    <div class="popular-restaurants-section anim-section" *ngIf="popularVendors.length" style="animation-delay: 0.35s;">
       <div class="section-header">
         <h2>Popular near you</h2>
         <span class="see-all" (click)="navigateToPopularVendors()">See all</span>
@@ -192,6 +242,16 @@
             <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
             <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
               <ion-icon name="storefront-outline"></ion-icon>
+            </div>
+            <!-- Rating badge -->
+            <div class="vendor-rating-badge">
+              <ion-icon name="star"></ion-icon>
+              <span>{{ vendor.rating || '4.5' }}</span>
+            </div>
+            <!-- Delivery time pill -->
+            <div class="vendor-delivery-pill" *ngIf="vendor.approxDeliveryTime">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>~{{ vendor.approxDeliveryTime }} min</span>
             </div>
           </div>
           <div class="restaurant-info">
@@ -207,8 +267,40 @@
       </div>
     </div>
 
+    <!-- Section 6.5: Top Rated Near You -->
+    <div class="popular-restaurants-section anim-section" *ngIf="topRatedVendors.length" style="animation-delay: 0.4s;">
+      <div class="section-header">
+        <h2>Top rated near you</h2>
+      </div>
+      <div class="popular-scroll">
+        <div class="restaurant-card top-rated-card" *ngFor="let vendor of topRatedVendors" (click)="navigateRestaurant(vendor)">
+          <div class="restaurant-cover">
+            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
+            <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
+              <ion-icon name="storefront-outline"></ion-icon>
+            </div>
+            <!-- Prominent rating badge -->
+            <div class="top-rating-badge">
+              <ion-icon name="star"></ion-icon>
+              <span>{{ vendor.rating || '4.5' }}</span>
+            </div>
+          </div>
+          <div class="restaurant-info">
+            <div class="restaurant-name-row">
+              <span class="restaurant-name">{{ vendor.name }}</span>
+            </div>
+            <span class="restaurant-meta" *ngIf="vendor.address">{{ vendor.address }}</span>
+            <div class="restaurant-categories" *ngIf="vendor.categories?.length">
+              <span class="category-chip" *ngFor="let cat of vendor.categories.slice(0, 3)">{{ cat.categoryName }}</span>
+            </div>
+            <span class="vendor-distance-meta" *ngIf="vendor.distance">{{ vendor.distance }} km away</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Section 7: Essentials at your doorstep -->
-    <div class="essentials-section">
+    <div class="essentials-section anim-section" style="animation-delay: 0.45s;">
       <div class="section-header">
         <h2>Essentials at your doorstep</h2>
       </div>

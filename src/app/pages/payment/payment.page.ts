@@ -12,6 +12,12 @@ export class PaymentPage implements OnInit {
   @Input() totalItems: number = 0;
   @Input() totalSaved: number = 0;
   @Input() deliveryAddress: string = '';
+  @Input() deliveryFee: number = 0;
+  @Input() platformFee: number = 0;
+  @Input() taxAmount: number = 0;
+  @Input() feeBreakdown: any = null;
+  @Input() appliedOffer: any = null;
+  @Input() couponDiscount: number = 0;
 
   selectedPayment: string = 'COD';
   isPlacing = false;

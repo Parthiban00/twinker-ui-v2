@@ -32,17 +32,24 @@
       <h3 class="section-heading">Delivery location</h3>
       <div class="delivery-card">
         <div class="delivery-info">
-          <p class="delivery-distance"><strong>4.6Km distance</strong></p>
-          <p class="delivery-meta">Est. delivery fee 12rb &middot; Delivery in 15 min</p>
+          <p class="delivery-distance" *ngIf="feeBreakdown">
+            <strong>{{ feeBreakdown.delivery.maxDistanceKm }} km distance</strong>
+          </p>
+          <p class="delivery-distance" *ngIf="!feeBreakdown && !isLoadingFees">
+            <strong>Calculating...</strong>
+          </p>
+          <p class="delivery-meta" *ngIf="feeBreakdown">
+            Est. delivery fee &#8377;{{ feeBreakdown.delivery.originalFee.toFixed(0) }}
+            <span *ngIf="feeBreakdown.delivery.freeDeliveryApplied"> &middot; Free delivery!</span>
+          </p>
         </div>
-        <button class="link-btn">Change location</button>
+        <button class="link-btn" (click)="changeLocation()">Change location</button>
       </div>
       <div class="action-chips">
-        <button class="chip-btn">Edit address details</button>
         <button class="chip-btn">Add note</button>
       </div>
-      <div class="address-box">
-        <p>Gunawarman street No.3, Selong, Kec. Kby. Baru, South Jakarta, Jakarta 12110</p>
+      <div class="address-box" *ngIf="userAddress">
+        <p>{{ userAddress.fullAddress || userAddress.addressLine1 || 'Delivery address' }}</p>
       </div>
     </div>
 
@@ -73,9 +80,9 @@
           <h4 class="cart-item-name">{{ item.productName }}</h4>
           <p class="cart-item-customization" *ngIf="item.customizationSummary">{{ item.customizationSummary }}</p>
           <div class="cart-item-price-row">
-            <span class="cart-item-price">$ {{ (item.price * item.itemCount).toFixed(2) }}</span>
+            <span class="cart-item-price">&#8377; {{ (item.price * item.itemCount).toFixed(2) }}</span>
             <span class="cart-item-original" *ngIf="item.basePrice && item.basePrice !== item.price">
-              $ {{ (item.basePrice * item.itemCount).toFixed(2) }}
+              &#8377; {{ (item.basePrice * item.itemCount).toFixed(2) }}
             </span>
           </div>
           <div class="cart-item-actions">
@@ -108,7 +115,7 @@
       <!-- Per-vendor subtotal (only for multi-vendor) -->
       <div class="vendor-subtotal" *ngIf="hasMultipleVendors">
         <span>Subtotal</span>
-        <span class="subtotal-amount">$ {{ group.subtotal.toFixed(2) }}</span>
+        <span class="subtotal-amount">&#8377; {{ group.subtotal.toFixed(2) }}</span>
       </div>
     </div>
 
@@ -230,18 +237,98 @@
         <span>Coupon discount ({{ appliedOffer.code || appliedOffer.title }})</span>
         <span class="coupon-discount-amount">-&#8377;{{ couponDiscount.toFixed(2) }}</span>
       </div>
+
+      <!-- Delivery Fee -->
       <div class="summary-row">
-        <span>Delivery fee</span>
-        <div class="summary-prices">
-          <span class="original-price">&#8377; 20.00</span>
-          <span class="free-text">Free</span>
+        <span>Delivery fee<span class="delivery-km" *ngIf="feeBreakdown"> ({{ feeBreakdown.delivery.maxDistanceKm }} km)</span></span>
+        <div class="summary-prices" *ngIf="!isLoadingFees && feeBreakdown">
+          <ng-container *ngIf="feeBreakdown.delivery.freeDeliveryApplied">
+            <span class="original-price">&#8377; {{ feeBreakdown.delivery.originalFee.toFixed(2) }}</span>
+            <span class="free-badge-inline">FREE</span>
+          </ng-container>
+          <span *ngIf="!feeBreakdown.delivery.freeDeliveryApplied">&#8377; {{ feeBreakdown.delivery.fee.toFixed(2) }}</span>
         </div>
+        <span class="inline-spinner" *ngIf="isLoadingFees">
+          <ion-spinner name="dots" color="medium"></ion-spinner>
+        </span>
+        <span *ngIf="!isLoadingFees && !feeBreakdown">--</span>
       </div>
+
+      <!-- Platform Fee -->
+      <div class="summary-row" *ngIf="feeBreakdown && platformFee > 0">
+        <span>Platform fee</span>
+        <span>&#8377; {{ platformFee.toFixed(2) }}</span>
+      </div>
+
+      <!-- Tax -->
+      <div class="summary-row" *ngIf="feeBreakdown && taxAmount > 0">
+        <span>
+          {{ feeBreakdown.tax.label }}
+          <span class="tax-rate" *ngIf="feeBreakdown.tax.type === 'percentage'">({{ feeBreakdown.tax.value }}%)</span>
+        </span>
+        <span>&#8377; {{ taxAmount.toFixed(2) }}</span>
+      </div>
+
       <div class="summary-row total-row">
         <span>Total payment</span>
         <span class="total-amount">&#8377; {{ totalPayment.toFixed(2) }}</span>
       </div>
-      <button class="view-details-link">View details</button>
+
+      <!-- View Details Toggle -->
+      <button class="view-details-link" (click)="toggleFeeDetails()" *ngIf="feeBreakdown">
+        <span>{{ showFeeDetails ? 'Hide details' : 'View details' }}</span>
+        <ion-icon [name]="showFeeDetails ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </button>
+
+      <!-- Expandable Fee Details -->
+      <div class="fee-details-expand" *ngIf="showFeeDetails && feeBreakdown">
+        <!-- Delivery Breakdown -->
+        <div class="fee-details-section">
+          <div class="fee-details-title">Delivery breakdown</div>
+          <div class="fee-detail-row" *ngFor="let vd of feeBreakdown.delivery.vendorDistances">
+            <span>{{ vd.vendorName }}</span>
+            <span class="fee-detail-value">{{ vd.distanceKm }} km</span>
+          </div>
+          <div class="fee-detail-row">
+            <span>Base fee (first {{ feeBreakdown.delivery.baseDistanceKm }} km)</span>
+            <span class="fee-detail-value">&#8377; {{ feeBreakdown.delivery.baseFee }}</span>
+          </div>
+          <div class="fee-detail-row" *ngIf="feeBreakdown.delivery.maxDistanceKm > feeBreakdown.delivery.baseDistanceKm">
+            <span>Extra distance ({{ (feeBreakdown.delivery.maxDistanceKm - feeBreakdown.delivery.baseDistanceKm).toFixed(1) }} km x &#8377;{{ feeBreakdown.delivery.perKmCharge }})</span>
+            <span class="fee-detail-value">&#8377; {{ ((feeBreakdown.delivery.maxDistanceKm - feeBreakdown.delivery.baseDistanceKm) * feeBreakdown.delivery.perKmCharge).toFixed(2) }}</span>
+          </div>
+          <div class="fee-detail-row fee-detail-note" *ngIf="feeBreakdown.delivery.storeCount > 1">
+            <span>Multi-store surcharge ({{ feeBreakdown.delivery.storeCount }} stores, +{{ (feeBreakdown.delivery.storeCount - 1) * feeBreakdown.delivery.multiStoreSurchargePercent }}%)</span>
+          </div>
+          <div class="fee-detail-row fee-detail-note" *ngIf="feeBreakdown.delivery.freeDeliveryApplied">
+            <ion-icon name="checkmark-circle" class="free-check-icon"></ion-icon>
+            <span>Free delivery applied (order above &#8377;{{ feeBreakdown.delivery.freeDeliveryThreshold }})</span>
+          </div>
+          <div class="fee-detail-row fee-detail-note" *ngIf="!feeBreakdown.delivery.freeDeliveryApplied && feeBreakdown.delivery.freeDeliveryThreshold > 0">
+            <ion-icon name="information-circle-outline" class="info-icon"></ion-icon>
+            <span>Add &#8377;{{ (feeBreakdown.delivery.freeDeliveryThreshold - totalDiscountedPrice).toFixed(0) }} more for free delivery</span>
+          </div>
+        </div>
+
+        <!-- Platform Fee Details -->
+        <div class="fee-details-section" *ngIf="platformFee > 0">
+          <div class="fee-details-title">Platform fee</div>
+          <div class="fee-detail-row">
+            <span>Service & operations charge</span>
+            <span class="fee-detail-value">&#8377; {{ platformFee.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Tax Details -->
+        <div class="fee-details-section" *ngIf="taxAmount > 0">
+          <div class="fee-details-title">{{ feeBreakdown.tax.label }}</div>
+          <div class="fee-detail-row">
+            <span *ngIf="feeBreakdown.tax.type === 'percentage'">{{ feeBreakdown.tax.value }}% on item total</span>
+            <span *ngIf="feeBreakdown.tax.type === 'flat'">Flat tax</span>
+            <span class="fee-detail-value">&#8377; {{ taxAmount.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Payment Method -->

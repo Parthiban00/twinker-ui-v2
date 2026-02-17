@@ -78,9 +78,9 @@
           <div class="cuisine-icon-wrap">
             <img [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name"
               *ngIf="cuisine.imageUrl" class="cuisine-img" />
-            <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji">{{ theme.cuisines[0]?.icon || '🍽️' }}</span>
+            <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji">{{ theme.cuisines[0]?.icon || '\uD83C\uDF7D\uFE0F' }}</span>
           </div>
-          <span class="cuisine-name">{{ cuisine.name }}</span>
+          <span class="cuisine-name">{{ cuisine.productName || cuisine.name }}</span>
         </div>
       </ng-container>
       <ng-template #dummyCuisineList>
@@ -101,7 +101,22 @@
   <!-- 5. PROMO DEALS BANNER CAROUSEL               -->
   <!-- ============================================ -->
   <div class="deals-section">
-    <div class="deals-scroll">
+    <!-- Loading skeleton -->
+    <div class="deals-scroll" *ngIf="isDealsLoading">
+      <div class="deal-card-skeleton shimmer" *ngFor="let i of [1,2]"></div>
+    </div>
+    <!-- Real deals from API -->
+    <div class="deals-scroll" *ngIf="!isDealsLoading && deals.length">
+      <div class="deal-card" *ngFor="let deal of deals"
+        [style.background]="'linear-gradient(135deg, ' + (deal.accentColor || deal.badgeColor || theme.accentColor) + ', ' + (deal.accentColor || deal.badgeColor || theme.accentColor) + 'cc)'">
+        <div class="deal-badge">{{ deal.badgeText || getDealDiscountLabel(deal) }}</div>
+        <h3 class="deal-title">{{ deal.title }}</h3>
+        <p class="deal-subtitle">{{ deal.description }}</p>
+        <span class="deal-code" *ngIf="deal.code">{{ deal.code }}</span>
+      </div>
+    </div>
+    <!-- Fallback to theme deals -->
+    <div class="deals-scroll" *ngIf="!isDealsLoading && !deals.length">
       <div class="deal-card" *ngFor="let deal of theme.deals"
         [style.background]="'linear-gradient(135deg, ' + deal.color + ', ' + deal.color + 'cc)'">
         <div class="deal-badge">{{ deal.badge }}</div>
@@ -114,16 +129,32 @@
   <!-- ============================================ -->
   <!-- 6. TRENDING VENDORS HORIZONTAL CAROUSEL      -->
   <!-- ============================================ -->
-  <div class="section-block" *ngIf="trendingVendors.length">
+  <!-- Loading skeleton -->
+  <div class="section-block" *ngIf="isTrendingLoading">
     <div class="section-header">
       <h2>Trending near you</h2>
-      <span class="see-all" [style.color]="theme.accentColor">See all</span>
+    </div>
+    <div class="trending-scroll">
+      <div class="trending-card-skeleton" *ngFor="let i of [1,2,3]">
+        <div class="skeleton-img shimmer"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-line w70 shimmer"></div>
+          <div class="skeleton-line w50 shimmer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Real trending -->
+  <div class="section-block" *ngIf="!isTrendingLoading && trendingVendors.length">
+    <div class="section-header">
+      <h2>Trending near you</h2>
+      <span class="see-all" [style.color]="theme.accentColor" (click)="navigateTrendingSeeAll()">See all</span>
     </div>
     <div class="trending-scroll">
       <div class="trending-card" *ngFor="let vendor of trendingVendors"
         [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
         <div class="trending-img-wrap">
-          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : vendor.dummyImg"
+          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : 'assets/announcement-banner.jpg'"
             [alt]="vendor.name" />
           <div class="trending-tag" [style.background]="theme.accentColor">Popular</div>
         </div>
@@ -151,15 +182,20 @@
     <div class="featured-scroll">
       <div class="featured-card" *ngFor="let item of featuredItems">
         <div class="featured-img-wrap">
-          <img [src]="imgBaseUrl + item.imageUrl" [alt]="item.name" />
+          <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" [alt]="item.productName" />
+          <div class="img-placeholder" *ngIf="!item.imageUrl">
+            <ion-icon name="restaurant-outline"></ion-icon>
+          </div>
+          <div class="discount-badge" *ngIf="item.discount">{{ getDiscountLabel(item) }}</div>
         </div>
         <div class="featured-info">
-          <h4>{{ item.name }}</h4>
-          <p class="featured-vendor">{{ item.vendorName || 'Local vendor' }}</p>
+          <h4>{{ item.productName }}</h4>
+          <p class="featured-vendor">{{ item.vendor?.name || 'Local vendor' }}</p>
           <div class="featured-bottom">
             <span class="featured-price">{{ item.price | currency:'INR':'symbol':'1.0-0' }}</span>
-            <button class="add-btn" [style.color]="theme.accentColor"
-              [style.border-color]="theme.accentColor">ADD</button>
+            <button class="add-btn-rect" [style.color]="theme.accentColor"
+              [style.border-color]="theme.accentColor"
+              (click)="addToCart(item); $event.stopPropagation()">ADD</button>
           </div>
         </div>
       </div>
@@ -194,7 +230,7 @@
 
         <!-- Cover image -->
         <div class="vendor-cover">
-          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : vendor.dummyImg"
+          <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : 'assets/announcement-banner.jpg'"
             [alt]="vendor.name" />
           <!-- Delivery time pill -->
           <div class="delivery-pill">
@@ -214,9 +250,12 @@
         <div class="vendor-info">
           <div class="vendor-name-row">
             <h3>{{ vendor.name }}</h3>
-            <span class="vendor-distance">{{ vendor.distance || '2.5' }} km</span>
+            <span class="vendor-distance">{{ vendor.distance || '...' }} km</span>
           </div>
           <p class="vendor-desc">{{ vendor.description }}</p>
+          <div class="vendor-categories" *ngIf="vendor.categories?.length">
+            <span class="category-chip" *ngFor="let cat of vendor.categories.slice(0, 3)">{{ cat.categoryName }}</span>
+          </div>
           <div class="vendor-tags" *ngIf="vendor.tags?.length">
             <ng-container *ngFor="let tag of vendor.tags">
               <span class="vtag" [ngClass]="{

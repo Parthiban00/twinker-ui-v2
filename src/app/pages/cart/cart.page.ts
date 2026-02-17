@@ -9,6 +9,7 @@ import { DealsService } from '../deals/deals.service';
 import { HomeMainService } from '../home-main/home-main.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { CommonService } from 'src/app/services/common.service';
+import { CartService } from './cart.service';
 
 interface CartItem {
   _id: string;
@@ -37,6 +38,30 @@ interface VendorGroup {
   subtotal: number;
 }
 
+interface FeeBreakdown {
+  delivery: {
+    fee: number;
+    originalFee: number;
+    freeDeliveryApplied: boolean;
+    freeDeliveryThreshold: number;
+    baseDistanceKm: number;
+    baseFee: number;
+    perKmCharge: number;
+    maxDistanceKm: number;
+    storeCount: number;
+    multiStoreSurchargePercent: number;
+    vendorDistances: { vendorId: string; vendorName: string; distanceKm: number }[];
+  };
+  platformFee: number;
+  tax: {
+    amount: number;
+    type: string;
+    value: number;
+    label: string;
+  };
+  totalFees: number;
+}
+
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.page.html',
@@ -57,6 +82,12 @@ export class CartPage implements OnInit {
   isLoadingOffers: boolean = false;
   localityId: string = '';
 
+  // Fee state
+  feeBreakdown: FeeBreakdown | null = null;
+  isLoadingFees: boolean = false;
+  showFeeDetails: boolean = false;
+  userAddress: any = null;
+
   constructor(
     private modalCtrl: ModalController,
     private router: Router,
@@ -66,6 +97,7 @@ export class CartPage implements OnInit {
     private homeMainService: HomeMainService,
     private storageService: StorageService,
     private commonService: CommonService,
+    private cartService: CartService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -126,7 +158,9 @@ export class CartPage implements OnInit {
       next: (res: any) => {
         if (res?.status && res?.data?.locality) {
           this.localityId = res.data.locality._id;
+          this.userAddress = res.data;
           this.fetchOffers();
+          this.calculateCartFees();
         } else {
           this.isLoadingOffers = false;
           this.cdr.detectChanges();
@@ -276,8 +310,20 @@ export class CartPage implements OnInit {
     return this.cartItems.reduce((sum, item) => sum + (item.price * item.itemCount), 0);
   }
 
+  get deliveryFee(): number {
+    return this.feeBreakdown?.delivery?.fee ?? 0;
+  }
+
+  get platformFee(): number {
+    return this.feeBreakdown?.platformFee ?? 0;
+  }
+
+  get taxAmount(): number {
+    return this.feeBreakdown?.tax?.amount ?? 0;
+  }
+
   get totalPayment(): number {
-    return Math.max(0, this.totalDiscountedPrice - this.couponDiscount);
+    return Math.max(0, this.totalDiscountedPrice - this.couponDiscount + this.deliveryFee + this.platformFee + this.taxAmount);
   }
 
   get totalSaved(): number {
@@ -305,10 +351,47 @@ export class CartPage implements OnInit {
     localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
     this.eventBus.emit('cart:updated', this.cartItems.length);
     this.buildVendorGroups();
-    // Re-fetch offers (order amount may have changed)
+    // Re-fetch offers and fees (order amount may have changed)
     if (this.localityId) {
       this.fetchOffers();
+      this.calculateCartFees();
     }
+  }
+
+  calculateCartFees() {
+    if (this.isCartEmpty || !this.localityId || !this.userAddress) return;
+
+    const vendorIds = this.vendorGroups.map(g => g.vendorId).filter(id => id !== 'unknown');
+    if (vendorIds.length === 0) return;
+
+    const coords = this.userAddress.coords;
+    if (!coords?.lat || !coords?.lng) return;
+
+    this.isLoadingFees = true;
+
+    this.cartService.calculateFees({
+      localityId: this.localityId,
+      vendorIds,
+      userLat: coords.lat,
+      userLng: coords.lng,
+      orderSubtotal: this.totalDiscountedPrice
+    }).subscribe({
+      next: (res: any) => {
+        if (res?.status && res?.data) {
+          this.feeBreakdown = res.data;
+        }
+        this.isLoadingFees = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingFees = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  toggleFeeDetails() {
+    this.showFeeDetails = !this.showFeeDetails;
   }
 
   getItemImage(item: CartItem): string {
@@ -345,6 +428,7 @@ export class CartPage implements OnInit {
     this.appliedOffer = null;
     this.couponDiscount = 0;
     this.applicableOffers = [];
+    this.feeBreakdown = null;
     this.eventBus.emit('cart:updated', 0);
   }
 
@@ -356,6 +440,10 @@ export class CartPage implements OnInit {
     this.router.navigate(['/tabs/deals']);
   }
 
+  changeLocation() {
+    this.router.navigate(['/location-setup']);
+  }
+
   async openPaymentModal() {
     const modal = await this.modalCtrl.create({
       component: PaymentPage,
@@ -364,7 +452,12 @@ export class CartPage implements OnInit {
         totalItems: this.totalItems,
         totalSaved: this.totalSaved,
         appliedOffer: this.appliedOffer,
-        couponDiscount: this.couponDiscount
+        couponDiscount: this.couponDiscount,
+        deliveryFee: this.deliveryFee,
+        platformFee: this.platformFee,
+        taxAmount: this.taxAmount,
+        feeBreakdown: this.feeBreakdown,
+        deliveryAddress: this.userAddress?.fullAddress || ''
       },
       cssClass: 'payment-confirm-modal'
     });

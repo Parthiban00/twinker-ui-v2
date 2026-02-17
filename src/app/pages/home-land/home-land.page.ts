@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ActionSheetController, ModalController } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CouponsPage } from 'src/app/shared/pages/coupons/coupons.page';
 import { SpecificItemListPage } from 'src/app/shared/pages/specific-item-list/specific-item-list.page';
 import { VendorService } from './vendor.service';
@@ -39,19 +41,19 @@ const categoryThemes: Record<string, CategoryTheme> = {
     searchPlaceholder: 'Search for restaurants or dishes...',
     filterChips: ['Nearest', 'Top rated', 'Fast delivery', 'Offers', 'Pure veg'],
     cuisines: [
-      { name: 'Pizza', icon: '🍕' },
-      { name: 'Biryani', icon: '🍛' },
-      { name: 'Chinese', icon: '🥡' },
-      { name: 'Burger', icon: '🍔' },
-      { name: 'South Indian', icon: '🥘' },
-      { name: 'Desserts', icon: '🍰' },
-      { name: 'Rolls', icon: '🌯' },
-      { name: 'Thali', icon: '🍱' }
+      { name: 'Pizza', icon: '\uD83C\uDF55' },
+      { name: 'Biryani', icon: '\uD83C\uDF5B' },
+      { name: 'Chinese', icon: '\uD83E\uDD61' },
+      { name: 'Burger', icon: '\uD83C\uDF54' },
+      { name: 'South Indian', icon: '\uD83E\uDD58' },
+      { name: 'Desserts', icon: '\uD83C\uDF70' },
+      { name: 'Rolls', icon: '\uD83C\uDF2F' },
+      { name: 'Thali', icon: '\uD83C\uDF71' }
     ],
     deals: [
-      { title: '50% OFF up to ₹100', subtitle: 'On your first order', badge: 'NEW USER', color: '#F85C70' },
-      { title: 'Free delivery', subtitle: 'On orders above ₹199', badge: 'FREE', color: '#2ecc71' },
-      { title: 'Flat ₹125 OFF', subtitle: 'Use code TASTY125', badge: 'DEAL', color: '#FF8C42' }
+      { title: '50% OFF up to \u20B9100', subtitle: 'On your first order', badge: 'NEW USER', color: '#F85C70' },
+      { title: 'Free delivery', subtitle: 'On orders above \u20B9199', badge: 'FREE', color: '#2ecc71' },
+      { title: 'Flat \u20B9125 OFF', subtitle: 'Use code TASTY125', badge: 'DEAL', color: '#FF8C42' }
     ]
   },
   'Groceries': {
@@ -65,17 +67,17 @@ const categoryThemes: Record<string, CategoryTheme> = {
     searchPlaceholder: 'Search for groceries or stores...',
     filterChips: ['Nearest', 'Top rated', 'Best price', 'Organic', 'Express'],
     cuisines: [
-      { name: 'Fruits', icon: '🍎' },
-      { name: 'Vegetables', icon: '🥬' },
-      { name: 'Dairy', icon: '🥛' },
-      { name: 'Snacks', icon: '🍿' },
-      { name: 'Beverages', icon: '🧃' },
-      { name: 'Staples', icon: '🌾' },
-      { name: 'Bakery', icon: '🍞' },
-      { name: 'Meat', icon: '🥩' }
+      { name: 'Fruits', icon: '\uD83C\uDF4E' },
+      { name: 'Vegetables', icon: '\uD83E\uDD6C' },
+      { name: 'Dairy', icon: '\uD83E\uDD5B' },
+      { name: 'Snacks', icon: '\uD83C\uDF7F' },
+      { name: 'Beverages', icon: '\uD83E\uDDC3' },
+      { name: 'Staples', icon: '\uD83C\uDF3E' },
+      { name: 'Bakery', icon: '\uD83C\uDF5E' },
+      { name: 'Meat', icon: '\uD83E\uDD69' }
     ],
     deals: [
-      { title: '₹1 deals on fruits', subtitle: 'Limited time only', badge: '₹1', color: '#2ecc71' },
+      { title: '\u20B91 deals on fruits', subtitle: 'Limited time only', badge: '\u20B91', color: '#2ecc71' },
       { title: 'Buy 2 Get 1 Free', subtitle: 'On dairy products', badge: 'B2G1', color: '#3498db' },
       { title: '30% OFF on veggies', subtitle: 'Fresh from farms', badge: 'FRESH', color: '#27ae60' }
     ]
@@ -91,17 +93,17 @@ const categoryThemes: Record<string, CategoryTheme> = {
     searchPlaceholder: 'Search medicines or pharmacies...',
     filterChips: ['Nearest', 'Top rated', '24/7 open', 'Discounts', 'Express'],
     cuisines: [
-      { name: 'OTC', icon: '💊' },
-      { name: 'Wellness', icon: '🧘' },
-      { name: 'Personal care', icon: '🧴' },
-      { name: 'Baby care', icon: '🍼' },
-      { name: 'Devices', icon: '🩺' },
-      { name: 'Ayurveda', icon: '🌿' }
+      { name: 'OTC', icon: '\uD83D\uDC8A' },
+      { name: 'Wellness', icon: '\uD83E\uDDD8' },
+      { name: 'Personal care', icon: '\uD83E\uDDF4' },
+      { name: 'Baby care', icon: '\uD83C\uDF7C' },
+      { name: 'Devices', icon: '\uD83E\uDE7A' },
+      { name: 'Ayurveda', icon: '\uD83C\uDF3F' }
     ],
     deals: [
       { title: '25% OFF on all orders', subtitle: 'Use code HEALTH25', badge: 'SAVE', color: '#4A5BF5' },
       { title: 'Free delivery', subtitle: 'On pharmacy orders', badge: 'FREE', color: '#2ecc71' },
-      { title: 'Flat ₹50 OFF', subtitle: 'On orders above ₹500', badge: 'FLAT', color: '#6C7CFF' }
+      { title: 'Flat \u20B950 OFF', subtitle: 'On orders above \u20B9500', badge: 'FLAT', color: '#6C7CFF' }
     ]
   },
   'Desserts': {
@@ -115,15 +117,15 @@ const categoryThemes: Record<string, CategoryTheme> = {
     searchPlaceholder: 'Search desserts or bakeries...',
     filterChips: ['Nearest', 'Top rated', 'Fast delivery', 'Cakes', 'Ice cream'],
     cuisines: [
-      { name: 'Cakes', icon: '🎂' },
-      { name: 'Ice cream', icon: '🍦' },
-      { name: 'Cookies', icon: '🍪' },
-      { name: 'Pastries', icon: '🥐' },
-      { name: 'Chocolates', icon: '🍫' },
-      { name: 'Indian sweets', icon: '🍬' }
+      { name: 'Cakes', icon: '\uD83C\uDF82' },
+      { name: 'Ice cream', icon: '\uD83C\uDF66' },
+      { name: 'Cookies', icon: '\uD83C\uDF6A' },
+      { name: 'Pastries', icon: '\uD83E\uDD50' },
+      { name: 'Chocolates', icon: '\uD83C\uDF6B' },
+      { name: 'Indian sweets', icon: '\uD83C\uDF6C' }
     ],
     deals: [
-      { title: '20% OFF on cakes', subtitle: 'Order above ₹499', badge: 'SWEET', color: '#E91E8C' },
+      { title: '20% OFF on cakes', subtitle: 'Order above \u20B9499', badge: 'SWEET', color: '#E91E8C' },
       { title: 'Buy 1 Get 1 Free', subtitle: 'On ice cream tubs', badge: 'B1G1', color: '#FF6EB4' },
       { title: 'Free delivery', subtitle: 'On dessert orders', badge: 'FREE', color: '#2ecc71' }
     ]
@@ -139,15 +141,15 @@ const categoryThemes: Record<string, CategoryTheme> = {
     searchPlaceholder: 'Search beverages or cafes...',
     filterChips: ['Nearest', 'Top rated', 'Fast delivery', 'Healthy', 'Cold drinks'],
     cuisines: [
-      { name: 'Coffee', icon: '☕' },
-      { name: 'Juices', icon: '🧃' },
-      { name: 'Shakes', icon: '🥤' },
-      { name: 'Tea', icon: '🍵' },
-      { name: 'Smoothies', icon: '🫐' },
-      { name: 'Sodas', icon: '🥂' }
+      { name: 'Coffee', icon: '\u2615' },
+      { name: 'Juices', icon: '\uD83E\uDDC3' },
+      { name: 'Shakes', icon: '\uD83E\uDD64' },
+      { name: 'Tea', icon: '\uD83C\uDF75' },
+      { name: 'Smoothies', icon: '\uD83E\uDED0' },
+      { name: 'Sodas', icon: '\uD83E\uDD42' }
     ],
     deals: [
-      { title: 'Flat ₹50 OFF', subtitle: 'On first beverage order', badge: 'SIP', color: '#FF8C42' },
+      { title: 'Flat \u20B950 OFF', subtitle: 'On first beverage order', badge: 'SIP', color: '#FF8C42' },
       { title: 'Buy 2 Get 1 Free', subtitle: 'On cold coffees', badge: 'B2G1', color: '#8B4513' },
       { title: '30% OFF smoothies', subtitle: 'Fresh & healthy', badge: 'FRESH', color: '#2ecc71' }
     ]
@@ -162,7 +164,7 @@ const defaultTheme = categoryThemes['Food'];
   styleUrls: ['./home-land.page.scss'],
   standalone: false,
 })
-export class HomeLandPage implements OnInit {
+export class HomeLandPage implements OnInit, OnDestroy {
 
   categoryId = '';
   vendorDetails: any[] = [];
@@ -173,120 +175,58 @@ export class HomeLandPage implements OnInit {
   imgBaseUrl: string = environment.imageBaseUrl;
   featuredItems: any[] = [];
   popularCuisines: any[] = [];
-  productDetails: any[] = [];
+  deals: any[] = [];
   pageTitle = 'Food';
+  cuisineFilter = '';
 
   isLoading = true;
+  isDealsLoading = true;
+  isTrendingLoading = true;
   searchTerm = '';
   activeSort = '';
   activeFilters: string[] = [];
   selectedCuisine = '';
 
-  dummyVendors: any[] = [
-    {
-      _id: '1',
-      name: 'Bottega Restorante',
-      description: 'Italian restaurant with various dishes',
-      profileImgUrl: '',
-      distance: '4.6',
-      approxDeliveryTime: 15,
-      rating: 4.6,
-      ratingCount: 456,
-      startPrice: 49,
-      tags: ['Extra discount', 'Free delivery'],
-      dummyImg: 'assets/announcement-banner.jpg',
-      popular: true
-    },
-    {
-      _id: '2',
-      name: 'SOULFOOD Jakarta',
-      description: 'Indonesian comfort eats served with love',
-      profileImgUrl: '',
-      distance: '3.2',
-      approxDeliveryTime: 10,
-      rating: 4.7,
-      ratingCount: 346,
-      startPrice: 35,
-      tags: ['Extra discount'],
-      dummyImg: 'assets/announcement-banner.jpg',
-      popular: true
-    },
-    {
-      _id: '3',
-      name: 'Greyhound Cafe',
-      description: 'Hip, industrial-style eatery with fusion menu',
-      profileImgUrl: '',
-      distance: '2.6',
-      approxDeliveryTime: 10,
-      rating: 4.2,
-      ratingCount: 354,
-      startPrice: 39,
-      tags: ['Free delivery'],
-      dummyImg: 'assets/announcement-banner.jpg'
-    },
-    {
-      _id: '4',
-      name: 'Le Quartier',
-      description: 'Classic French-influenced brasserie cuisine',
-      profileImgUrl: '',
-      distance: '5.4',
-      approxDeliveryTime: 15,
-      rating: 4.6,
-      ratingCount: 546,
-      startPrice: 79,
-      tags: ['Extra discount', 'Free delivery'],
-      dummyImg: 'assets/announcement-banner.jpg',
-      popular: true
-    },
-    {
-      _id: '5',
-      name: 'Sofia Gunawarman',
-      description: 'Modern fusion cuisine and cocktails served fresh',
-      profileImgUrl: '',
-      distance: '1.8',
-      approxDeliveryTime: 12,
-      rating: 4.6,
-      ratingCount: 456,
-      startPrice: 55,
-      tags: ['Recommended'],
-      dummyImg: 'assets/announcement-banner.jpg'
-    }
-  ];
-
-  dummyDefaultAddress: any = {
-    _id: 'addr_001',
-    fullAddress: '123 MG Road, Madurai, Tamil Nadu 625001',
-    addressType: 'Home',
-    defaultAddress: true,
-    coords: { lat: 9.9252, lng: 78.1198 },
-    locality: { _id: 'loc_001', name: 'Madurai Central' }
-  };
+  private searchSubject = new Subject<string>();
+  private searchSub: any;
 
   constructor(
     private modalCtrl: ModalController,
     private actionSheetCtrl: ActionSheetController,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     private vendorService: VendorService,
     private commonService: CommonService,
     private homeService: HomeMainService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.performSearch(term);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
+  }
 
   get theme(): CategoryTheme {
     return categoryThemes[this.pageTitle] || defaultTheme;
   }
 
   get displayVendors(): any[] {
-    return this.filteredVendors.length || this.vendorDetails.length
-      ? this.filteredVendors
-      : this.dummyVendors;
+    return this.filteredVendors;
   }
 
   get trendingVendors(): any[] {
-    if (this.popularVendors.length) return this.popularVendors;
-    return this.dummyVendors.filter(v => v.popular);
+    return this.popularVendors;
   }
 
   get hasActiveFilters(): boolean {
@@ -295,27 +235,26 @@ export class HomeLandPage implements OnInit {
 
   ionViewWillEnter() {
     this.isLoading = true;
+    this.isDealsLoading = true;
+    this.isTrendingLoading = true;
     const userData = this.storageService.getUser();
 
     this.activatedRoute.queryParams.subscribe(params => {
-      this.categoryId = params.categoryId;
-      this.localityId = params.localityId;
+      this.categoryId = params['categoryId'] || '';
+      this.localityId = params['localityId'] || '';
+      this.cuisineFilter = params['cuisineFilter'] || '';
 
-      if (params.title) {
-        this.pageTitle = params.title;
+      if (params['title']) {
+        this.pageTitle = params['title'];
       }
 
-      if (userData?._id && (this.categoryId || this.localityId)) {
+      if (userData?._id) {
         this.getDefaultAddressByUserId(userData._id);
       } else {
-        this.defaultAddress = this.dummyDefaultAddress;
-        this.filteredVendors = [...this.dummyVendors];
         this.isLoading = false;
-      }
-
-      if (this.categoryId) {
-        this.getFeaturedItemsByCategory(this.categoryId);
-        this.getPopularCuisines(this.categoryId);
+        this.isDealsLoading = false;
+        this.isTrendingLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -325,77 +264,122 @@ export class HomeLandPage implements OnInit {
       next: (resdata: any) => {
         if (resdata.status && resdata.data) {
           this.defaultAddress = resdata.data;
-          if (this.categoryId) {
-            this.getAllByLocalityAndCategory(this.localityId, this.categoryId);
+          if (!this.localityId && this.defaultAddress.locality?._id) {
+            this.localityId = this.defaultAddress.locality._id;
+          }
+          if (this.categoryId && this.localityId) {
+            this.loadCategoryLandingData();
+          } else if (this.localityId && !this.categoryId) {
+            this.resolveCategoryAndLoad();
+          } else {
+            this.isLoading = false;
+            this.isDealsLoading = false;
+            this.isTrendingLoading = false;
+            this.cdr.detectChanges();
           }
         } else {
-          this.defaultAddress = this.dummyDefaultAddress;
-          this.filteredVendors = [...this.dummyVendors];
           this.isLoading = false;
+          this.isDealsLoading = false;
+          this.isTrendingLoading = false;
+          this.cdr.detectChanges();
         }
       },
       error: () => {
-        this.defaultAddress = this.dummyDefaultAddress;
-        this.filteredVendors = [...this.dummyVendors];
         this.isLoading = false;
+        this.isDealsLoading = false;
+        this.isTrendingLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  getPopularCuisines(categoryId: string) {
-    this.homeService.getPopularCuisines(categoryId).subscribe({
+  resolveCategoryAndLoad() {
+    this.homeService.getAllCategoriesByLocality(this.localityId).subscribe({
       next: (resdata: any) => {
-        if (resdata.status && resdata.data) {
-          this.popularCuisines = resdata.data;
+        if (resdata.status && resdata.data?.length) {
+          const match = resdata.data.find((c: any) =>
+            c.categoryName?.toLowerCase() === this.pageTitle.toLowerCase()
+          );
+          if (match) {
+            this.categoryId = match._id;
+            this.loadCategoryLandingData();
+          } else {
+            this.categoryId = resdata.data[0]._id;
+            this.loadCategoryLandingData();
+          }
         } else {
-          this.popularCuisines = [];
+          this.isLoading = false;
+          this.isDealsLoading = false;
+          this.isTrendingLoading = false;
+          this.cdr.detectChanges();
         }
       },
       error: () => {
-        this.popularCuisines = [];
+        this.isLoading = false;
+        this.isDealsLoading = false;
+        this.isTrendingLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  getFeaturedItemsByCategory(categoryId: string) {
-    this.homeService.getFeaturedItemsByCategory(categoryId).subscribe({
+  loadCategoryLandingData() {
+    this.homeService.getCategoryLanding(this.localityId, this.categoryId).subscribe({
       next: (resdata: any) => {
         if (resdata.status && resdata.data) {
-          this.featuredItems = resdata.data;
-        } else {
-          this.featuredItems = [];
-        }
-      },
-      error: () => {
-        this.featuredItems = [];
-      }
-    });
-  }
-
-  getAllByLocalityAndCategory(localityId: any, categoryId: any) {
-    this.vendorService.getAllByLocalityAndCategory(localityId, categoryId).subscribe({
-      next: (resdata: any) => {
-        if (resdata.status && resdata.data) {
-          this.vendorDetails = resdata.data;
-          this.vendorDetails.forEach((vendor) => {
-            vendor.distance = this.commonService.calculateDistance(
-              this.defaultAddress.coords.lat, this.defaultAddress.coords.lng,
-              vendor.latitude, vendor.longitude
-            );
-            vendor.approxDeliveryTime = (Math.ceil(parseFloat(vendor.distance)) * 3) + 15;
-          });
-          this.popularVendors = this.vendorDetails.filter(vendor => vendor.popular);
+          const d = resdata.data;
+          this.vendorDetails = d.vendors || [];
+          this.enrichVendors(this.vendorDetails);
+          this.popularVendors = d.popularVendors || [];
+          this.enrichVendors(this.popularVendors);
+          this.popularCuisines = d.cuisines || [];
+          this.featuredItems = d.featuredItems || [];
+          this.deals = d.deals || [];
           this.filteredVendors = [...this.vendorDetails];
+
+          // Apply cuisine filter if navigated from home-main cuisine click
+          if (this.cuisineFilter) {
+            this.selectedCuisine = this.cuisineFilter;
+            this.applyFiltersAndSort();
+          }
         } else {
           this.vendorDetails = [];
           this.filteredVendors = [];
+          this.popularVendors = [];
+          this.popularCuisines = [];
+          this.featuredItems = [];
+          this.deals = [];
         }
         this.isLoading = false;
+        this.isDealsLoading = false;
+        this.isTrendingLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.vendorDetails = [];
         this.filteredVendors = [];
+        this.popularVendors = [];
+        this.popularCuisines = [];
+        this.featuredItems = [];
+        this.deals = [];
         this.isLoading = false;
+        this.isDealsLoading = false;
+        this.isTrendingLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  enrichVendors(vendors: any[]) {
+    if (!this.defaultAddress?.coords) return;
+    const userLat = this.defaultAddress.coords.lat;
+    const userLng = this.defaultAddress.coords.lng;
+    vendors.forEach((vendor: any) => {
+      if (vendor.latitude && vendor.longitude) {
+        vendor.distance = this.commonService.calculateDistance(
+          userLat, userLng, vendor.latitude, vendor.longitude
+        );
+        vendor.approxDeliveryTime = (Math.ceil(parseFloat(vendor.distance)) * 3) + 15;
       }
     });
   }
@@ -403,7 +387,10 @@ export class HomeLandPage implements OnInit {
   handleSearchInput(ev: any) {
     const term = ev.target?.value || ev;
     this.searchTerm = term;
+    this.searchSubject.next(term);
+  }
 
+  private performSearch(term: string) {
     if (!term) {
       this.applyFiltersAndSort();
       return;
@@ -414,28 +401,23 @@ export class HomeLandPage implements OnInit {
         next: (resdata: any) => {
           if (resdata.status && resdata.data) {
             this.filteredVendors = resdata.data;
-            this.filteredVendors.forEach((vendor) => {
-              vendor.distance = this.commonService.calculateDistance(
-                this.defaultAddress.coords.lat, this.defaultAddress.coords.lng,
-                vendor.latitude, vendor.longitude
-              );
-              vendor.approxDeliveryTime = (Math.ceil(parseFloat(vendor.distance)) * 3) + 15;
-            });
+            this.enrichVendors(this.filteredVendors);
           } else {
             this.filteredVendors = [];
           }
+          this.cdr.detectChanges();
         },
         error: () => {
           this.filteredVendors = [];
+          this.cdr.detectChanges();
         }
       });
     } else {
-      // Client-side search for dummy mode
       const lowerTerm = term.toLowerCase();
-      const source = this.vendorDetails.length ? this.vendorDetails : this.dummyVendors;
-      this.filteredVendors = source.filter((v: any) =>
+      this.filteredVendors = this.vendorDetails.filter((v: any) =>
         v.name.toLowerCase().includes(lowerTerm) || v.description?.toLowerCase().includes(lowerTerm)
       );
+      this.cdr.detectChanges();
     }
   }
 
@@ -498,7 +480,7 @@ export class HomeLandPage implements OnInit {
   }
 
   applyFiltersAndSort() {
-    let source = this.vendorDetails.length ? [...this.vendorDetails] : [...this.dummyVendors];
+    let source = [...this.vendorDetails];
 
     // Text search
     if (this.searchTerm) {
@@ -564,6 +546,53 @@ export class HomeLandPage implements OnInit {
     }
 
     this.filteredVendors = source;
+    this.cdr.detectChanges();
+  }
+
+  addToCart(item: any) {
+    const cartItems = this.storageService.getItem('cart-items') || [];
+    const existing = cartItems.find((c: any) => c._id === item._id);
+    if (existing) {
+      existing.quantity = (existing.quantity || 1) + 1;
+    } else {
+      cartItems.push({
+        _id: item._id,
+        productName: item.productName,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        vendor: item.vendor,
+        quantity: 1
+      });
+    }
+    this.storageService.setItem('cart-items', cartItems);
+    this.commonService.presentToast('bottom', `${item.productName || 'Item'} added to cart`, 'success');
+  }
+
+  getDiscountLabel(item: any): string {
+    if (!item.discount) return '';
+    if (item.discountType === 'in-percentage') {
+      return `${item.discount}% OFF`;
+    } else if (item.discountType === 'in-price') {
+      return `\u20B9${item.discount} OFF`;
+    }
+    return `${item.discount}% OFF`;
+  }
+
+  getDealDiscountLabel(deal: any): string {
+    if (!deal.discountValue) return '';
+    if (deal.discountType === 'percentage') {
+      return `${deal.discountValue}% OFF`;
+    }
+    return `\u20B9${deal.discountValue} OFF`;
+  }
+
+  navigateTrendingSeeAll() {
+    this.router.navigate(['/popular-vendors'], {
+      queryParams: {
+        localityId: this.localityId,
+        category: this.categoryId
+      }
+    });
   }
 
   async openModal(passData: any) {

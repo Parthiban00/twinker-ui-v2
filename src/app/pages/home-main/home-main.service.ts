@@ -34,4 +34,8 @@ export class HomeMainService {
   getDashboard(localityId: string): Observable<any> {
     return this.webservice.get(`home/dashboard/${localityId}`);
   }
+
+  getCategoryLanding(localityId: string, categoryId: string): Observable<any> {
+    return this.webservice.get(`home/category-landing/${localityId}/${categoryId}`);
+  }
 }

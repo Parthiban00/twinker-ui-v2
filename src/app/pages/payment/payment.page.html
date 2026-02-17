@@ -20,7 +20,7 @@
       </div>
       <div class="summary-details">
         <span class="summary-label">Order Total</span>
-        <span class="summary-amount">$ {{ totalAmount.toFixed(2) }}</span>
+        <span class="summary-amount">&#8377; {{ totalAmount.toFixed(2) }}</span>
       </div>
       <div class="summary-badge">
         <span class="badge-text">{{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }}</span>
@@ -28,7 +28,28 @@
     </div>
     <div class="savings-strip" *ngIf="totalSaved > 0">
       <ion-icon name="pricetag-outline"></ion-icon>
-      <span>You're saving $ {{ totalSaved.toFixed(2) }} on this order</span>
+      <span>You're saving &#8377; {{ totalSaved.toFixed(2) }} on this order</span>
+    </div>
+  </div>
+
+  <!-- Fee Mini Summary -->
+  <div class="fee-mini-summary" *ngIf="feeBreakdown">
+    <div class="fee-mini-row" *ngIf="couponDiscount > 0">
+      <span>Coupon discount</span>
+      <span class="fee-mini-green">-&#8377;{{ couponDiscount.toFixed(2) }}</span>
+    </div>
+    <div class="fee-mini-row">
+      <span>Delivery</span>
+      <span *ngIf="!feeBreakdown.delivery.freeDeliveryApplied">&#8377;{{ deliveryFee.toFixed(2) }}</span>
+      <span class="fee-mini-green" *ngIf="feeBreakdown.delivery.freeDeliveryApplied">FREE</span>
+    </div>
+    <div class="fee-mini-row" *ngIf="platformFee > 0">
+      <span>Platform fee</span>
+      <span>&#8377;{{ platformFee.toFixed(2) }}</span>
+    </div>
+    <div class="fee-mini-row" *ngIf="taxAmount > 0">
+      <span>{{ feeBreakdown.tax.label }}</span>
+      <span>&#8377;{{ taxAmount.toFixed(2) }}</span>
     </div>
   </div>
 
@@ -44,7 +65,7 @@
           <ion-icon name="business-outline"></ion-icon>
           Office
         </span>
-        <p class="address-text">{{ deliveryAddress || 'Gunawarman street No.3, Selong, Kec. Kby. Baru, South Jakarta 12110' }}</p>
+        <p class="address-text">{{ deliveryAddress || 'Default delivery address' }}</p>
       </div>
       <button class="change-link">Change</button>
     </div>
@@ -98,7 +119,7 @@
   <div class="confirm-footer">
     <div class="footer-top">
       <span class="footer-total-label">Total</span>
-      <span class="footer-total-amount">$ {{ totalAmount.toFixed(2) }}</span>
+      <span class="footer-total-amount">&#8377; {{ totalAmount.toFixed(2) }}</span>
     </div>
     <button
       class="confirm-btn"

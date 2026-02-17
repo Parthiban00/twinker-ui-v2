@@ -110,6 +110,30 @@ ion-footer {
   }
 }
 
+// Fee Mini Summary
+.fee-mini-summary {
+  margin: 0 20px 16px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+}
+
+.fee-mini-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-secondary;
+
+  .fee-mini-green {
+    font-family: 'latoBold', sans-serif;
+    color: $green;
+  }
+}
+
 // Sections
 .section {
   padding: 0 20px 18px;
