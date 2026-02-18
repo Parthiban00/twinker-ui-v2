@@ -596,10 +596,23 @@ ion-content {
       justify-content: space-between;
       align-items: center;
 
+      .featured-price-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
       .featured-price {
         font-family: "latoBold";
         font-size: 14px;
         color: #1a1a1a;
+      }
+
+      .featured-original-price {
+        font-family: "latoRegular";
+        font-size: 12px;
+        color: #bbb;
+        text-decoration: line-through;
       }
 
       .add-btn {
@@ -610,6 +623,22 @@ ion-content {
         font-family: "latoBold";
         font-size: 12px;
         cursor: pointer;
+      }
+    }
+
+    .featured-discount-tag {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-top: 4px;
+
+      ion-icon {
+        font-size: 11px;
+      }
+
+      span {
+        font-family: "latoBold";
+        font-size: 11px;
       }
     }
   }
@@ -865,4 +894,128 @@ ion-content {
     font-size: 14px;
     cursor: pointer;
   }
+}
+
+/* ===== Product Search Results ===== */
+.product-search-results {
+  padding: 0 16px 16px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+
+    h2 {
+      font-family: "latoBold";
+      font-size: 17px;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    .result-count {
+      font-family: "latoRegular";
+      font-size: 13px;
+      color: #999;
+    }
+  }
+}
+
+.psr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-search-card {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.psr-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  background: #f5f5f5;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .psr-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 32px;
+      color: #ccc;
+    }
+  }
+
+  .psr-discount {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: #F85C70;
+    color: #fff;
+    font-family: "latoBold";
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+}
+
+.psr-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.psr-name {
+  font-family: "latoBold";
+  font-size: 14px;
+  color: #1a1a1a;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.psr-vendor {
+  font-family: "latoRegular";
+  font-size: 12px;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+.psr-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.psr-price {
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #1a1a1a;
 }

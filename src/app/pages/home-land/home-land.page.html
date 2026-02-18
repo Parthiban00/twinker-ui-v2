@@ -80,7 +80,7 @@
               *ngIf="cuisine.imageUrl" class="cuisine-img" />
             <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji">{{ theme.cuisines[0]?.icon || '\uD83C\uDF7D\uFE0F' }}</span>
           </div>
-          <span class="cuisine-name">{{ cuisine.productName || cuisine.name }}</span>
+          <span class="cuisine-name">{{ cuisine.name || cuisine.productName }}</span>
         </div>
       </ng-container>
       <ng-template #dummyCuisineList>
@@ -192,10 +192,49 @@
           <h4>{{ item.productName }}</h4>
           <p class="featured-vendor">{{ item.vendor?.name || 'Local vendor' }}</p>
           <div class="featured-bottom">
-            <span class="featured-price">{{ item.price | currency:'INR':'symbol':'1.0-0' }}</span>
+            <div class="featured-price-group">
+              <span class="featured-price">{{ item.price | currency:'INR':'symbol':'1.0-0' }}</span>
+              <span class="featured-original-price" *ngIf="item.discount && item.actualPrice > item.price">{{ item.actualPrice | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
             <button class="add-btn-rect" [style.color]="theme.accentColor"
               [style.border-color]="theme.accentColor"
               (click)="addToCart(item); $event.stopPropagation()">ADD</button>
+          </div>
+          <div class="featured-discount-tag" *ngIf="item.discount" [style.color]="theme.accentColor">
+            <ion-icon name="pricetag-outline"></ion-icon>
+            <span>{{ getDiscountLabel(item) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 7b. MATCHING DISHES (search mode only)       -->
+  <!-- ============================================ -->
+  <div class="product-search-results" *ngIf="searchTerm && searchedProducts.length">
+    <div class="section-header">
+      <h2>Matching dishes</h2>
+      <span class="result-count">{{ searchedProducts.length }} found</span>
+    </div>
+    <div class="psr-list">
+      <div class="product-search-card" *ngFor="let product of searchedProducts"
+        (click)="navigateToProductVendor(product)">
+        <div class="psr-img">
+          <img *ngIf="product.imageUrl" [src]="imgBaseUrl + product.imageUrl" [alt]="product.productName" />
+          <div class="psr-img-placeholder" *ngIf="!product.imageUrl">
+            <ion-icon name="fast-food-outline"></ion-icon>
+          </div>
+          <div class="psr-discount" *ngIf="product.discount">{{ getDiscountLabel(product) }}</div>
+        </div>
+        <div class="psr-info">
+          <h4 class="psr-name">{{ product.productName }}</h4>
+          <p class="psr-vendor">{{ product.vendorName }}</p>
+          <div class="psr-bottom">
+            <span class="psr-price">{{ product.price | currency:'INR':'symbol':'1.0-0' }}</span>
+            <button class="add-btn-rect" [style.color]="theme.accentColor"
+              [style.border-color]="theme.accentColor"
+              (click)="addToCart(product); $event.stopPropagation()">ADD</button>
           </div>
         </div>
       </div>

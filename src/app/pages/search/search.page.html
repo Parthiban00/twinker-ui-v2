@@ -45,25 +45,26 @@
     </div>
 
     <!-- Browse Categories -->
-    <div class="browse-section">
+    <div class="browse-section" *ngIf="apiCategories.length">
       <span class="section-title">Browse categories</span>
       <div class="pillars-scroll">
-        <div class="pillar-chip" *ngFor="let pillar of servicePillars" (click)="navigatePillar(pillar)">
-          <div class="pillar-chip-icon" [ngStyle]="{'background-color': pillar.bgColor}">
-            <ion-icon [name]="pillar.icon" [ngStyle]="{'color': pillar.accentColor}"></ion-icon>
+        <div class="pillar-chip" *ngFor="let cat of apiCategories" (click)="navigatePillar(cat)">
+          <div class="pillar-chip-icon" [ngStyle]="{'background-color': getCategoryBgColor(cat.categoryName)}">
+            <ion-icon [name]="getCategoryIcon(cat.categoryName)" [ngStyle]="{'color': getCategoryAccentColor(cat.categoryName)}"></ion-icon>
           </div>
-          <span class="pillar-chip-name">{{ pillar.name }}</span>
+          <span class="pillar-chip-name">{{ cat.categoryName }}</span>
         </div>
       </div>
     </div>
 
     <!-- Popular Cuisines -->
-    <div class="cuisine-section">
+    <div class="cuisine-section" *ngIf="apiCuisines.length">
       <span class="section-title">Popular cuisines</span>
       <div class="cuisine-grid">
-        <div class="cuisine-item" *ngFor="let cuisine of cuisineGrid" (click)="navigateCuisine(cuisine)">
-          <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
-            <ion-icon [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+        <div class="cuisine-item" *ngFor="let cuisine of apiCuisines" (click)="navigateCuisine(cuisine)">
+          <div class="cuisine-circle">
+            <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name" class="cuisine-img" />
+            <ion-icon *ngIf="!cuisine.imageUrl" name="restaurant-outline" style="font-size: 24px; color: #F85C70;"></ion-icon>
           </div>
           <span class="cuisine-label">{{ cuisine.name }}</span>
         </div>
@@ -145,12 +146,17 @@
           <div class="product-img">
             <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="" />
             <ion-icon *ngIf="!product.imageUrl" name="fast-food-outline" class="product-placeholder"></ion-icon>
+            <span class="product-discount-badge" *ngIf="product.discount">{{ getDiscountLabel(product) }}</span>
           </div>
           <div class="product-info">
             <span class="product-name">{{ product.productName }}</span>
-            <span class="product-vendor">{{ product.vendorName || product.vendor?.vendorName || '' }}</span>
+            <span class="product-vendor">{{ product.vendorName }}</span>
+            <span class="product-tag" *ngIf="product.tag && getTagLabel(product.tag)">{{ getTagLabel(product.tag) }}</span>
           </div>
-          <span class="product-price" *ngIf="product.price">${{ product.price.toFixed(2) }}</span>
+          <div class="product-price-group" *ngIf="product.price">
+            <span class="product-price">&#x20B9;{{ product.price }}</span>
+            <span class="product-original-price" *ngIf="product.discount && product.actualPrice > product.price">&#x20B9;{{ product.actualPrice }}</span>
+          </div>
         </div>
       </div>
 
@@ -165,12 +171,13 @@
       </div>
 
       <!-- Fallback cuisine grid -->
-      <div class="cuisine-section fallback-cuisines">
+      <div class="cuisine-section fallback-cuisines" *ngIf="apiCuisines.length">
         <span class="section-title">Popular cuisines</span>
         <div class="cuisine-grid">
-          <div class="cuisine-item" *ngFor="let cuisine of cuisineGrid" (click)="navigateCuisine(cuisine)">
-            <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
-              <ion-icon [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+          <div class="cuisine-item" *ngFor="let cuisine of apiCuisines" (click)="navigateCuisine(cuisine)">
+            <div class="cuisine-circle">
+              <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name" class="cuisine-img" />
+              <ion-icon *ngIf="!cuisine.imageUrl" name="restaurant-outline" style="font-size: 24px; color: #F85C70;"></ion-icon>
             </div>
             <span class="cuisine-label">{{ cuisine.name }}</span>
           </div>

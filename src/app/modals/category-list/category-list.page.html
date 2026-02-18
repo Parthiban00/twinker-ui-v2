@@ -1,25 +1,91 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="cancel()">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
-      </ion-button>
-      <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event)" placeholder="Search by Category..."
-        class="custom"></ion-searchbar>
-    </ion-buttons>
+    <div class="modal-header">
+      <button class="close-btn" (click)="cancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+      <span class="modal-title">All categories</span>
+    </div>
+    <div class="search-wrap">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input type="text" placeholder="Search categories..."
+        [(ngModel)]="searchTerm" (input)="handleSearch($event)" class="search-input" />
+      <button class="clear-btn" *ngIf="searchTerm" (click)="searchTerm = ''; handleSearch('')">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="categories-container">
-    <ion-row *ngIf="categories">
-      <ion-col size="6" [routerLink]="['/home-land']" *ngFor="let list of categories">
-        <div class="category-content">
-          <img [src]="imgBaseUrl + list.imageUrl" />
-        </div>
-      </ion-col>
-    </ion-row>
+<ion-content>
 
+  <!-- Deals & Offers Banner -->
+  <div class="offers-section" *ngIf="!searchTerm && (deals.length || bestCoupon)">
+
+    <!-- Best coupon banner -->
+    <div class="coupon-banner" *ngIf="bestCoupon">
+      <div class="coupon-left">
+        <ion-icon name="pricetag"></ion-icon>
+      </div>
+      <div class="coupon-info">
+        <span class="coupon-value">{{ getCouponLabel() }}</span>
+        <span class="coupon-title">{{ bestCoupon.title }}</span>
+      </div>
+      <span class="coupon-code" *ngIf="bestCoupon.code">{{ bestCoupon.code }}</span>
+    </div>
+
+    <!-- Deals scroll -->
+    <div class="deals-scroll" *ngIf="deals.length">
+      <span class="offers-title">Today's deals</span>
+      <div class="deals-list">
+        <div class="deal-chip" *ngFor="let deal of deals.slice(0, 8)">
+          <div class="deal-chip-img">
+            <img *ngIf="deal.imageUrl" [src]="imgBaseUrl + deal.imageUrl" [alt]="deal.productName" />
+            <div class="deal-chip-placeholder" *ngIf="!deal.imageUrl">
+              <ion-icon name="pricetag-outline"></ion-icon>
+            </div>
+          </div>
+          <div class="deal-chip-info">
+            <span class="deal-chip-name">{{ deal.productName }}</span>
+            <div class="deal-chip-price-row">
+              <span class="deal-chip-price">&#x20B9;{{ deal.price }}</span>
+              <span class="deal-chip-original" *ngIf="deal.actualPrice > deal.price">&#x20B9;{{ deal.actualPrice }}</span>
+            </div>
+            <span class="deal-chip-badge" *ngIf="deal.discount">{{ getDiscountLabel(deal) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Category List -->
+  <div class="cat-grid" *ngIf="filteredCategories.length">
+    <span class="cat-section-title" *ngIf="!searchTerm">Browse by category</span>
+    <div class="cat-card" *ngFor="let cat of filteredCategories; let i = index"
+      (click)="selectCategory(cat)">
+      <div class="cat-icon-wrap" [ngStyle]="{'background-color': getBgColor(cat.categoryName, i)}">
+        <img *ngIf="cat.imageUrl" [src]="imgBaseUrl + cat.imageUrl" class="cat-img" [alt]="cat.categoryName" />
+        <ion-icon *ngIf="!cat.imageUrl" [name]="getIcon(cat.categoryName)"
+          [ngStyle]="{'color': getAccentColor(cat.categoryName, i)}"></ion-icon>
+      </div>
+      <div class="cat-details">
+        <span class="cat-name">{{ cat.categoryName }}</span>
+        <span class="cat-offer-badge" *ngIf="getDealCount(cat._id)"
+          [ngStyle]="{'color': getAccentColor(cat.categoryName, i)}">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          {{ getDealCount(cat._id) }} {{ getDealCount(cat._id) === 1 ? 'offer' : 'offers' }}
+        </span>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="cat-chevron"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!filteredCategories.length">
+    <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+    <span class="empty-title">No categories found</span>
+    <span class="empty-sub">Try a different search term</span>
+  </div>
+
+  <div style="height: 24px;"></div>
 </ion-content>

@@ -186,6 +186,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
   activeSort = '';
   activeFilters: string[] = [];
   selectedCuisine = '';
+  searchedProducts: any[] = [];
 
   private searchSubject = new Subject<string>();
   private searchSub: any;
@@ -390,13 +391,19 @@ export class HomeLandPage implements OnInit, OnDestroy {
     this.searchSubject.next(term);
   }
 
+  get isSearchMode(): boolean {
+    return !!this.searchTerm;
+  }
+
   private performSearch(term: string) {
     if (!term) {
+      this.searchedProducts = [];
       this.applyFiltersAndSort();
       return;
     }
 
     if (this.localityId && this.categoryId) {
+      // Search vendors
       this.vendorService.searchVendorByLocalityAndCategory(term, this.localityId, this.categoryId).subscribe({
         next: (resdata: any) => {
           if (resdata.status && resdata.data) {
@@ -412,18 +419,68 @@ export class HomeLandPage implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       });
+
+      // Search products
+      this.vendorService.searchSpecificProductsByCategory(this.categoryId, term).subscribe({
+        next: (resdata: any) => {
+          if (resdata.status && resdata.data) {
+            // Flatten grouped response [{vendor, products}] into flat array
+            const flat: any[] = [];
+            resdata.data.forEach((group: any) => {
+              if (group.products?.length) {
+                group.products.forEach((p: any) => {
+                  flat.push({
+                    ...p,
+                    vendorName: group.vendor?.name || p.vendor?.name || '',
+                    vendorId: group.vendor?._id || p.vendor?._id || ''
+                  });
+                });
+              } else if (Array.isArray(resdata.data) && resdata.data.length && resdata.data[0]?.productName) {
+                // Flat array of products
+                resdata.data.forEach((p: any) => {
+                  flat.push({
+                    ...p,
+                    vendorName: p.vendor?.name || '',
+                    vendorId: p.vendor?._id || ''
+                  });
+                });
+              }
+            });
+            this.searchedProducts = flat.length ? flat : resdata.data.map((p: any) => ({
+              ...p,
+              vendorName: p.vendor?.name || '',
+              vendorId: p.vendor?._id || ''
+            }));
+          } else {
+            this.searchedProducts = [];
+          }
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.searchedProducts = [];
+          this.cdr.detectChanges();
+        }
+      });
     } else {
       const lowerTerm = term.toLowerCase();
       this.filteredVendors = this.vendorDetails.filter((v: any) =>
         v.name.toLowerCase().includes(lowerTerm) || v.description?.toLowerCase().includes(lowerTerm)
       );
+      this.searchedProducts = [];
       this.cdr.detectChanges();
     }
   }
 
   clearSearch() {
     this.searchTerm = '';
+    this.searchedProducts = [];
     this.applyFiltersAndSort();
+  }
+
+  navigateToProductVendor(product: any) {
+    this.router.navigate(['/items'], {
+      queryParams: { vendorId: product.vendorId || product.vendor?._id }
+    });
   }
 
   async openSortSheet() {

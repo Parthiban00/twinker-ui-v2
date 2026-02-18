@@ -1,138 +1,370 @@
-.categories-container {
-    // box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    margin: 10px;
-    padding: 5px;
-    border-radius: 10px;
+/* ===== Header ===== */
+ion-toolbar {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: auto;
+  --background: #fff;
+  padding: calc(var(--ion-safe-area-top, 20px) + 8px) 16px 12px;
+}
 
-    .container-label {
-      margin-top: 10px;
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
 
-      ion-label {
-        font-family: "latoBold";
-        font-weight: 600;
-        font-size: 14px;
-      }
-    }
+.close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
 
-    ion-card {
-      padding: 0px;
-      box-shadow: none;
+  ion-icon {
+    font-size: 22px;
+    color: #1a1a1a;
+  }
+}
 
-      //  background-color:  #ffd148; //secondary
-      //  height: 300px;
-      //  overflow: scroll;
-      //   scroll-behavior: smooth;
-      ion-card-content {
-        ion-col>div {
-          background-color: #ffffff;
-          // border: solid 1px #ddd;
-          // padding: 10px;
-          height: 100px;
-          border-radius: 5px;
+.modal-title {
+  font-family: "latoBold";
+  font-size: 19px;
+  color: #1a1a1a;
+}
 
-          .category-img {
-            // style="background-color: green;height:80px;border-radius: 5px;"
-            background-color: green;
-            height: 80px;
-            border-radius: 5px;
-          }
+/* ===== Search ===== */
+.search-wrap {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 25px;
+  padding: 10px 16px;
+  gap: 10px;
 
-          .category-label {
-            // style="bottom:0;height:30px;font-size: 12px;font-weight:600;text-align: center;"
-            bottom: 0;
-            height: 30px;
-            font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-          }
-        }
-      }
+  .search-icon {
+    font-size: 20px;
+    color: #aaa;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "latoRegular";
+    font-size: 15px;
+    color: #1a1a1a;
+
+    &::placeholder {
+      color: #aaa;
     }
   }
 
-  .categories-container {
+  .clear-btn {
+    border: none;
+    background: transparent;
     padding: 0;
-    // background: rgb(250, 193, 24);
-    // background: linear-gradient(90deg, rgba(250, 193, 24, 1) 0%, rgba(246, 184, 7, 1) 50%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
-    // background: url(../../../assets/back.png);
-    // background-size: cover;
-    .start-col {
-      background: var(--ion-color-primary);
+    display: flex;
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 20px;
+      color: #bbb;
     }
-  
-    .category-img-div {
-      height: 50px;
-      width: 50px;
-      background: gray;
-      border-radius: 5px;
-      transform: rotate(45deg);
-      z-index: 1;
-      position: absolute;
-      top: 14px;
-      left: -32px;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-  
-      img {
-        height: 50px;
-        width: 50px;
-        border-radius: 5px;
-        // transform: rotate(-45deg);
-      }
-    }
-  
-    .category-name-div {
-      height: 80px;
-      width: 98%;
-      border-radius: 50px 5px 5px 50px;
-      position: relative;
-      padding: 10px 0;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-      background: white;
-    }
-  
-    .category-name {
-      font-family: "latoBold";
-    }
-  
-    .category-items {
-      font-size: 12px;
-    }
-  
-    .view-all-arrow {
-      position: absolute;
-      right: -16px;
-      height: 30px;
-      width: 30px;
-      border-radius: 50%;
-      background: white;
-      top: 23px;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  
-    ion-row{
-      ion-col{
-        height: 200px;
-        width: 100%;
-  
-        padding: 5px;
-  
-        .category-content{
-          background:#ffecbe;;
-          height: 100%;
-          width: 100%;
-          border-radius: 10px;
-  
-          img{
-            height: 190px;
-            width: 100%;
-            border-radius: 10px;
-          }
-        }
-      }
-    }
-  
   }
-  
+}
+
+/* ===== Content ===== */
+ion-content {
+  --background: #fff;
+}
+
+/* ===== Offers Section ===== */
+.offers-section {
+  padding: 16px 16px 0;
+}
+
+/* Coupon Banner */
+.coupon-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #F85C70, #FC8C5C);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+
+  .coupon-left {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    ion-icon {
+      font-size: 20px;
+      color: #fff;
+    }
+  }
+
+  .coupon-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .coupon-value {
+      font-family: "latoBold";
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .coupon-title {
+      font-family: "latoRegular";
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .coupon-code {
+    font-family: "latoBold";
+    font-size: 11px;
+    color: #F85C70;
+    background: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+}
+
+/* Deals Scroll */
+.deals-scroll {
+  margin-bottom: 8px;
+}
+
+.offers-title {
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.deals-list {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.deal-chip {
+  width: 130px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.deal-chip-img {
+  width: 100%;
+  height: 80px;
+  background: #f5f5f5;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .deal-chip-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 28px;
+      color: #ddd;
+    }
+  }
+}
+
+.deal-chip-info {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.deal-chip-name {
+  font-family: "latoBold";
+  font-size: 12px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deal-chip-price-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.deal-chip-price {
+  font-family: "latoBold";
+  font-size: 13px;
+  color: #1a1a1a;
+}
+
+.deal-chip-original {
+  font-family: "latoRegular";
+  font-size: 11px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.deal-chip-badge {
+  font-family: "latoBold";
+  font-size: 10px;
+  color: #F85C70;
+  background: #FFF0F0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+/* ===== Category Grid ===== */
+.cat-grid {
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cat-section-title {
+  font-family: "latoBold";
+  font-size: 15px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.cat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:active {
+    background: #fafafa;
+    transform: scale(0.98);
+  }
+}
+
+.cat-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  .cat-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+}
+
+.cat-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cat-name {
+  font-family: "latoBold";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.cat-offer-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: "latoBold";
+  font-size: 11px;
+
+  ion-icon {
+    font-size: 12px;
+  }
+}
+
+.cat-chevron {
+  font-size: 18px;
+  color: #ccc;
+  flex-shrink: 0;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 32px 24px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 56px;
+    color: #ddd;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-family: "latoBold";
+    font-size: 17px;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  .empty-sub {
+    font-family: "latoRegular";
+    font-size: 14px;
+    color: #888;
+  }
+}

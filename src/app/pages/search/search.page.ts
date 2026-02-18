@@ -1,11 +1,13 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from 'src/app/services/storage.service';
+import { CommonService } from 'src/app/services/common.service';
 import { HomeMainService } from '../home-main/home-main.service';
 import { SearchService, SearchResults } from './search.service';
+import { environment } from 'src/environments/environment';
 
 const RECENT_SEARCHES_KEY = 'recent-searches';
 const MAX_RECENT = 10;
@@ -23,7 +25,7 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   isLoading = false;
   hasSearched = false;
   localityId = '';
-  categoryIds: string[] = [];
+  imgBaseUrl: string = environment.imageBaseUrl;
 
   recentSearches: string[] = [];
 
@@ -32,45 +34,11 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   matchedVendors: any[] = [];
   matchedProducts: any[] = [];
 
-  // Suggestions
-  servicePillars = [
-    { name: 'Food', icon: 'restaurant-outline', bgColor: '#FFF0F0', accentColor: '#F85C70', route: '/home-land', queryTitle: 'Food' },
-    { name: 'Groceries', icon: 'cart-outline', bgColor: '#F0FFF4', accentColor: '#2ecc71', route: '/home-land', queryTitle: 'Groceries' },
-    { name: 'Medicine', icon: 'medkit-outline', bgColor: '#F0F4FF', accentColor: '#4A5BF5', route: '/home-land', queryTitle: 'Medicine' },
-    { name: 'Desserts', icon: 'ice-cream-outline', bgColor: '#FFF0F8', accentColor: '#FC5C7D', route: '/home-land', queryTitle: 'Desserts' },
-    { name: 'Beverages', icon: 'cafe-outline', bgColor: '#FFF5F0', accentColor: '#FF8C42', route: '/home-land', queryTitle: 'Beverages' }
-  ];
-
-  cuisineGrid = [
-    { name: 'Pizza', icon: 'pizza-outline', bgColor: '#FFF0F0', accentColor: '#F85C70' },
-    { name: 'Burger', icon: 'fast-food-outline', bgColor: '#FFF5F0', accentColor: '#FF8C42' },
-    { name: 'Salad', icon: 'leaf-outline', bgColor: '#F0FFF4', accentColor: '#2ecc71' },
-    { name: 'Noodles', icon: 'restaurant-outline', bgColor: '#FFF0F8', accentColor: '#FC5C7D' },
-    { name: 'Cakes', icon: 'ice-cream-outline', bgColor: '#FFF0F5', accentColor: '#E91E8C' },
-    { name: 'Juice', icon: 'cafe-outline', bgColor: '#FFF5F0', accentColor: '#FF8C42' },
-    { name: 'Pharma', icon: 'medkit-outline', bgColor: '#F0F4FF', accentColor: '#4A5BF5' },
-    { name: 'Veggies', icon: 'nutrition-outline', bgColor: '#F0FFF4', accentColor: '#2DBCB6' }
-  ];
-
-  // Dummy fallback data
-  dummyVendors = [
-    { _id: 'v1', vendorName: 'Pizza Palace', cuisine: 'Italian', rating: 4.5, distance: '2.3 km', deliveryTime: '25 min', imageUrl: '' },
-    { _id: 'v2', vendorName: 'Burger Barn', cuisine: 'American', rating: 4.2, distance: '1.8 km', deliveryTime: '20 min', imageUrl: '' },
-    { _id: 'v3', vendorName: 'Spice Garden', cuisine: 'Indian', rating: 4.6, distance: '3.1 km', deliveryTime: '30 min', imageUrl: '' },
-    { _id: 'v4', vendorName: 'Green Bowl', cuisine: 'Healthy', rating: 4.4, distance: '2.5 km', deliveryTime: '25 min', imageUrl: '' },
-    { _id: 'v5', vendorName: 'Sweet Treats', cuisine: 'Desserts', rating: 4.7, distance: '4.0 km', deliveryTime: '35 min', imageUrl: '' }
-  ];
-
-  dummyProducts = [
-    { _id: 'p1', productName: 'Margherita Pizza', price: 9.99, vendorName: 'Pizza Palace', vendorId: 'v1', imageUrl: '' },
-    { _id: 'p2', productName: 'Pepperoni Pizza', price: 12.99, vendorName: 'Pizza Palace', vendorId: 'v1', imageUrl: '' },
-    { _id: 'p3', productName: 'Classic Burger', price: 7.49, vendorName: 'Burger Barn', vendorId: 'v2', imageUrl: '' },
-    { _id: 'p4', productName: 'Chicken Biryani', price: 11.50, vendorName: 'Spice Garden', vendorId: 'v3', imageUrl: '' },
-    { _id: 'p5', productName: 'Caesar Salad', price: 8.99, vendorName: 'Green Bowl', vendorId: 'v4', imageUrl: '' },
-    { _id: 'p6', productName: 'Chocolate Cake', price: 6.50, vendorName: 'Sweet Treats', vendorId: 'v5', imageUrl: '' },
-    { _id: 'p7', productName: 'Noodle Bowl', price: 10.00, vendorName: 'Spice Garden', vendorId: 'v3', imageUrl: '' },
-    { _id: 'p8', productName: 'Fresh Juice', price: 4.50, vendorName: 'Green Bowl', vendorId: 'v4', imageUrl: '' }
-  ];
+  // Browse data from API
+  apiCategories: any[] = [];
+  apiCuisines: any[] = [];
+  trendingDishes: any[] = [];
+  defaultAddress: any;
 
   private searchSubject = new Subject<string>();
   private searchSub!: Subscription;
@@ -80,15 +48,24 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private navCtrl: NavController,
     private storageService: StorageService,
+    private commonService: CommonService,
     private homeMainService: HomeMainService,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.localityId = this.route.snapshot.queryParamMap.get('localityId') || '';
+    const prefill = this.route.snapshot.queryParamMap.get('q') || '';
     this.loadRecentSearches();
-    this.loadCategories();
+    this.loadBrowseData();
     this.setupSearchPipeline();
+
+    // Auto-trigger search if a query was passed (e.g. from cuisine click)
+    if (prefill) {
+      this.searchTerm = prefill;
+      setTimeout(() => this.searchSubject.next(prefill), 100);
+    }
   }
 
   ngAfterViewInit() {
@@ -103,6 +80,78 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
 
   goBack() {
     this.navCtrl.back();
+  }
+
+  // --- Load browse data from API ---
+
+  private loadBrowseData() {
+    if (!this.localityId) return;
+
+    // Load categories
+    this.homeMainService.getAllCategoriesByLocality(this.localityId).subscribe({
+      next: (res: any) => {
+        if (res.status && res.data) {
+          this.apiCategories = res.data;
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+
+    // Load dashboard for cuisines + trending dishes
+    this.homeMainService.getDashboard(this.localityId).subscribe({
+      next: (res: any) => {
+        if (res.status && res.data) {
+          this.apiCuisines = res.data.cuisines || [];
+
+          // Build trending dishes: popular items first, then discounted deals
+          const popular = (res.data.popularItems || []).map((p: any) => ({
+            _id: p._id,
+            productName: p.productName,
+            price: p.price,
+            actualPrice: p.actualPrice,
+            imageUrl: p.imageUrl ? (this.imgBaseUrl + p.imageUrl) : '',
+            vendorName: p.vendor?.name || '',
+            vendorId: p.vendor?._id || '',
+            discount: p.discount,
+            discountType: p.discountType,
+            tag: p.tag
+          }));
+
+          const dealItems = (res.data.deals || [])
+            .filter((d: any) => !popular.some((p: any) => p._id === d._id))
+            .map((p: any) => ({
+              _id: p._id,
+              productName: p.productName,
+              price: p.price,
+              actualPrice: p.actualPrice,
+              imageUrl: p.imageUrl ? (this.imgBaseUrl + p.imageUrl) : '',
+              vendorName: p.vendor?.name || '',
+              vendorId: p.vendor?._id || '',
+              discount: p.discount,
+              discountType: p.discountType,
+              tag: p.tag || 'offer'
+            }));
+
+          this.trendingDishes = [...popular, ...dealItems];
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+
+    // Load default address for distance calculation
+    const userData = this.storageService.getUser();
+    if (userData?._id) {
+      this.homeMainService.getDefaultAddressByUserId(userData._id).subscribe({
+        next: (res: any) => {
+          if (res.status && res.data) {
+            this.defaultAddress = res.data;
+          }
+        },
+        error: () => {}
+      });
+    }
   }
 
   // --- Search pipeline ---
@@ -123,23 +172,75 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
       }),
       switchMap(term => {
         if (!term.trim()) return [];
-        return this.searchService.searchAll(term, this.localityId, this.categoryIds);
+        return this.searchService.searchAll(term, this.localityId);
       })
     ).subscribe({
       next: (results: SearchResults) => {
-        this.matchedVendors = results.vendors;
-        this.matchedProducts = results.products;
-        this.matchedCategories = this.filterLocalCategories(this.searchTerm);
-        this.isLoading = false;
+        // Map vendor results
+        this.matchedVendors = results.vendors.map(v => {
+          const mapped: any = {
+            _id: v._id,
+            vendorName: v.name,
+            imageUrl: v.profileImgUrl ? (this.imgBaseUrl + v.profileImgUrl) : '',
+            rating: v.rating || '4.5',
+            categories: v.categories
+          };
+          // Calculate distance/time
+          this.calcVendorDistanceAndTime(mapped, v);
+          // Build cuisine string from categories
+          if (v.categories?.length) {
+            mapped.cuisine = v.categories.map((c: any) => c.categoryName).join(', ');
+          }
+          return mapped;
+        });
 
-        // If API returned nothing, use dummy data filtered by search term
-        if (!this.matchedVendors.length && !this.matchedProducts.length) {
-          this.useDummyResults(this.searchTerm);
-        }
+        // Map product results and sort: popular/trending/recommended/offer first
+        const mapped = results.products.map(p => ({
+          _id: p._id,
+          productName: p.productName,
+          price: p.price,
+          actualPrice: p.actualPrice,
+          imageUrl: p.imageUrl ? (this.imgBaseUrl + p.imageUrl) : '',
+          vendorName: p.vendor?.name || '',
+          vendorId: p.vendor?._id || '',
+          discount: p.discount,
+          discountType: p.discountType,
+          tag: p.tag || 'none'
+        }));
+
+        // Priority tags come first, then items with discounts, then the rest
+        const priorityTags = ['bestseller', 'trending', 'recommended', 'new'];
+        mapped.sort((a, b) => {
+          const aHasTag = priorityTags.includes(a.tag?.toLowerCase());
+          const bHasTag = priorityTags.includes(b.tag?.toLowerCase());
+          const aHasDiscount = a.discount > 0;
+          const bHasDiscount = b.discount > 0;
+
+          if (aHasTag && !bHasTag) return -1;
+          if (!aHasTag && bHasTag) return 1;
+          if (aHasDiscount && !bHasDiscount) return -1;
+          if (!aHasDiscount && bHasDiscount) return 1;
+          return 0;
+        });
+
+        this.matchedProducts = mapped;
+
+        // Map category results
+        this.matchedCategories = results.categories.map(c => ({
+          _id: c._id,
+          categoryId: c._id,
+          name: c.categoryName,
+          icon: this.getCategoryIcon(c.categoryName),
+          bgColor: this.getCategoryBgColor(c.categoryName),
+          accentColor: this.getCategoryAccentColor(c.categoryName)
+        }));
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
-        this.useDummyResults(this.searchTerm);
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -162,54 +263,72 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
     this.matchedProducts = [];
   }
 
-  // --- Category matching ---
+  // --- Helpers ---
 
-  private filterLocalCategories(term: string): any[] {
-    const q = term.toLowerCase();
-    const matched: any[] = [];
-
-    this.servicePillars.forEach(p => {
-      if (p.name.toLowerCase().includes(q) || p.queryTitle.toLowerCase().includes(q)) {
-        matched.push({ type: 'pillar', ...p });
-      }
-    });
-
-    this.cuisineGrid.forEach(c => {
-      if (c.name.toLowerCase().includes(q)) {
-        matched.push({ type: 'cuisine', ...c });
-      }
-    });
-
-    return matched;
-  }
-
-  // --- Dummy fallback ---
-
-  private useDummyResults(term: string) {
-    const q = term.toLowerCase();
-    this.matchedVendors = this.dummyVendors.filter(v =>
-      v.vendorName.toLowerCase().includes(q) || v.cuisine.toLowerCase().includes(q)
-    );
-    this.matchedProducts = this.dummyProducts.filter(p =>
-      p.productName.toLowerCase().includes(q) || p.vendorName.toLowerCase().includes(q)
-    );
-    if (!this.matchedCategories.length) {
-      this.matchedCategories = this.filterLocalCategories(term);
+  private calcVendorDistanceAndTime(mapped: any, raw: any) {
+    if (this.defaultAddress?.coords && raw.latitude && raw.longitude) {
+      mapped.distance = this.commonService.calculateDistance(
+        this.defaultAddress.coords.lat,
+        this.defaultAddress.coords.lng,
+        raw.latitude,
+        raw.longitude
+      ) + ' km';
+      mapped.deliveryTime = (Math.ceil(parseFloat(mapped.distance)) * 3) + 15 + ' min';
     }
   }
 
-  // --- Load categories for API search ---
+  getCategoryIcon(name: string): string {
+    const map: Record<string, string> = {
+      'food': 'restaurant-outline',
+      'groceries': 'cart-outline',
+      'medicine': 'medkit-outline',
+      'desserts': 'ice-cream-outline',
+      'beverages': 'cafe-outline'
+    };
+    return map[name?.toLowerCase()] || 'grid-outline';
+  }
 
-  private loadCategories() {
-    if (!this.localityId) return;
-    this.homeMainService.getAllCategoriesByLocality(this.localityId).subscribe({
-      next: (res: any) => {
-        if (res.status && res.data) {
-          this.categoryIds = res.data.map((c: any) => c._id);
-        }
-      },
-      error: () => {}
-    });
+  getCategoryBgColor(name: string): string {
+    const map: Record<string, string> = {
+      'food': '#FFF0F0',
+      'groceries': '#F0FFF4',
+      'medicine': '#F0F4FF',
+      'desserts': '#FFF0F8',
+      'beverages': '#FFF5F0'
+    };
+    return map[name?.toLowerCase()] || '#f5f5f5';
+  }
+
+  getCategoryAccentColor(name: string): string {
+    const map: Record<string, string> = {
+      'food': '#F85C70',
+      'groceries': '#2ecc71',
+      'medicine': '#4A5BF5',
+      'desserts': '#FC5C7D',
+      'beverages': '#FF8C42'
+    };
+    return map[name?.toLowerCase()] || '#888';
+  }
+
+  getDiscountLabel(item: any): string {
+    if (!item.discount) return '';
+    if (item.discountType === 'in-percentage') {
+      return `${item.discount}% OFF`;
+    } else if (item.discountType === 'in-price') {
+      return `\u20B9${item.discount} OFF`;
+    }
+    return `${item.discount}% OFF`;
+  }
+
+  getTagLabel(tag: string): string {
+    const map: Record<string, string> = {
+      'bestseller': 'Bestseller',
+      'trending': 'Trending',
+      'recommended': 'Recommended',
+      'new': 'New',
+      'offer': 'Offer'
+    };
+    return map[tag?.toLowerCase()] || '';
   }
 
   // --- Recent searches ---
@@ -222,7 +341,6 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
     const trimmed = term.trim();
     if (!trimmed) return;
 
-    // Remove existing (case-insensitive) to avoid duplicates
     this.recentSearches = this.recentSearches.filter(
       s => s.toLowerCase() !== trimmed.toLowerCase()
     );
@@ -252,15 +370,13 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
 
   navigateCategory(cat: any) {
     this.saveRecentSearch(this.searchTerm);
-    if (cat.type === 'pillar') {
-      this.router.navigate([cat.route], {
-        queryParams: { title: cat.queryTitle, localityId: this.localityId }
-      });
-    } else {
-      this.router.navigate(['/home-land'], {
-        queryParams: { title: cat.name, localityId: this.localityId }
-      });
-    }
+    this.router.navigate(['/home-land'], {
+      queryParams: {
+        categoryId: cat.categoryId || cat._id,
+        localityId: this.localityId,
+        title: cat.name
+      }
+    });
   }
 
   navigateVendor(vendor: any) {
@@ -273,19 +389,32 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   navigateProduct(product: any) {
     this.saveRecentSearch(this.searchTerm);
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: product.vendorId || product.vendor?._id || '' }
+      queryParams: { vendorId: product.vendorId }
     });
   }
 
-  navigatePillar(pillar: any) {
-    this.router.navigate([pillar.route], {
-      queryParams: { title: pillar.queryTitle, localityId: this.localityId }
+  navigatePillar(cat: any) {
+    this.router.navigate(['/home-land'], {
+      queryParams: {
+        categoryId: cat._id,
+        localityId: this.localityId,
+        title: cat.categoryName
+      }
     });
   }
 
   navigateCuisine(cuisine: any) {
+    // Find the Food category to navigate with cuisineFilter
+    const foodCat = this.apiCategories.find(
+      c => c.categoryName?.toLowerCase() === 'food'
+    );
     this.router.navigate(['/home-land'], {
-      queryParams: { title: cuisine.name, localityId: this.localityId }
+      queryParams: {
+        categoryId: foodCat?._id || '',
+        localityId: this.localityId,
+        title: 'Food',
+        cuisineFilter: cuisine.name
+      }
     });
   }
 

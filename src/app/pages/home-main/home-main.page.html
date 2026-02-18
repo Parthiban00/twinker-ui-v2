@@ -71,6 +71,10 @@
 
     <!-- Section 1: Service Pillars / Categories -->
     <div class="service-pillars-section anim-section" *ngIf="categories.length" style="animation-delay: 0s;">
+      <div class="pillars-header">
+        <span class="pillars-title">Our services</span>
+        <span class="see-all-link" (click)="exploreCategories()">See all</span>
+      </div>
       <div class="service-pillars-scroll">
         <div class="service-pillar pulse-once" *ngFor="let cat of categories; let i = index"
           [style.animation-delay]="(i * 0.05) + 's'"
@@ -181,10 +185,17 @@
             <span class="order-item-name">{{ item.productName }}</span>
             <span class="order-item-vendor" *ngIf="item.vendor">{{ item.vendor.name }}</span>
             <div class="order-item-bottom">
-              <span class="order-item-price">&#8377;{{ item.price }}</span>
+              <div class="price-group">
+                <span class="order-item-price">&#8377;{{ item.price }}</span>
+                <span class="order-item-original-price" *ngIf="item.discount && item.actualPrice > item.price">&#8377;{{ item.actualPrice }}</span>
+              </div>
               <button class="add-btn" (click)="addToCart(item); $event.stopPropagation()">
                 <ion-icon name="add-outline"></ion-icon>
               </button>
+            </div>
+            <div class="order-item-discount-tag" *ngIf="item.discount">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <span>{{ getDiscountLabel(item) }}</span>
             </div>
           </div>
         </div>

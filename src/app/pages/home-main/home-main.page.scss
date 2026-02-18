@@ -162,6 +162,26 @@ ion-content {
   padding: 20px 16px 8px;
 }
 
+.pillars-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .pillars-title {
+    font-family: "latoBold";
+    font-size: 17px;
+    color: #1a1a1a;
+  }
+
+  .see-all-link {
+    font-family: "latoBold";
+    font-size: 13px;
+    color: #F85C70;
+    cursor: pointer;
+  }
+}
+
 .service-pillars-scroll {
   display: flex;
   overflow-x: auto;
@@ -747,10 +767,41 @@ ion-content {
   margin-top: 6px;
 }
 
+.price-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .order-item-price {
   font-family: "latoBold";
   font-size: 14px;
   color: #1a1a1a;
+}
+
+.order-item-original-price {
+  font-family: "latoRegular";
+  font-size: 12px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.order-item-discount-tag {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+
+  ion-icon {
+    font-size: 11px;
+    color: #F85C70;
+  }
+
+  span {
+    font-family: "latoBold";
+    font-size: 11px;
+    color: #F85C70;
+  }
 }
 
 .add-btn {

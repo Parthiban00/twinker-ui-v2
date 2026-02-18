@@ -133,13 +133,10 @@ export class HomeMainPage implements OnInit, OnDestroy {
   }
 
   navigateCuisine(cuisine: any) {
-    const foodCat = this.categories.find((c: any) => c.categoryName?.toLowerCase() === 'food');
-    this.router.navigate(['/home-land'], {
+    this.router.navigate(['/search'], {
       queryParams: {
-        title: 'Food',
-        localityId: this.defaultAddress?.locality?._id,
-        categoryId: foodCat?._id || '',
-        cuisineFilter: cuisine.name
+        localityId: this.defaultAddress?.locality?._id || '',
+        q: cuisine.name
       }
     });
   }
@@ -309,13 +306,18 @@ export class HomeMainPage implements OnInit, OnDestroy {
   async exploreCategories() {
     const modal = await this.modalCtrl.create({
       component: CategoryListPage,
-      componentProps: { categories: this.categories }
+      componentProps: {
+        categories: this.categories,
+        localityId: this.defaultAddress?.locality?._id || '',
+        deals: this.deals,
+        bestCoupon: this.bestCoupon
+      }
     });
     modal.present();
 
     const { data, role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      // handle confirmation
+    if (role === 'navigate' && data) {
+      this.navigateService(data);
     }
   }
 
