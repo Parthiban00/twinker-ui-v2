@@ -391,21 +391,247 @@ ion-content {
   }
 }
 
+// ── Vendor Offer Area ──────────────────────────────────────────
+.vendor-offer-area {
+  margin-top: 12px;
+  border-top: 1px dashed #e8e8e8;
+  padding-top: 12px;
+}
+
+// Loading
+.vendor-offer-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 8px;
+
+  ion-spinner { width: 16px; height: 16px; }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: $text-muted;
+  }
+}
+
+// ── Nudge strip (offer exists but min order not yet met) ────────
+.vendor-offer-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 140, 66, 0.08);
+  border: 1px solid rgba(255, 140, 66, 0.28);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  .nudge-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+
+    .nudge-icon-wrap {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255, 140, 66, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 16px;
+        color: #FF8C42;
+      }
+    }
+
+    .nudge-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .nudge-headline {
+        font-family: 'latoRegular', sans-serif;
+        font-size: 12px;
+        color: $text-primary;
+        line-height: 1.45;
+
+        strong { font-family: 'latoBold', sans-serif; color: $text-primary; }
+        .nudge-discount { color: #FF8C42; }
+      }
+
+      .nudge-sub {
+        font-family: 'latoRegular', sans-serif;
+        font-size: 11px;
+        color: $text-secondary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .nudge-add-btn {
+    background: #FF8C42;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 14px;
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+// Progress bar beneath the nudge
+.nudge-progress-wrap {
+  height: 3px;
+  background: rgba(255, 140, 66, 0.15);
+  border-radius: 2px;
+  margin-bottom: 10px;
+  overflow: hidden;
+
+  .nudge-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #FF8C42, #FC8C5C);
+    border-radius: 2px;
+    max-width: 100%;
+    transition: width 0.4s ease;
+  }
+}
+
+// ── Auto-applied offer banner ───────────────────────────────────
+.vendor-offer-auto {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.08), rgba(39, 174, 96, 0.12));
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  .vendor-offer-auto-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+
+    .offer-check-wrap {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(46, 204, 113, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .offer-check-icon {
+        font-size: 18px;
+        color: $green;
+      }
+    }
+
+    .vendor-offer-auto-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .vendor-offer-auto-label {
+        display: flex;
+        align-items: center;
+
+        .auto-badge {
+          background: $green;
+          color: #fff;
+          font-family: 'latoBold', sans-serif;
+          font-size: 9px;
+          padding: 2px 7px;
+          border-radius: 4px;
+          letter-spacing: 0.6px;
+        }
+      }
+
+      .vendor-offer-name {
+        font-family: 'latoBold', sans-serif;
+        font-size: 13px;
+        color: $text-primary;
+        line-height: 1.3;
+      }
+
+      .vendor-offer-auto-savings {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: 'latoBold', sans-serif;
+        font-size: 12px;
+        color: $green;
+
+        ion-icon { font-size: 13px; }
+      }
+    }
+  }
+
+  .vendor-offer-remove-btn {
+    background: none;
+    border: none;
+    font-family: 'latoBold', sans-serif;
+    font-size: 11px;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 2px 0;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
 // Per-vendor Subtotal
 .vendor-subtotal {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0 0;
-  margin-top: 8px;
-  border-top: 1px dashed #e0e0e0;
+  padding: 8px 0 0;
   font-family: 'latoRegular', sans-serif;
   font-size: 14px;
   color: $text-secondary;
 
+  .subtotal-label {
+    font-family: 'latoRegular', sans-serif;
+  }
+
+  .vendor-subtotal-prices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subtotal-original {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $text-muted;
+    text-decoration: line-through;
+  }
+
   .subtotal-amount {
     font-family: 'latoBold', sans-serif;
     color: $text-primary;
+
+    &.amount-savings {
+      color: $green;
+    }
   }
 }
 
@@ -809,6 +1035,28 @@ ion-content {
   .free-text {
     color: $green;
     font-family: 'latoBold', sans-serif;
+  }
+
+  &.vendor-savings-row {
+    color: $green;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+
+    .vendor-savings-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .vendor-savings-icon {
+        font-size: 15px;
+        color: $green;
+      }
+    }
+
+    .coupon-discount-amount {
+      font-family: 'latoBold', sans-serif;
+      color: $green;
+    }
   }
 
   &.coupon-savings-row {

@@ -7,6 +7,7 @@ import { StorageService } from 'src/app/services/storage.service';
 import { ItemsService } from './items.service';
 import { environment } from 'src/environments/environment';
 import { ItemCustomisePage } from 'src/app/shared/pages/item-customise/item-customise.page';
+import { DealsService } from '../deals/deals.service';
 
 @Component({
   selector: 'app-items',
@@ -45,6 +46,11 @@ export class ItemsPage implements OnInit {
 
   // Cart
   cartItems: any[] = [];
+
+  // Offers
+  vendorOffers: any[] = [];
+  offersLoading = true;
+  copiedCode: string = '';
 
   dummyVendor: any = {
     name: 'Bottega Ristorante',
@@ -161,7 +167,8 @@ export class ItemsPage implements OnInit {
     private navController: NavController,
     private eventBus: EventBusService,
     private activatedRoute: ActivatedRoute,
-    private itemService: ItemsService
+    private itemService: ItemsService,
+    private dealsService: DealsService
   ) {}
 
   ngOnInit() {
@@ -179,6 +186,7 @@ export class ItemsPage implements OnInit {
         this.getDiscountedItemsByVendor(this.vendorId);
         this.getVendorDetails(this.vendorId);
         this.getReviewsByVendor(this.vendorId);
+        this.loadVendorOffers();
       }
     });
   }
@@ -502,6 +510,7 @@ export class ItemsPage implements OnInit {
             }
             this.selectedCategory = '';
             this.updateDisplayData();
+            this.loadCartFromStorage(); // re-run now that real product IDs are available
           } else {
             this.productDetails = [];
           }
@@ -632,7 +641,92 @@ export class ItemsPage implements OnInit {
     this.saveCartToStorage();
   }
 
+  // --- Vendor Offers ---
+
+  loadVendorOffers() {
+    this.offersLoading = true;
+    const user = this.storageService.getUser();
+    const addr = user?.addresses?.find((a: any) => a.isDefault) || user?.addresses?.[0];
+    const localityId = addr?.locality?._id || addr?.locality || '';
+    if (!localityId) {
+      this.offersLoading = false;
+      return;
+    }
+    this.dealsService.getDealsPage(localityId).subscribe({
+      next: (res: any) => {
+        if (res.status && res.data) {
+          const restaurantOffers = (res.data.restaurantOffers || [])
+            .filter((o: any) => o.vendor?._id === this.vendorId);
+          const platformCoupons = res.data.platformCoupons || [];
+          const firstOrderOffers = res.data.firstOrderOffers || [];
+          const generalOffers = res.data.generalOffers || [];
+          const seen = new Set<string>();
+          const combined = [...restaurantOffers, ...firstOrderOffers, ...platformCoupons, ...generalOffers];
+          this.vendorOffers = combined.filter((o: any) => {
+            if (seen.has(o._id)) return false;
+            seen.add(o._id);
+            return true;
+          });
+        }
+        this.offersLoading = false;
+      },
+      error: () => {
+        this.offersLoading = false;
+      }
+    });
+  }
+
+  getOfferValue(offer: any): string {
+    if (offer.discountType === 'percentage') return `${offer.discountValue}% OFF`;
+    return `\u20B9${offer.discountValue} OFF`;
+  }
+
+  getOfferSubtitle(offer: any): string {
+    const parts: string[] = [];
+    if (offer.maxDiscount) parts.push(`Upto \u20B9${offer.maxDiscount}`);
+    if (offer.minOrderAmount) parts.push(`Min order \u20B9${offer.minOrderAmount}`);
+    return parts.join(' \u2022 ');
+  }
+
+  getOfferIcon(offer: any): string {
+    switch (offer.type) {
+      case 'restaurant': return 'restaurant-outline';
+      case 'platform_coupon': return 'ticket-outline';
+      case 'first_order': return 'gift-outline';
+      case 'locality_based': return 'location-outline';
+      default: return 'pricetag-outline';
+    }
+  }
+
+  getOfferAccent(offer: any): string {
+    switch (offer.type) {
+      case 'restaurant': return '#F85C70';
+      case 'platform_coupon': return '#4A5BF5';
+      case 'first_order': return '#2ecc71';
+      case 'locality_based': return '#2DBCB6';
+      default: return '#FF8C42';
+    }
+  }
+
+  copyOfferCode(code: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      this.copiedCode = code;
+      this.commonService.presentToast('bottom', `Code "${code}" copied!`, 'success');
+      setTimeout(() => { this.copiedCode = ''; }, 2000);
+    });
+  }
+
+  getDiscountLabel(item: any): string {
+    if (!item.discount) return '';
+    if (item.discountType === 'in-percentage') {
+      return `${item.discount}% OFF`;
+    } else if (item.discountType === 'in-price') {
+      return `\u20B9${item.discount} OFF`;
+    }
+    return '';
+  }
+
   goToCart() {
-    this.router.navigate(['/cart']);
+    this.router.navigate(['/tabs/cart']);
   }
 }

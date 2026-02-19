@@ -7,7 +7,6 @@ import { PopularItemsPage } from './popular-items.page';
 import { PopularItemsService } from './popular-items.service';
 import { WebService } from 'src/app/services/web.service';
 import { StorageService } from 'src/app/services/storage.service';
-
 @NgModule({
   imports: [
     CommonModule,

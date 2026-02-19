@@ -326,7 +326,19 @@
     </div>
   </div>
 
-  <!-- Bottom spacer -->
-  <div style="height: 30px;"></div>
+  <!-- Bottom spacer — taller when cart bar is visible -->
+  <div [style.height]="cartItems.length ? '80px' : '30px'"></div>
 
 </ion-content>
+
+<!-- Cart Bar -->
+<div class="cart-bar" *ngIf="cartItems.length" (click)="goToCart()">
+  <div class="cart-bar-info">
+    <span class="cart-bar-count">{{ cartTotalItems }} {{ cartTotalItems === 1 ? 'Item' : 'Items' }}</span>
+    <span class="cart-bar-name">{{ cartFirstItemName }}{{ cartItems.length > 1 ? ' & more' : '' }}</span>
+  </div>
+  <div class="cart-bar-action">
+    <span class="cart-bar-price">&#8377;{{ cartTotalPrice.toFixed(2) }}</span>
+    <ion-icon name="chevron-forward-outline"></ion-icon>
+  </div>
+</div>

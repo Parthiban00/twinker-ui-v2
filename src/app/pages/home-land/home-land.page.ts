@@ -188,6 +188,19 @@ export class HomeLandPage implements OnInit, OnDestroy {
   selectedCuisine = '';
   searchedProducts: any[] = [];
 
+  // Cart
+  cartItems: any[] = [];
+
+  get cartTotalItems(): number {
+    return this.cartItems.reduce((sum, i) => sum + (i.itemCount || 1), 0);
+  }
+  get cartTotalPrice(): number {
+    return this.cartItems.reduce((sum, i) => sum + (i.price || 0) * (i.itemCount || 1), 0);
+  }
+  get cartFirstItemName(): string {
+    return this.cartItems[0]?.productName || '';
+  }
+
   private searchSubject = new Subject<string>();
   private searchSub: any;
 
@@ -234,10 +247,19 @@ export class HomeLandPage implements OnInit, OnDestroy {
     return this.activeFilters.length > 0 || !!this.activeSort || !!this.selectedCuisine || !!this.searchTerm;
   }
 
+  loadCart() {
+    this.cartItems = this.storageService.getItem('cart-items') || [];
+  }
+
+  goToCart() {
+    this.router.navigate(['/tabs/cart']);
+  }
+
   ionViewWillEnter() {
     this.isLoading = true;
     this.isDealsLoading = true;
     this.isTrendingLoading = true;
+    this.loadCart();
     const userData = this.storageService.getUser();
 
     this.activatedRoute.queryParams.subscribe(params => {
@@ -608,20 +630,29 @@ export class HomeLandPage implements OnInit, OnDestroy {
 
   addToCart(item: any) {
     const cartItems = this.storageService.getItem('cart-items') || [];
+    const vendor = item.vendor || {};
+    const vendorId = item.vendorId || vendor._id || 'unknown';
+
     const existing = cartItems.find((c: any) => c._id === item._id);
     if (existing) {
-      existing.quantity = (existing.quantity || 1) + 1;
+      existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
       cartItems.push({
         _id: item._id,
-        productName: item.productName,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        vendor: item.vendor,
-        quantity: 1
+        productName: item.productName || item.name || '',
+        price: item.price || 0,
+        basePrice: item.actualPrice || item.basePrice || undefined,
+        itemCount: 1,
+        imageUrl: item.imageUrl || '',
+        type: item.type || '',
+        vendorId,
+        vendorName: item.vendorName || vendor.businessName || vendor.name || '',
+        vendorImage: item.vendorImage || vendor.imageUrl || '',
+        vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
       });
     }
     this.storageService.setItem('cart-items', cartItems);
+    this.loadCart();
     this.commonService.presentToast('bottom', `${item.productName || 'Item'} added to cart`, 'success');
   }
 

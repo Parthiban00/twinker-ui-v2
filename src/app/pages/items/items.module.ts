@@ -13,6 +13,8 @@ import { ItemsService } from './items.service';
 import { StarRatingComponent } from 'src/app/shared/components/star-rating/star-rating.component';
 import { TimeAgoPipe } from 'src/app/shared/pipes/time-ago.pipe';
 import { ItemCustomisePageModule } from 'src/app/shared/pages/item-customise/item-customise.module';
+import { DealsService } from '../deals/deals.service';
+import { HomeMainService } from '../home-main/home-main.service';
 
 @NgModule({
   imports: [
@@ -24,6 +26,6 @@ import { ItemCustomisePageModule } from 'src/app/shared/pages/item-customise/ite
     ItemCustomisePageModule
   ],
   declarations: [ItemsPage, TimeAgoPipe],
-  providers:[ WebService, StorageService, ItemsService ]
+  providers:[ WebService, StorageService, ItemsService, DealsService, HomeMainService ]
 })
 export class ItemsPageModule {}

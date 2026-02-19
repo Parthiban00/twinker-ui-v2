@@ -76,15 +76,72 @@
       </span>
     </div>
 
-    <!-- Discount Section -->
-    <div class="discount-section" *ngIf="displayDiscounts.length">
-      <p class="discount-label">Discount for you</p>
-      <div class="discount-badges">
-        <div class="discount-badge" *ngFor="let discount of displayDiscounts">
-          <ion-icon [name]="discount.icon" [style.color]="discount.color"></ion-icon>
-          <span>{{ discount.label }}</span>
+    <!-- Offers Section -->
+    <div class="offers-section" *ngIf="offersLoading || vendorOffers.length">
+
+      <div class="offers-header">
+        <span class="offers-title">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          Offers for you
+        </span>
+        <span class="offers-count" *ngIf="!offersLoading">{{ vendorOffers.length }} available</span>
+      </div>
+
+      <!-- Skeletons while loading -->
+      <div class="offers-scroll" *ngIf="offersLoading">
+        <div class="offer-skeleton" *ngFor="let s of [1,2,3]">
+          <div class="sk-bar"></div>
+          <div class="sk-icon"></div>
+          <div class="sk-lines">
+            <div class="sk-l1"></div>
+            <div class="sk-l2"></div>
+            <div class="sk-l3"></div>
+          </div>
         </div>
       </div>
+
+      <!-- Real offer cards -->
+      <div class="offers-scroll" *ngIf="!offersLoading">
+        <div class="offer-card" *ngFor="let offer of vendorOffers">
+          <!-- Colored left accent bar -->
+          <div class="offer-accent-bar" [style.background]="getOfferAccent(offer)"></div>
+
+          <div class="offer-body">
+            <!-- Icon -->
+            <div class="offer-icon-wrap" [style.background]="getOfferAccent(offer) + '20'">
+              <ion-icon [name]="getOfferIcon(offer)" [style.color]="getOfferAccent(offer)"></ion-icon>
+            </div>
+
+            <!-- Content -->
+            <div class="offer-content">
+              <div class="offer-value" [style.color]="getOfferAccent(offer)">{{ getOfferValue(offer) }}</div>
+              <div class="offer-title">{{ offer.title }}</div>
+              <div class="offer-subtitle" *ngIf="getOfferSubtitle(offer)">{{ getOfferSubtitle(offer) }}</div>
+
+              <!-- Code row -->
+              <div class="offer-code-row" *ngIf="offer.code">
+                <div class="offer-code">
+                  <ion-icon name="ticket-outline"></ion-icon>
+                  <span>{{ offer.code }}</span>
+                </div>
+                <button class="copy-btn"
+                        [class.copied]="copiedCode === offer.code"
+                        (click)="copyOfferCode(offer.code)">
+                  <ion-icon [name]="copiedCode === offer.code ? 'checkmark-outline' : 'copy-outline'"></ion-icon>
+                  {{ copiedCode === offer.code ? 'COPIED' : 'COPY' }}
+                </button>
+              </div>
+
+              <!-- Auto-applied badge (no code) -->
+              <div class="offer-auto" *ngIf="!offer.code">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                Auto applied at checkout
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Inline Search Bar (anchor for sticky detection) -->
@@ -137,7 +194,11 @@
           </div>
           <p class="popular-name">{{ item.productName }}</p>
           <p class="popular-desc">{{ item.description }}</p>
-          <p class="popular-price">$ {{ item.price }}</p>
+          <div class="popular-price-row">
+            <span class="popular-price">&#8377;{{ item.price }}</span>
+            <span class="popular-actual-price" *ngIf="item.actualPrice && item.actualPrice !== item.price">&#8377;{{ item.actualPrice }}</span>
+            <span class="discount-tag" *ngIf="item.discount">{{ getDiscountLabel(item) }}</span>
+          </div>
           <span class="customisable-tag" *ngIf="isCustomizable(item)">Customisable</span>
         </div>
       </div>
@@ -160,7 +221,11 @@
             </div>
             <h4 class="item-name">{{ product.productName }}</h4>
             <p class="item-desc">{{ product.description }}</p>
-            <p class="item-price">$ {{ product.price }}</p>
+            <div class="item-price-row">
+              <span class="item-price">&#8377;{{ product.price }}</span>
+              <span class="item-actual-price" *ngIf="product.actualPrice && product.actualPrice !== product.price">&#8377;{{ product.actualPrice }}</span>
+              <span class="discount-tag" *ngIf="product.discount">{{ getDiscountLabel(product) }}</span>
+            </div>
             <span class="customisable-tag" *ngIf="isCustomizable(product)">Customisable</span>
           </div>
 
@@ -225,7 +290,7 @@
     <span class="cart-bar-name">{{ cartFirstItemName }}{{ cartItems.length > 1 ? ' & more' : '' }}</span>
   </div>
   <div class="cart-bar-action">
-    <span class="cart-bar-price">$ {{ cartTotalPrice.toFixed(2) }}</span>
+    <span class="cart-bar-price">&#8377;{{ cartTotalPrice.toFixed(2) }}</span>
     <ion-icon name="chevron-forward-outline"></ion-icon>
   </div>
 </div>

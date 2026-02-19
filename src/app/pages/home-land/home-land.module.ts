@@ -13,7 +13,6 @@ import { VendorService } from './vendor.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { HomeMainService } from '../home-main/home-main.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
 @NgModule({
   imports: [
     CommonModule,

@@ -195,23 +195,38 @@ export class PopularItemsPage {
 
   addToCart(item: any) {
     const cartItems = this.storageService.getItem('cart-items') || [];
+    const vendor = item.vendor || {};
+    const vendorId = item.vendorId || vendor._id || 'unknown';
+
     const existing = cartItems.find((c: any) => c._id === item._id);
     if (existing) {
-      existing.quantity = (existing.quantity || 1) + 1;
+      existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
-      cartItems.push({ ...item, quantity: 1 });
+      cartItems.push({
+        _id: item._id,
+        productName: item.productName || item.name || '',
+        price: item.price || 0,
+        basePrice: item.actualPrice || item.basePrice || undefined,
+        itemCount: 1,
+        imageUrl: item.imageUrl || '',
+        type: item.type || '',
+        vendorId,
+        vendorName: item.vendorName || vendor.businessName || vendor.name || '',
+        vendorImage: item.vendorImage || vendor.imageUrl || '',
+        vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+      });
     }
     this.storageService.setItem('cart-items', cartItems);
     this.loadCart();
-    this.commonService.presentToast('bottom', `${item.productName || item.name} added to cart`, 'success');
+    this.commonService.presentToast('bottom', `${item.productName || item.name || 'Item'} added to cart`, 'success');
   }
 
   loadCart() {
     const cartItems = this.storageService.getItem('cart-items');
     if (cartItems && cartItems.length > 0) {
       this.cartItems = cartItems;
-      this.cartItemCount = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
-      this.cartTotal = cartItems.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+      this.cartItemCount = cartItems.reduce((sum: number, item: any) => sum + (item.itemCount || item.quantity || 1), 0);
+      this.cartTotal = cartItems.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.itemCount || item.quantity || 1)), 0);
     } else {
       this.cartItems = [];
       this.cartItemCount = 0;
@@ -226,7 +241,7 @@ export class PopularItemsPage {
   }
 
   navigateToCart() {
-    this.router.navigate(['/cart']);
+    this.router.navigate(['/tabs/cart']);
   }
 
   getDiscountLabel(item: any): string {

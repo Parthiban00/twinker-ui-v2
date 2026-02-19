@@ -108,14 +108,81 @@
 
       <!-- Add More -->
       <div class="add-more-row">
-        <span class="add-more-label">Need anything dishes?</span>
+        <span class="add-more-label">Need anything else?</span>
         <button class="add-more-btn" (click)="goToVendor(group.vendorId)">Add more</button>
       </div>
 
-      <!-- Per-vendor subtotal (only for multi-vendor) -->
-      <div class="vendor-subtotal" *ngIf="hasMultipleVendors">
-        <span>Subtotal</span>
-        <span class="subtotal-amount">&#8377; {{ group.subtotal.toFixed(2) }}</span>
+      <!-- Offer area: loading → nudge → applied -->
+      <div class="vendor-offer-area">
+
+        <!-- Loading skeleton -->
+        <div class="vendor-offer-loading" *ngIf="isLoadingOffers">
+          <ion-spinner name="dots" color="medium"></ion-spinner>
+          <span>Finding best offers...</span>
+        </div>
+
+        <ng-container *ngIf="!isLoadingOffers">
+
+          <!-- NUDGE: offer exists but min-order not yet reached -->
+          <ng-container *ngIf="getVendorBestNudgeOffer(group) as nudgeOffer">
+            <div class="vendor-offer-nudge">
+              <div class="nudge-left">
+                <div class="nudge-icon-wrap">
+                  <ion-icon name="pricetag-outline"></ion-icon>
+                </div>
+                <div class="nudge-text">
+                  <span class="nudge-headline">
+                    Add <strong>&#8377;{{ getVendorNudgeAmount(group) }} more</strong>
+                    to unlock <strong class="nudge-discount">{{ getVendorNudgeLabel(nudgeOffer) }}</strong>
+                  </span>
+                  <span class="nudge-sub">{{ nudgeOffer.title }}</span>
+                </div>
+              </div>
+              <button class="nudge-add-btn" (click)="goToVendor(group.vendorId)">Add items</button>
+            </div>
+            <!-- Progress bar -->
+            <div class="nudge-progress-wrap">
+              <div class="nudge-progress-bar"
+                   [style.width.%]="(group.subtotal / nudgeOffer.minOrderAmount) * 100 | number:'1.0-0'">
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- AUTO-APPLIED: offer met and applied -->
+          <div class="vendor-offer-auto" *ngIf="group.appliedOffer">
+            <div class="vendor-offer-auto-left">
+              <div class="offer-check-wrap">
+                <ion-icon name="checkmark-circle" class="offer-check-icon"></ion-icon>
+              </div>
+              <div class="vendor-offer-auto-text">
+                <span class="vendor-offer-auto-label">
+                  <span class="auto-badge">AUTO APPLIED</span>
+                </span>
+                <span class="vendor-offer-name">
+                  {{ group.appliedOffer.code ? group.appliedOffer.code + ' · ' : '' }}{{ group.appliedOffer.title }}
+                </span>
+                <span class="vendor-offer-auto-savings">
+                  <ion-icon name="gift-outline"></ion-icon>
+                  You save &#8377;{{ group.offerDiscount }} on this order!
+                </span>
+              </div>
+            </div>
+            <button class="vendor-offer-remove-btn" (click)="removeVendorOffer(group)">REMOVE</button>
+          </div>
+
+        </ng-container>
+
+        <!-- Subtotal row (always visible) -->
+        <div class="vendor-subtotal">
+          <span class="subtotal-label">Subtotal</span>
+          <div class="vendor-subtotal-prices">
+            <span class="subtotal-original" *ngIf="group.offerDiscount">&#8377;{{ group.subtotal.toFixed(2) }}</span>
+            <span class="subtotal-amount" [class.amount-savings]="group.offerDiscount">
+              &#8377;{{ (group.subtotal - (group.offerDiscount || 0)).toFixed(2) }}
+            </span>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -233,8 +300,15 @@
           <span>&#8377; {{ totalDiscountedPrice.toFixed(2) }}</span>
         </div>
       </div>
+      <div class="summary-row vendor-savings-row" *ngIf="vendorDiscountTotal > 0">
+        <div class="vendor-savings-label">
+          <ion-icon name="storefront-outline" class="vendor-savings-icon"></ion-icon>
+          <span>Restaurant offers</span>
+        </div>
+        <span class="coupon-discount-amount">-&#8377;{{ vendorDiscountTotal.toFixed(2) }}</span>
+      </div>
       <div class="summary-row coupon-savings-row" *ngIf="appliedOffer">
-        <span>Coupon discount ({{ appliedOffer.code || appliedOffer.title }})</span>
+        <span>Coupon ({{ appliedOffer.code || appliedOffer.title }})</span>
         <span class="coupon-discount-amount">-&#8377;{{ couponDiscount.toFixed(2) }}</span>
       </div>
 

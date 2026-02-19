@@ -11,7 +11,6 @@ import { StorageService } from 'src/app/services/storage.service';
 import { HomeMainService } from './home-main.service';
 import { WebService } from 'src/app/services/web.service';
 import { CategoryListPageModule } from 'src/app/modals/category-list/category-list.module';
-
 @NgModule({
   imports: [
     CommonModule,

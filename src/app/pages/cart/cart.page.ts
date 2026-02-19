@@ -1,6 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, NavController } from '@ionic/angular';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { PaymentPage } from '../payment/payment.page';
 import { OrderStatusComponent } from 'src/app/shared/components/order-status/order-status.component';
 import { environment } from 'src/environments/environment';
@@ -36,6 +38,8 @@ interface VendorGroup {
   vendorCuisine: string;
   items: CartItem[];
   subtotal: number;
+  appliedOffer?: any;
+  offerDiscount?: number;
 }
 
 interface FeeBreakdown {
@@ -81,6 +85,8 @@ export class CartPage implements OnInit {
   couponCode: string = '';
   isLoadingOffers: boolean = false;
   localityId: string = '';
+  // All vendor restaurant offers (including those below min-order threshold — for nudge display)
+  vendorAllOffers: Record<string, any[]> = {};
 
   // Fee state
   feeBreakdown: FeeBreakdown | null = null;
@@ -115,7 +121,21 @@ export class CartPage implements OnInit {
       return;
     }
     try {
-      this.cartItems = JSON.parse(raw) || [];
+      const rawItems: any[] = JSON.parse(raw) || [];
+      // Normalize: flatten nested vendor object and standardize quantity field name
+      this.cartItems = rawItems.map((item: any) => {
+        const vendor = item.vendor || {};
+        return {
+          ...item,
+          itemCount: item.itemCount || item.quantity || 1,
+          vendorId: item.vendorId || vendor._id || 'unknown',
+          vendorName: item.vendorName || vendor.businessName || vendor.name || 'Unknown Restaurant',
+          vendorImage: item.vendorImage || vendor.imageUrl || '',
+          vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+        };
+      });
+      // Persist the normalized form so future reads are already clean
+      localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
     } catch (_) {
       this.cartItems = [];
     }
@@ -175,33 +195,56 @@ export class CartPage implements OnInit {
 
   private fetchOffers() {
     const vendorIds = this.vendorGroups.map(g => g.vendorId).filter(id => id !== 'unknown');
+    if (vendorIds.length === 0) { this.isLoadingOffers = false; return; }
+
     const orderAmount = this.totalDiscountedPrice;
     const vendorSubtotals: Record<string, number> = {};
     this.vendorGroups.forEach(g => {
-      if (g.vendorId !== 'unknown') {
-        vendorSubtotals[g.vendorId] = g.subtotal;
-      }
+      if (g.vendorId !== 'unknown') vendorSubtotals[g.vendorId] = g.subtotal;
     });
 
-    this.dealsService.getApplicableOffers(this.localityId, vendorIds, orderAmount, vendorSubtotals).subscribe({
-      next: (res: any) => {
-        if (res?.status && res?.data) {
-          this.applicableOffers = res.data;
-        } else {
-          this.applicableOffers = [];
+    // Run both calls in parallel:
+    // 1. getApplicableOffers → offers that actually meet min-order (for auto-apply + discount calc)
+    // 2. getDealsPage → ALL vendor offers regardless of min-order (for nudge display)
+    forkJoin({
+      applicable: this.dealsService
+        .getApplicableOffers(this.localityId, vendorIds, orderAmount, vendorSubtotals)
+        .pipe(catchError(() => of(null))),
+      allDeals: this.dealsService
+        .getDealsPage(this.localityId)
+        .pipe(catchError(() => of(null)))
+    }).subscribe(({ applicable, allDeals }) => {
+
+      // Build vendorAllOffers map: vendorId → all their restaurant offers (any min-order)
+      const allRestaurantOffers: any[] = allDeals?.data?.restaurantOffers || [];
+      this.vendorAllOffers = {};
+      for (const offer of allRestaurantOffers) {
+        const vid = offer.vendor?._id;
+        if (vid) {
+          if (!this.vendorAllOffers[vid]) this.vendorAllOffers[vid] = [];
+          this.vendorAllOffers[vid].push(offer);
         }
-        this.isLoadingOffers = false;
-        // If applied offer is no longer valid, auto-remove it
-        if (this.appliedOffer) {
-          this.revalidateAppliedOffer();
-        }
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.applicableOffers = [];
-        this.isLoadingOffers = false;
-        this.cdr.detectChanges();
       }
+
+      // Auto-apply best restaurant offer per vendor (only ones that meet min-order)
+      const allApplicable: any[] = applicable?.status && applicable?.data ? applicable.data : [];
+      for (const group of this.vendorGroups) {
+        const best = allApplicable
+          .filter(o => o.type === 'restaurant' && o.vendor?._id === group.vendorId)
+          .sort((a, b) => (b.calculatedDiscount || 0) - (a.calculatedDiscount || 0))[0];
+        group.appliedOffer = best || undefined;
+        group.offerDiscount = best ? (best.calculatedDiscount || 0) : 0;
+      }
+
+      // Coupon section: show only platform/general offers (not already-auto-applied restaurant ones)
+      const autoAppliedIds = new Set(
+        this.vendorGroups.filter(g => g.appliedOffer).map(g => g.appliedOffer!._id)
+      );
+      this.applicableOffers = allApplicable.filter(o => !autoAppliedIds.has(o._id));
+
+      this.isLoadingOffers = false;
+      if (this.appliedOffer) this.revalidateAppliedOffer();
+      this.cdr.detectChanges();
     });
   }
 
@@ -238,6 +281,33 @@ export class CartPage implements OnInit {
     this.appliedOffer = null;
     this.couponDiscount = 0;
     this.cdr.detectChanges();
+  }
+
+  removeVendorOffer(group: VendorGroup) {
+    group.appliedOffer = undefined;
+    group.offerDiscount = 0;
+    this.cdr.detectChanges();
+  }
+
+  // Returns the best unmet offer for a vendor (for nudge — within ₹300 of threshold)
+  getVendorBestNudgeOffer(group: VendorGroup): any {
+    if (group.appliedOffer) return null;
+    const offers: any[] = this.vendorAllOffers[group.vendorId] || [];
+    return offers
+      .filter(o => o.minOrderAmount > 0 && o.minOrderAmount > group.subtotal
+                   && (o.minOrderAmount - group.subtotal) <= 300)
+      .sort((a, b) => (a.minOrderAmount - group.subtotal) - (b.minOrderAmount - group.subtotal))[0] || null;
+  }
+
+  getVendorNudgeAmount(group: VendorGroup): number {
+    const offer = this.getVendorBestNudgeOffer(group);
+    return offer ? Math.ceil(offer.minOrderAmount - group.subtotal) : 0;
+  }
+
+  getVendorNudgeLabel(offer: any): string {
+    if (!offer) return '';
+    if (offer.discountType === 'percentage') return `${offer.discountValue}% OFF`;
+    return `₹${offer.discountValue} OFF`;
   }
 
   applyCouponCode() {
@@ -322,12 +392,16 @@ export class CartPage implements OnInit {
     return this.feeBreakdown?.tax?.amount ?? 0;
   }
 
+  get vendorDiscountTotal(): number {
+    return this.vendorGroups.reduce((sum, g) => sum + (g.offerDiscount || 0), 0);
+  }
+
   get totalPayment(): number {
-    return Math.max(0, this.totalDiscountedPrice - this.couponDiscount + this.deliveryFee + this.platformFee + this.taxAmount);
+    return Math.max(0, this.totalDiscountedPrice - this.vendorDiscountTotal - this.couponDiscount + this.deliveryFee + this.platformFee + this.taxAmount);
   }
 
   get totalSaved(): number {
-    return (this.totalOriginalPrice - this.totalDiscountedPrice) + this.couponDiscount;
+    return (this.totalOriginalPrice - this.totalDiscountedPrice) + this.vendorDiscountTotal + this.couponDiscount;
   }
 
   get totalItems(): number {

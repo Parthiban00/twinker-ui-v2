@@ -31,11 +31,6 @@ const routes: Routes = [
     canLoad: [AuthGuard]
   },
   {
-    path: 'cart',
-    loadChildren: () => import('./pages/cart/cart.module').then( m => m.CartPageModule),
-    canLoad: [AuthGuard]
-  },
-  {
     path: 'payment',
     loadChildren: () => import('./pages/payment/payment.module').then( m => m.PaymentPageModule),
     canLoad: [AuthGuard]
