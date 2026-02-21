@@ -30,92 +30,110 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'location-setup',
     loadChildren: () => import('./pages/location-setup/location-setup.module').then( m => m.LocationSetupPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'home-main',
     loadChildren: () => import('./pages/home-main/home-main.module').then( m => m.HomeMainPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'payment',
     loadChildren: () => import('./pages/payment/payment.module').then( m => m.PaymentPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'shared/location-setup',
     loadChildren: () => import('./shared/location-setup/location-setup.module').then( m => m.LocationSetupPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'home-land',
     loadChildren: () => import('./pages/home-land/home-land.module').then( m => m.HomeLandPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'items',
     loadChildren: () => import('./pages/items/items.module').then( m => m.ItemsPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'tabs',
     loadChildren: () => import('./tabs/tabs.module').then( m => m.TabsPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'orders',
     loadChildren: () => import('./pages/orders/orders.module').then( m => m.OrdersPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'all-items',
     loadChildren: () => import('./shared/pages/all-items/all-items.module').then( m => m.AllItemsPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'essentials-home',
     loadChildren: () => import('./pages/essentials-home/essentials-home.module').then( m => m.EssentialsHomePageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'groceries-home',
     loadChildren: () => import('./pages/groceries-home/groceries-home.module').then( m => m.GroceriesHomePageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'popular-items',
     loadChildren: () => import('./pages/popular-items/popular-items.module').then( m => m.PopularItemsPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'popular-vendors',
     loadChildren: () => import('./pages/popular-vendors/popular-vendors.module').then( m => m.PopularVendorsPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'search',
     loadChildren: () => import('./pages/search/search.module').then( m => m.SearchPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'order-detail',
     loadChildren: () => import('./pages/order-detail-view/order-detail-view.module').then( m => m.OrderDetailViewPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'order-tracking',
     loadChildren: () => import('./pages/order-tracking/order-tracking.module').then( m => m.OrderTrackingPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'vendor-orders',
     loadChildren: () => import('./pages/vendor-orders/vendor-orders.module').then( m => m.VendorOrdersPageModule),
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard]
   }
 ];
 
@@ -126,3 +144,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+

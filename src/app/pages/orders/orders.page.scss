@@ -675,6 +675,69 @@ ion-toolbar {
   padding: 2px 8px;
 }
 
+// ── Order ID row with vertical tag ───────────────────────────
+.history-order-id-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.history-vertical-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 9px;
+  background: rgba(248, 92, 112, 0.12);
+  color: $primary;
+  border-radius: 20px;
+  padding: 1px 6px;
+
+  ion-icon { font-size: 10px; }
+
+  &.mart-tag {
+    background: rgba(74, 91, 245, 0.12);
+    color: #4A5BF5;
+  }
+}
+
+// ── Reorder button ───────────────────────────────────────────
+.reorder-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid $primary;
+  background: #fff8f9;
+  color: $primary;
+  font-family: 'latoBold', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  ion-icon { font-size: 13px; }
+
+  &:active {
+    background: #ffe8eb;
+  }
+}
+
+// ── Empty state icon wrap ────────────────────────────────────
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 // ======== EMPTY STATE ========
 .empty-state {
   display: flex;
@@ -686,9 +749,8 @@ ion-toolbar {
 }
 
 .empty-icon {
-  font-size: 64px;
-  color: #ddd;
-  margin-bottom: 20px;
+  font-size: 40px;
+  color: #ccc;
 }
 
 .empty-title {

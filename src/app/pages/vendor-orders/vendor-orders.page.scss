@@ -206,6 +206,28 @@ ion-content {
   font-size: 16px;
   color: #1a1a1a;
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vertical-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 10px;
+  background: rgba(248, 92, 112, 0.12);
+  color: #F85C70;
+  border-radius: 20px;
+  padding: 2px 8px;
+
+  ion-icon { font-size: 11px; }
+
+  &.mart-tag {
+    background: rgba(74, 91, 245, 0.12);
+    color: #4A5BF5;
+  }
 }
 
 .order-id-text {

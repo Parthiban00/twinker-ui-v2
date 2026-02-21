@@ -4,14 +4,14 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home-main" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title color="light">Popular Items</ion-title>
+    <ion-title color="light">{{ vertical === 'mart' ? 'Popular Products' : 'Popular Items' }}</ion-title>
   </ion-toolbar>
 
   <!-- Search Bar -->
   <div class="header-search-wrap">
     <div class="search-bar">
       <ion-icon name="search-outline" class="search-icon"></ion-icon>
-      <input type="text" placeholder="Search popular items..."
+      <input type="text" [placeholder]="vertical === 'mart' ? 'Search products, stores...' : 'Search popular items...'"
         [value]="searchTerm" (input)="onSearchInput($event)" />
       <ion-icon name="close-circle" class="clear-icon"
         *ngIf="searchTerm" (click)="clearSearch()"></ion-icon>
@@ -68,7 +68,7 @@
 
     <!-- Result count -->
     <div class="result-bar" *ngIf="items.length">
-      <span class="result-count">{{ totalCount }} item{{ totalCount !== 1 ? 's' : '' }} found</span>
+      <span class="result-count">{{ totalCount }} {{ vertical === 'mart' ? 'product' : 'item' }}{{ totalCount !== 1 ? 's' : '' }} found</span>
     </div>
 
     <!-- Product Grid -->
@@ -77,8 +77,8 @@
         <!-- Image -->
         <div class="product-img-wrap">
           <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" [alt]="item.productName" />
-          <div class="img-placeholder" *ngIf="!item.imageUrl">
-            <ion-icon name="restaurant-outline"></ion-icon>
+          <div class="img-placeholder item-placeholder" *ngIf="!item.imageUrl">
+            <span class="placeholder-emoji">{{ vertical === 'mart' ? '🛒' : '🍽️' }}</span>
           </div>
           <!-- Discount badge -->
           <div class="discount-badge" *ngIf="item.discount">{{ getDiscountLabel(item) }}</div>
@@ -109,10 +109,10 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="!items.length">
-      <ion-icon name="flame-outline" class="empty-icon"></ion-icon>
-      <h3>No popular items found</h3>
+      <ion-icon [name]="vertical === 'mart' ? 'bag-handle-outline' : 'flame-outline'" class="empty-icon"></ion-icon>
+      <h3>No {{ vertical === 'mart' ? 'popular products' : 'popular items' }} found</h3>
       <p *ngIf="hasActiveFilters">Try adjusting your filters or search</p>
-      <p *ngIf="!hasActiveFilters">Popular items will appear here soon</p>
+      <p *ngIf="!hasActiveFilters">{{ vertical === 'mart' ? 'Popular products' : 'Popular items' }} will appear here soon</p>
       <button class="clear-filters-btn" *ngIf="hasActiveFilters"
         (click)="clearAllFilters()">
         Clear all filters
@@ -136,7 +136,7 @@
 <!-- Cart Bar -->
 <div class="cart-bar" *ngIf="cartItems.length" (click)="navigateToCart()">
   <div class="cart-bar-left">
-    <ion-icon name="cart"></ion-icon>
+    <ion-icon [name]="vertical === 'mart' ? 'bag-handle' : 'cart'"></ion-icon>
     <span class="cart-bar-count">{{ cartItemCount }} item{{ cartItemCount > 1 ? 's' : '' }}</span>
     <span class="cart-bar-separator">|</span>
     <span class="cart-bar-total">&#8377;{{ cartTotal.toFixed(2) }}</span>

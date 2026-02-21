@@ -67,8 +67,11 @@
 
   <!-- ============================================ -->
   <!-- 3. CUISINE / SUB-CATEGORY QUICK SCROLL       -->
+  <!-- Show if: API has cuisines, OR eats vertical with theme fallback cuisines -->
+  <!-- Hide for mart when API returns no cuisines (prevents food chips on mart pages) -->
   <!-- ============================================ -->
-  <div class="cuisine-scroll">
+  <div class="cuisine-scroll"
+    *ngIf="popularCuisines.length || (activeVertical === 'eats' && theme.cuisines.length)">
     <div class="cuisine-list">
       <ng-container *ngIf="popularCuisines.length; else dummyCuisineList">
         <div class="cuisine-chip" *ngFor="let cuisine of popularCuisines"
@@ -152,11 +155,21 @@
     </div>
     <div class="trending-scroll">
       <div class="trending-card" *ngFor="let vendor of trendingVendors"
-        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
+        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id, vertical: activeVertical}">
         <div class="trending-img-wrap">
           <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : 'assets/announcement-banner.jpg'"
             [alt]="vendor.name" />
           <div class="trending-tag" [style.background]="theme.accentColor">Popular</div>
+          <!-- Open badge (only when open) -->
+          <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
+            <span class="open-dot"></span>Open
+          </div>
+          <!-- Closed overlay with next open time -->
+          <div class="vendor-closed-overlay" *ngIf="!isVendorOpen(vendor)">
+            <ion-icon name="time-outline" class="closed-clock-icon"></ion-icon>
+            <span class="closed-label">Closed</span>
+            <span class="closed-next-open">{{ getNextOpenTime(vendor) }}</span>
+          </div>
         </div>
         <div class="trending-info">
           <h4>{{ vendor.name }}</h4>
@@ -184,7 +197,7 @@
         <div class="featured-img-wrap">
           <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" [alt]="item.productName" />
           <div class="img-placeholder" *ngIf="!item.imageUrl">
-            <ion-icon name="restaurant-outline"></ion-icon>
+            <ion-icon [name]="activeVertical === 'mart' ? 'bag-handle-outline' : 'restaurant-outline'"></ion-icon>
           </div>
           <div class="discount-badge" *ngIf="item.discount">{{ getDiscountLabel(item) }}</div>
         </div>
@@ -214,7 +227,7 @@
   <!-- ============================================ -->
   <div class="product-search-results" *ngIf="searchTerm && searchedProducts.length">
     <div class="section-header">
-      <h2>Matching dishes</h2>
+      <h2>{{ activeVertical === 'mart' ? 'Matching products' : 'Matching dishes' }}</h2>
       <span class="result-count">{{ searchedProducts.length }} found</span>
     </div>
     <div class="psr-list">
@@ -223,7 +236,7 @@
         <div class="psr-img">
           <img *ngIf="product.imageUrl" [src]="imgBaseUrl + product.imageUrl" [alt]="product.productName" />
           <div class="psr-img-placeholder" *ngIf="!product.imageUrl">
-            <ion-icon name="fast-food-outline"></ion-icon>
+            <ion-icon [name]="activeVertical === 'mart' ? 'cube-outline' : 'fast-food-outline'"></ion-icon>
           </div>
           <div class="psr-discount" *ngIf="product.discount">{{ getDiscountLabel(product) }}</div>
         </div>
@@ -265,12 +278,22 @@
     <!-- Vendor cards -->
     <ng-container *ngIf="!isLoading && displayVendors.length">
       <div class="vendor-card" *ngFor="let vendor of displayVendors"
-        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id}">
+        [routerLink]="['/items']" [queryParams]="{vendorId: vendor._id, vertical: activeVertical}">
 
         <!-- Cover image -->
         <div class="vendor-cover">
           <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : 'assets/announcement-banner.jpg'"
             [alt]="vendor.name" />
+          <!-- Open badge (only when open) -->
+          <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
+            <span class="open-dot"></span>Open
+          </div>
+          <!-- Closed overlay with next open time -->
+          <div class="vendor-closed-overlay" *ngIf="!isVendorOpen(vendor)">
+            <ion-icon name="time-outline" class="closed-clock-icon"></ion-icon>
+            <span class="closed-label">Closed</span>
+            <span class="closed-next-open">{{ getNextOpenTime(vendor) }}</span>
+          </div>
           <!-- Delivery time pill -->
           <div class="delivery-pill">
             <ion-icon name="time-outline"></ion-icon>

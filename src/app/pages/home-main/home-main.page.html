@@ -1,12 +1,8 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <!-- Greeting -->
-    <div class="greeting-row" *ngIf="greeting">
-      <span class="greeting-text">{{ greeting }}<span *ngIf="userName">, {{ userName }}</span>!</span>
-    </div>
     <div class="header-top">
       <div class="address-section" [routerLink]="['/location-setup']">
-        <span class="address-label">Your current address</span>
+        <span class="address-label">Deliver to</span>
         <div class="address-value" *ngIf="defaultAddress">
           <span class="elipsis">{{ defaultAddress.fullAddress }}</span>
           <ion-icon name="chevron-down"></ion-icon>
@@ -17,10 +13,22 @@
         <ion-icon name="notifications-outline"></ion-icon>
       </div>
     </div>
+    <!-- Vertical Switcher -->
+    <div class="vertical-switcher">
+      <button class="vs-pill" [class.vs-active-eats]="activeVertical === 'eats'" (click)="switchVertical('eats')">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <span>Eats</span>
+      </button>
+      <button class="vs-pill" [class.vs-active-mart]="activeVertical === 'mart'" (click)="switchVertical('mart')">
+        <ion-icon name="bag-handle-outline"></ion-icon>
+        <span>Mart</span>
+      </button>
+    </div>
+
     <div class="search-container" (click)="navigateToSearch()">
       <div class="search-bar">
         <ion-icon name="search-outline"></ion-icon>
-        <span>Search food, groceries, medicines...</span>
+        <span>{{ activeVertical === 'eats' ? 'Search food, restaurants...' : 'Search groceries, stores...' }}</span>
       </div>
     </div>
   </ion-toolbar>
@@ -72,19 +80,18 @@
     <!-- Section 1: Service Pillars / Categories -->
     <div class="service-pillars-section anim-section" *ngIf="categories.length" style="animation-delay: 0s;">
       <div class="pillars-header">
-        <span class="pillars-title">Our services</span>
+        <span class="pillars-title">{{ activeVertical === 'eats' ? 'What are you craving?' : 'Shop by category' }}</span>
         <span class="see-all-link" (click)="exploreCategories()">See all</span>
       </div>
       <div class="service-pillars-scroll">
-        <div class="service-pillar pulse-once" *ngFor="let cat of categories; let i = index"
+        <div class="service-pillar" *ngFor="let cat of categories; let i = index"
           [style.animation-delay]="(i * 0.05) + 's'"
           (click)="navigateService(cat)">
-          <div class="pillar-icon-wrap" [ngStyle]="{'background-color': '#FFF0F0'}">
-            <img *ngIf="cat.imageUrl" [src]="imgBaseUrl + cat.imageUrl" class="pillar-img" alt="{{ cat.categoryName }}" />
-            <ion-icon *ngIf="!cat.imageUrl" name="storefront-outline" style="color: #F85C70;"></ion-icon>
+          <div class="pillar-icon-wrap">
+            <img *ngIf="cat.imageUrl" [src]="getCategoryImageUrl(cat)" class="pillar-img" alt="{{ cat.categoryName }}" />
+            <ion-icon *ngIf="!cat.imageUrl" name="storefront-outline" class="pillar-fallback-icon"></ion-icon>
           </div>
           <span class="pillar-name">{{ cat.categoryName }}</span>
-          <span class="pillar-time" *ngIf="cat.vendorDetails?.length" style="color: #F85C70;">{{ cat.vendorDetails.length }} stores</span>
         </div>
       </div>
     </div>
@@ -169,15 +176,15 @@
     <!-- Section 4: Popular in your area -->
     <div class="order-again-section anim-section" *ngIf="popularItems.length" style="animation-delay: 0.2s;">
       <div class="section-header">
-        <h2>Popular in your area</h2>
+        <h2>{{ activeVertical === 'eats' ? 'Popular dishes near you' : 'Top picks for you' }}</h2>
         <span class="see-all" (click)="navigateToPopularItems()">See all</span>
       </div>
       <div class="order-again-scroll">
         <div class="order-again-card" *ngFor="let item of popularItems" (click)="navigatePopularItem(item)">
           <div class="order-again-img">
             <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" alt="{{ item.productName }}" />
-            <div class="img-placeholder" *ngIf="!item.imageUrl">
-              <ion-icon name="restaurant-outline"></ion-icon>
+            <div class="img-placeholder item-placeholder" *ngIf="!item.imageUrl">
+              <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🛒' : '🍽️' }}</span>
             </div>
             <div class="item-tag" *ngIf="item.tag && item.tag !== 'none'">{{ item.tag }}</div>
           </div>
@@ -224,35 +231,45 @@
       </div>
     </div>
 
-    <!-- Section 5: What's on your mind? -->
-    <div class="cuisine-section anim-section" *ngIf="cuisines.length" style="animation-delay: 0.3s;">
+    <!-- Section 5: What's on your mind? (Eats only) -->
+    <div class="cuisine-section anim-section" *ngIf="cuisines.length && activeVertical === 'eats'" style="animation-delay: 0.3s;">
       <div class="section-header">
         <h2>What's on your mind?</h2>
       </div>
       <div class="cuisine-grid">
         <div class="cuisine-item" *ngFor="let cuisine of cuisines" (click)="navigateCuisine(cuisine)">
-          <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor}">
+          <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor || '#f5f5f5', 'border': '2px solid ' + (cuisine.accentColor || '#ddd') + '22'}">
             <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" class="cuisine-img" alt="{{ cuisine.name }}" />
-            <ion-icon *ngIf="!cuisine.imageUrl && cuisine.icon" [name]="cuisine.icon" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
-            <ion-icon *ngIf="!cuisine.imageUrl && !cuisine.icon" name="restaurant-outline" [ngStyle]="{'color': cuisine.accentColor}"></ion-icon>
+            <span *ngIf="!cuisine.imageUrl && cuisine.icon" class="cuisine-emoji">{{ cuisine.icon }}</span>
+            <ion-icon *ngIf="!cuisine.imageUrl && !cuisine.icon" name="restaurant-outline" [ngStyle]="{'color': cuisine.accentColor || '#888'}"></ion-icon>
           </div>
           <span class="cuisine-label">{{ cuisine.name }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Section 6: Popular Restaurants Near You (Enhanced) -->
+    <!-- Section 6: Popular Restaurants / Stores Near You -->
     <div class="popular-restaurants-section anim-section" *ngIf="popularVendors.length" style="animation-delay: 0.35s;">
       <div class="section-header">
-        <h2>Popular near you</h2>
+        <h2>{{ activeVertical === 'eats' ? 'Popular restaurants' : 'Popular stores' }}</h2>
         <span class="see-all" (click)="navigateToPopularVendors()">See all</span>
       </div>
       <div class="popular-scroll">
         <div class="restaurant-card" *ngFor="let vendor of popularVendors" (click)="navigateRestaurant(vendor)">
           <div class="restaurant-cover">
             <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
-            <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
-              <ion-icon name="storefront-outline"></ion-icon>
+            <div class="img-placeholder vendor-placeholder" *ngIf="!vendor.profileImgUrl">
+              <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🏪' : '🍽️' }}</span>
+            </div>
+            <!-- Open badge (only when open) -->
+            <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
+              <span class="open-dot"></span>Open
+            </div>
+            <!-- Closed overlay with next open time -->
+            <div class="vendor-closed-overlay" *ngIf="!isVendorOpen(vendor)">
+              <ion-icon name="time-outline" class="closed-clock-icon"></ion-icon>
+              <span class="closed-label">Closed</span>
+              <span class="closed-next-open">{{ getNextOpenTime(vendor) }}</span>
             </div>
             <!-- Rating badge -->
             <div class="vendor-rating-badge">
@@ -281,14 +298,24 @@
     <!-- Section 6.5: Top Rated Near You -->
     <div class="popular-restaurants-section anim-section" *ngIf="topRatedVendors.length" style="animation-delay: 0.4s;">
       <div class="section-header">
-        <h2>Top rated near you</h2>
+        <h2>{{ activeVertical === 'eats' ? 'Top rated restaurants' : 'Top rated stores' }}</h2>
       </div>
       <div class="popular-scroll">
         <div class="restaurant-card top-rated-card" *ngFor="let vendor of topRatedVendors" (click)="navigateRestaurant(vendor)">
           <div class="restaurant-cover">
             <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
-            <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
-              <ion-icon name="storefront-outline"></ion-icon>
+            <div class="img-placeholder vendor-placeholder" *ngIf="!vendor.profileImgUrl">
+              <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🏪' : '🍽️' }}</span>
+            </div>
+            <!-- Open badge (only when open) -->
+            <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
+              <span class="open-dot"></span>Open
+            </div>
+            <!-- Closed overlay with next open time -->
+            <div class="vendor-closed-overlay" *ngIf="!isVendorOpen(vendor)">
+              <ion-icon name="time-outline" class="closed-clock-icon"></ion-icon>
+              <span class="closed-label">Closed</span>
+              <span class="closed-next-open">{{ getNextOpenTime(vendor) }}</span>
             </div>
             <!-- Prominent rating badge -->
             <div class="top-rating-badge">
@@ -310,8 +337,8 @@
       </div>
     </div>
 
-    <!-- Section 7: Essentials at your doorstep -->
-    <div class="essentials-section anim-section" style="animation-delay: 0.45s;">
+    <!-- Section 7: Essentials at your doorstep (Eats only) -->
+    <div class="essentials-section anim-section" *ngIf="activeVertical === 'eats'" style="animation-delay: 0.45s;">
       <div class="section-header">
         <h2>Essentials at your doorstep</h2>
       </div>
@@ -388,7 +415,9 @@
 <!-- View Cart Bar -->
 <div class="cart-bar" *ngIf="cartItems.length" (click)="navigateToCart()">
   <div class="cart-bar-left">
-    <ion-icon name="cart"></ion-icon>
+    <ion-icon [name]="activeVertical === 'mart' ? 'bag-handle' : 'cart'"></ion-icon>
+    <span class="cart-bar-vertical-tag">{{ activeVertical === 'mart' ? 'Mart' : 'Eats' }}</span>
+    <span class="cart-bar-separator">·</span>
     <span class="cart-bar-count">{{ cartItemCount }} item{{ cartItemCount > 1 ? 's' : '' }}</span>
     <span class="cart-bar-separator">|</span>
     <span class="cart-bar-total">&#8377;{{ cartTotal.toFixed(2) }}</span>

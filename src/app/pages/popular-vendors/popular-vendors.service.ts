@@ -8,6 +8,7 @@ export class PopularVendorsService {
 
   getPopularVendors(localityId: string, params: any) {
     const queryParts: string[] = [];
+    if (params.vertical) queryParts.push(`vertical=${encodeURIComponent(params.vertical)}`);
     if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
     if (params.category) queryParts.push(`category=${encodeURIComponent(params.category)}`);
     if (params.sort) queryParts.push(`sort=${encodeURIComponent(params.sort)}`);

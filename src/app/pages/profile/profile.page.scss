@@ -137,6 +137,43 @@ ion-content {
   color: #d0d0d0;
 }
 
+// ── Icon wrap colour variants ────────────────────────────────
+.help-icon-wrap {
+  background: #f0f4ff;
+  ion-icon { color: #4A5BF5; }
+}
+.info-icon-wrap {
+  background: #f0faf5;
+  ion-icon { color: #2DBCB6; }
+}
+
+// ── Logout button ────────────────────────────────────────────
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 32px);
+  margin: 4px 16px 12px;
+  padding: 13px;
+  border-radius: 14px;
+  border: 1.5px solid #FFD6DA;
+  background: #fff8f9;
+  color: #e74c3c;
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  &:active {
+    background: #ffe8eb;
+  }
+}
+
 // ── App version footer ───────────────────────────────────────
 .app-version {
   text-align: center;

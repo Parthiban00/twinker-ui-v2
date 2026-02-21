@@ -501,7 +501,7 @@ export class LocationSetupPage implements OnInit {
     this.locationService.checkServiceArea(coords).subscribe({
       next: (resdata: any) => {
         if (resdata.status && resdata.data?.serviceAvailable) {
-          this.router.navigate(['/tabs/']);
+          this.router.navigate(['/tabs/home-main']);
           this.emitEvent();
         } else {
           this.router.navigate(['/service-not-available']);
@@ -509,7 +509,7 @@ export class LocationSetupPage implements OnInit {
       },
       error: (_err: any) => {
         // If service area check fails, proceed to tabs
-        this.router.navigate(['/tabs/']);
+        this.router.navigate(['/tabs/home-main']);
         this.emitEvent();
       },
     });

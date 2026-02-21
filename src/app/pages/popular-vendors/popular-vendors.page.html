@@ -4,14 +4,14 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home-main" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title color="light">Popular near you</ion-title>
+    <ion-title color="light">{{ vertical === 'mart' ? 'Popular stores' : 'Popular near you' }}</ion-title>
   </ion-toolbar>
 
   <!-- Search Bar -->
   <div class="header-search-wrap">
     <div class="search-bar">
       <ion-icon name="search-outline" class="search-icon"></ion-icon>
-      <input type="text" placeholder="Search popular restaurants..."
+      <input type="text" [placeholder]="vertical === 'mart' ? 'Search stores, shops...' : 'Search popular restaurants...'"
         [value]="searchTerm" (input)="onSearchInput($event)" />
       <ion-icon name="close-circle" class="clear-icon"
         *ngIf="searchTerm" (click)="clearSearch()"></ion-icon>
@@ -66,7 +66,7 @@
 
     <!-- Result count -->
     <div class="result-bar" *ngIf="vendors.length">
-      <span class="result-count">{{ totalCount }} restaurant{{ totalCount !== 1 ? 's' : '' }} found</span>
+      <span class="result-count">{{ totalCount }} {{ vertical === 'mart' ? 'store' : 'restaurant' }}{{ totalCount !== 1 ? 's' : '' }} found</span>
     </div>
 
     <!-- Vendor List -->
@@ -76,11 +76,21 @@
         <!-- Cover image -->
         <div class="vendor-cover">
           <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" [alt]="vendor.name" />
-          <div class="img-placeholder" *ngIf="!vendor.profileImgUrl">
-            <ion-icon name="storefront-outline"></ion-icon>
+          <div class="img-placeholder vendor-placeholder" *ngIf="!vendor.profileImgUrl">
+            <span class="placeholder-emoji">{{ vertical === 'mart' ? '🏪' : '🍽️' }}</span>
           </div>
           <!-- Popular tag -->
           <div class="popular-tag">Popular</div>
+          <!-- Open badge (only when open) -->
+          <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
+            <span class="open-dot"></span>Open
+          </div>
+          <!-- Closed overlay with next open time -->
+          <div class="vendor-closed-overlay" *ngIf="!isVendorOpen(vendor)">
+            <ion-icon name="time-outline" class="closed-clock-icon"></ion-icon>
+            <span class="closed-label">Closed</span>
+            <span class="closed-next-open">{{ getNextOpenTime(vendor) }}</span>
+          </div>
           <!-- Delivery time pill -->
           <div class="delivery-pill" *ngIf="vendor.approxDeliveryTime">
             <ion-icon name="time-outline"></ion-icon>
@@ -111,10 +121,10 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="!vendors.length">
-      <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
-      <h3>No popular restaurants found</h3>
+      <ion-icon [name]="vertical === 'mart' ? 'bag-handle-outline' : 'storefront-outline'" class="empty-icon"></ion-icon>
+      <h3>No popular {{ vertical === 'mart' ? 'stores' : 'restaurants' }} found</h3>
       <p *ngIf="hasActiveFilters">Try adjusting your filters or search</p>
-      <p *ngIf="!hasActiveFilters">Popular restaurants will appear here soon</p>
+      <p *ngIf="!hasActiveFilters">Popular {{ vertical === 'mart' ? 'stores' : 'restaurants' }} will appear here soon</p>
       <button class="clear-filters-btn" *ngIf="hasActiveFilters"
         (click)="clearAllFilters()">
         Clear all filters

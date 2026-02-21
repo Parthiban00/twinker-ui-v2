@@ -8,6 +8,7 @@ export class PopularItemsService {
 
   getPopularItems(localityId: string, params: any) {
     const queryParts: string[] = [];
+    if (params.vertical) queryParts.push(`vertical=${encodeURIComponent(params.vertical)}`);
     if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
     if (params.tag) queryParts.push(`tag=${encodeURIComponent(params.tag)}`);
     if (params.type) queryParts.push(`type=${encodeURIComponent(params.type)}`);

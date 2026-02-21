@@ -100,7 +100,7 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
               if (resdata.data.user) this.storageService.saveUser(resdata.data.user);
 
               if (resdata.data.hasDefaultAddress) {
-                this.router.navigate(['/tabs/'], { replaceUrl: true });
+                this.router.navigate(['/tabs/home-main'], { replaceUrl: true });
               } else {
                 this.router.navigate(['/shared/location-setup'], { replaceUrl: true });
               }

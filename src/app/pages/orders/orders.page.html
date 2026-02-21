@@ -108,7 +108,8 @@
           <div class="eta-bottom-row">
             <span class="eta-pct">{{ etaMap[order.orderId]?.pctElapsed || 0 }}% complete</span>
             <span class="eta-steps-hint">
-              <ng-container *ngIf="order.status === 'confirmed'">🍳 Preparing</ng-container>
+              <ng-container *ngIf="order.status === 'confirmed' && order.vertical !== 'mart'">🍳 Preparing</ng-container>
+              <ng-container *ngIf="order.status === 'confirmed' && order.vertical === 'mart'">📦 Packing</ng-container>
               <ng-container *ngIf="order.status === 'out_for_delivery'">🛵 Out for delivery</ng-container>
             </span>
           </div>
@@ -117,7 +118,7 @@
         <!-- Waiting state: placed, no ETA yet -->
         <div class="eta-waiting" *ngIf="order.status === 'placed'">
           <ion-icon name="hourglass-outline"></ion-icon>
-          <span>Waiting for restaurant to accept...</span>
+          <span>{{ order.vertical === 'mart' ? 'Waiting for store to accept...' : 'Waiting for restaurant to accept...' }}</span>
         </div>
 
         <!-- Meta Row -->
@@ -181,17 +182,26 @@
                         [style.color]="getStatusColor(order.status)"></ion-icon>
             </div>
             <div class="history-info">
-              <span class="history-order-id">{{ order.orderId }}</span>
+              <div class="history-order-id-row">
+                <span class="history-order-id">{{ order.orderId }}</span>
+                <span class="history-vertical-tag" [class.mart-tag]="order.vertical === 'mart'">
+                  <ion-icon [name]="getVerticalIcon(order)"></ion-icon>
+                  {{ getVerticalLabel(order) }}
+                </span>
+              </div>
               <span class="history-vendor">{{ getVendorNames(order) }}</span>
-              <span class="history-meta">{{ getItemCount(order) }} items</span>
+              <span class="history-meta">{{ getItemCount(order) }} items · ₹{{ order.totalAmount?.toFixed(0) }}</span>
             </div>
             <div class="history-right">
-              <span class="history-amount">₹{{ order.totalAmount?.toFixed(0) }}</span>
               <span class="history-status-chip"
                     [style.color]="getStatusColor(order.status)"
                     [style.background]="getStatusColor(order.status) + '15'">
                 {{ getStatusLabel(order.status) }}
               </span>
+              <button class="reorder-btn" *ngIf="order.status === 'delivered'" (click)="$event.stopPropagation(); reorder(order)">
+                <ion-icon name="refresh-outline"></ion-icon>
+                Reorder
+              </button>
             </div>
           </div>
         </div>
@@ -200,10 +210,12 @@
 
     <!-- ===== EMPTY STATE ===== -->
     <div class="empty-state" *ngIf="isEmpty">
-      <ion-icon name="receipt-outline" class="empty-icon"></ion-icon>
-      <h2 class="empty-title">No orders yet</h2>
-      <p class="empty-subtitle">Your order history will appear here.<br/>Start by browsing restaurants!</p>
-      <button class="empty-browse-btn" (click)="goHome()">Browse Restaurants</button>
+      <div class="empty-icon-wrap">
+        <ion-icon [name]="activeFilter === 'cancelled' ? 'close-circle-outline' : activeFilter === 'delivered' ? 'checkmark-done-circle-outline' : 'receipt-outline'" class="empty-icon"></ion-icon>
+      </div>
+      <h2 class="empty-title">{{ getEmptyStateText() }}</h2>
+      <p class="empty-subtitle">{{ getEmptyStateSubtext() }}</p>
+      <button class="empty-browse-btn" *ngIf="activeFilter === 'all' || activeFilter === 'active'" (click)="goHome()">Browse Restaurants</button>
     </div>
 
   </ng-container>

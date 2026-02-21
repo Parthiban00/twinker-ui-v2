@@ -29,6 +29,7 @@ export class PopularVendorsPage {
   activeFilters: string[] = [];
 
   localityId = '';
+  vertical: 'eats' | 'mart' = 'eats';
   defaultAddress: any = null;
   imgBaseUrl = environment.imageBaseUrl;
 
@@ -57,10 +58,14 @@ export class PopularVendorsPage {
   }
 
   ionViewWillEnter() {
-    this.route.queryParams.subscribe(params => {
-      this.localityId = params['localityId'] || '';
-      this.fetchDefaultAddress();
-    });
+    const params = this.route.snapshot.queryParamMap;
+    this.localityId = params.get('localityId') || '';
+    const routeVertical = params.get('vertical');
+    this.vertical = (routeVertical === 'mart' || routeVertical === 'eats')
+      ? routeVertical
+      : this.storageService.getActiveVertical();
+    this.storageService.saveActiveVertical(this.vertical);
+    this.fetchDefaultAddress();
   }
 
   fetchDefaultAddress() {
@@ -92,7 +97,8 @@ export class PopularVendorsPage {
 
     const params: any = {
       page: this.currentPage,
-      limit: 20
+      limit: 20,
+      vertical: this.vertical,
     };
     if (this.searchTerm) params.search = this.searchTerm;
     if (this.activeCategory) params.category = this.activeCategory;
@@ -240,7 +246,7 @@ export class PopularVendorsPage {
     this.currentPage++;
     this.isLoadingMore = true;
 
-    const params: any = { page: this.currentPage, limit: 20 };
+    const params: any = { page: this.currentPage, limit: 20, vertical: this.vertical };
     if (this.searchTerm) params.search = this.searchTerm;
     if (this.activeCategory) params.category = this.activeCategory;
     if (this.activeSort) params.sort = this.activeSort;
@@ -271,6 +277,35 @@ export class PopularVendorsPage {
   }
 
   navigateToVendor(vendor: any) {
-    this.router.navigate(['/items'], { queryParams: { vendorId: vendor._id } });
+    this.router.navigate(['/items'], {
+      queryParams: {
+        vendorId: vendor._id,
+        vertical: this.vertical
+      }
+    });
+  }
+
+  isVendorOpen(vendor: any): boolean {
+    if (!vendor?.openAt || !vendor?.closeAt) return true;
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    return current >= vendor.openAt && current <= vendor.closeAt;
+  }
+
+  getNextOpenTime(vendor: any): string {
+    if (!vendor?.openAt) return '';
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    const [openH, openM] = vendor.openAt.split(':').map(Number);
+    const ampm = openH >= 12 ? 'PM' : 'AM';
+    const h12 = openH % 12 || 12;
+    const timeStr = `${h12}:${openM.toString().padStart(2, '0')} ${ampm}`;
+    return current < vendor.openAt ? `Opens at ${timeStr}` : `Opens tomorrow at ${timeStr}`;
   }
 }

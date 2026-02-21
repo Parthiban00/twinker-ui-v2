@@ -96,9 +96,29 @@ export class CartPage implements OnInit, OnDestroy {
   userAddress: any = null;
   private backButtonSub?: Subscription;
 
+  // Vertical
+  activeVertical: 'eats' | 'mart' = 'eats';
+
+  get eatsCartCount(): number {
+    return this.storageService.getEatsCart()
+      .reduce((s: number, i: any) => s + (i.itemCount || i.quantity || 1), 0);
+  }
+
+  get martCartCount(): number {
+    return this.storageService.getMartCart()
+      .reduce((s: number, i: any) => s + (i.itemCount || i.quantity || 1), 0);
+  }
+
+  get hasBothCarts(): boolean {
+    return this.eatsCartCount > 0 && this.martCartCount > 0;
+  }
+
   // Active order banner
   activeOrders: any[] = [];
   forcePlace: boolean = false;
+
+  // Debounce handle for fee/offer API calls on qty change
+  private refreshDebounce: any = null;
 
   get activeOrder(): any {
     return this.activeOrders[0] || null;
@@ -125,6 +145,7 @@ export class CartPage implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ionViewWillEnter() {
+    this.activeVertical = this.storageService.getActiveVertical();
     this.loadCart();
   }
 
@@ -149,14 +170,13 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   loadCart() {
-    const raw = localStorage.getItem('cart-items');
-    if (!raw) {
+    const rawItems: any[] = this.storageService.getCartByVertical(this.activeVertical);
+    if (!rawItems.length) {
       this.cartItems = [];
       this.vendorGroups = [];
       return;
     }
     try {
-      const rawItems: any[] = JSON.parse(raw) || [];
       // Normalize: flatten nested vendor object and standardize quantity field name
       this.cartItems = rawItems.map((item: any) => {
         const vendor = item.vendor || {};
@@ -164,13 +184,13 @@ export class CartPage implements OnInit, OnDestroy {
           ...item,
           itemCount: item.itemCount || item.quantity || 1,
           vendorId: item.vendorId || vendor._id || 'unknown',
-          vendorName: item.vendorName || vendor.businessName || vendor.name || 'Unknown Restaurant',
+          vendorName: item.vendorName || vendor.businessName || vendor.name || (this.activeVertical === 'mart' ? 'Unknown Store' : 'Unknown Restaurant'),
           vendorImage: item.vendorImage || vendor.imageUrl || '',
           vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
         };
       });
       // Persist the normalized form so future reads are already clean
-      localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
+      this.storageService.saveCartByVertical(this.activeVertical, this.cartItems);
     } catch (_) {
       this.cartItems = [];
     }
@@ -209,8 +229,8 @@ export class CartPage implements OnInit, OnDestroy {
 
     this.isLoadingOffers = true;
 
-    // Check for active orders (for banner)
-    this.orderService.getActiveOrder(user._id).subscribe({
+    // Check for active orders in the same vertical (for banner)
+    this.orderService.getActiveOrder(user._id, this.activeVertical).subscribe({
       next: (res: any) => {
         this.activeOrders = res?.data || [];
         this.cdr.detectChanges();
@@ -476,14 +496,19 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   private saveAndRefresh() {
-    localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
+    this.storageService.saveCartByVertical(this.activeVertical, this.cartItems);
     this.eventBus.emit('cart:updated', this.totalItems);
     this.buildVendorGroups();
-    // Re-fetch offers and fees (order amount may have changed)
-    if (this.localityId) {
-      this.fetchOffers();
-      this.calculateCartFees();
-    }
+    this.cdr.detectChanges();
+
+    // Debounce API calls (offers + fees) by 400ms to avoid hammering server on rapid taps
+    if (this.refreshDebounce) clearTimeout(this.refreshDebounce);
+    this.refreshDebounce = setTimeout(() => {
+      if (this.localityId) {
+        this.fetchOffers();
+        this.calculateCartFees();
+      }
+    }, 400);
   }
 
   calculateCartFees() {
@@ -507,15 +532,48 @@ export class CartPage implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res?.status && res?.data) {
           this.feeBreakdown = res.data;
+        } else if (!this.feeBreakdown) {
+          // Keep checkout unblocked even if live fee API returns empty payload.
+          this.feeBreakdown = this.createFallbackFeeBreakdown();
         }
         this.isLoadingFees = false;
         this.cdr.detectChanges();
       },
       error: () => {
+        if (!this.feeBreakdown) {
+          // Keep checkout unblocked even if live fee API fails.
+          this.feeBreakdown = this.createFallbackFeeBreakdown();
+        }
         this.isLoadingFees = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private createFallbackFeeBreakdown(): FeeBreakdown {
+    return {
+      delivery: {
+        fee: 0,
+        originalFee: 0,
+        freeDeliveryApplied: false,
+        freeDeliveryThreshold: 0,
+        baseDistanceKm: 0,
+        baseFee: 0,
+        perKmCharge: 0,
+        maxDistanceKm: 0,
+        storeCount: 0,
+        multiStoreSurchargePercent: 0,
+        vendorDistances: [],
+      },
+      platformFee: 0,
+      tax: {
+        amount: 0,
+        type: 'flat',
+        value: 0,
+        label: 'Tax',
+      },
+      totalFees: 0,
+    };
   }
 
   toggleFeeDetails() {
@@ -541,7 +599,12 @@ export class CartPage implements OnInit, OnDestroy {
 
   goToVendor(vendorId: string) {
     if (vendorId && vendorId !== 'unknown') {
-      this.router.navigate(['/items'], { queryParams: { vendorId } });
+      this.router.navigate(['/items'], {
+        queryParams: {
+          vendorId,
+          vertical: this.activeVertical
+        }
+      });
     }
   }
 
@@ -550,7 +613,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   clearCart() {
-    localStorage.removeItem('cart-items');
+    this.storageService.clearCartByVertical(this.activeVertical);
     this.cartItems = [];
     this.vendorGroups = [];
     this.appliedOffer = null;
@@ -560,8 +623,30 @@ export class CartPage implements OnInit, OnDestroy {
     this.eventBus.emit('cart:updated', 0);
   }
 
+  switchVertical(v: 'eats' | 'mart') {
+    if (this.activeVertical === v) return;
+    this.activeVertical = v;
+    this.storageService.saveActiveVertical(v);
+    this.eventBus.emit('vertical:changed', v);
+    // Reset all state for the new vertical
+    this.cartItems = [];
+    this.vendorGroups = [];
+    this.appliedOffer = null;
+    this.couponDiscount = 0;
+    this.feeBreakdown = null;
+    this.applicableOffers = [];
+    this.vendorAllOffers = {};
+    this.activeOrders = [];
+    this.forcePlace = false;
+    this.showOfferSheet = false;
+    this.couponCode = '';
+    this.cdr.detectChanges();
+    this.loadCart();
+  }
+
   browsRestaurants() {
-    this.router.navigate(['/home-land']);
+    this.storageService.saveActiveVertical(this.activeVertical);
+    this.router.navigate(['/tabs/home-main']);
   }
 
   goToDeals() {
@@ -581,6 +666,7 @@ export class CartPage implements OnInit, OnDestroy {
     const orderPayload = {
       userId: user._id,
       localityId: this.localityId,
+      vertical: this.activeVertical,
       vendorOrders: this.vendorGroups.map(group => ({
         vendor: group.vendorId,
         vendorName: group.vendorName,
@@ -665,7 +751,7 @@ export class CartPage implements OnInit, OnDestroy {
   private async openOrderStatus(orderCode: string = '') {
     const modal = await this.modalCtrl.create({
       component: OrderStatusComponent,
-      componentProps: { orderCode },
+      componentProps: { orderCode, vertical: this.activeVertical },
       cssClass: 'order-status-modal',
       backdropDismiss: false,
       showBackdrop: false

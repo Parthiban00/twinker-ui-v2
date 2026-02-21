@@ -13,6 +13,7 @@ import { CommonService } from 'src/app/services/common.service';
 })
 export class OrdersPage implements OnInit {
   userId: string = '';
+  activeVertical: 'eats' | 'mart' = 'eats';
   activeOrders: any[] = [];
   groupedOrders: { label: string; orders: any[] }[] = [];
   isLoading = true;
@@ -41,6 +42,7 @@ export class OrdersPage implements OnInit {
   ionViewWillEnter() {
     const user = this.storageService.getUser();
     this.userId = user?._id || '';
+    this.activeVertical = this.storageService.getActiveVertical();
 
     this.route.queryParams.subscribe(params => {
       this.highlightOrderId = params['highlight'] || '';
@@ -65,8 +67,10 @@ export class OrdersPage implements OnInit {
       next: (res: any) => {
         this.ngZone.run(() => {
           const allOrders: any[] = res?.data || [];
-          this.activeOrders = allOrders.filter(o => this.ACTIVE_STATUSES.includes(o.status));
-          const historyOrders = allOrders.filter(o => !this.ACTIVE_STATUSES.includes(o.status));
+          // Filter to only show orders matching the active vertical
+          const verticalOrders = allOrders.filter(o => (o.vertical || 'eats') === this.activeVertical);
+          this.activeOrders = verticalOrders.filter(o => this.ACTIVE_STATUSES.includes(o.status));
+          const historyOrders = verticalOrders.filter(o => !this.ACTIVE_STATUSES.includes(o.status));
           this.groupedOrders = this.groupByDate(historyOrders);
           this.isLoading = false;
           this.refreshEtaMap();
@@ -102,11 +106,12 @@ export class OrdersPage implements OnInit {
       next: (res: any) => {
         this.ngZone.run(() => {
           const allOrders: any[] = res?.data || [];
-          const newActive = allOrders.filter(o => this.ACTIVE_STATUSES.includes(o.status));
+          const verticalOrders = allOrders.filter(o => (o.vertical || 'eats') === this.activeVertical);
+          const newActive = verticalOrders.filter(o => this.ACTIVE_STATUSES.includes(o.status));
 
           // If an order moved out of active, reload everything
           if (newActive.length !== this.activeOrders.length) {
-            const historyOrders = allOrders.filter(o => !this.ACTIVE_STATUSES.includes(o.status));
+            const historyOrders = verticalOrders.filter(o => !this.ACTIVE_STATUSES.includes(o.status));
             this.groupedOrders = this.groupByDate(historyOrders);
           }
 
@@ -304,11 +309,14 @@ export class OrdersPage implements OnInit {
     const pctElapsed = Math.min(100, Math.max(2, Math.round((elapsed / (etaMins * 60000)) * 100)));
     const minsLeft = Math.max(0, Math.ceil((etaTime - now) / 60000));
 
+    const isMart = order.vertical === 'mart';
     let phaseLabel = '';
     if (order.status === 'placed') {
-      phaseLabel = 'Waiting for restaurant';
+      phaseLabel = isMart ? 'Waiting for store to accept' : 'Waiting for restaurant';
     } else if (order.status === 'confirmed') {
-      phaseLabel = minsLeft > 15 ? 'Preparing your order' : 'Getting ready for pickup';
+      phaseLabel = isMart
+        ? (minsLeft > 15 ? 'Packing your order' : 'Almost packed')
+        : (minsLeft > 15 ? 'Preparing your order' : 'Getting ready for pickup');
     } else if (order.status === 'out_for_delivery') {
       phaseLabel = 'On the way to you';
     }
@@ -328,5 +336,57 @@ export class OrdersPage implements OnInit {
 
   goHome() {
     this.router.navigate(['/tabs/home-main']);
+  }
+
+  reorder(order: any) {
+    if (!order?.vendorOrders?.length) return;
+    const vertical: 'eats' | 'mart' = order.vertical || 'eats';
+    const cartItems: any[] = [];
+
+    for (const vo of order.vendorOrders) {
+      if (vo.status === 'cancelled') continue;
+      for (const item of (vo.items || [])) {
+        cartItems.push({
+          _id: item.product?._id || item.product,
+          productName: item.productName,
+          price: item.price,
+          actualPrice: item.actualPrice || item.price,
+          itemCount: item.quantity || 1,
+          vendorId: vo.vendor?._id || vo.vendor,
+          vendorName: vo.vendorName,
+          vendorImage: '',
+        });
+      }
+    }
+
+    if (cartItems.length === 0) {
+      this.commonService.presentToast('bottom', 'Nothing to reorder', 'danger');
+      return;
+    }
+
+    this.storageService.saveCartByVertical(vertical, cartItems);
+    this.storageService.saveActiveVertical(vertical);
+    this.commonService.presentToast('bottom', `${cartItems.length} item${cartItems.length > 1 ? 's' : ''} added to cart`, 'success');
+    this.router.navigate(['/tabs/cart']);
+  }
+
+  getVerticalLabel(order: any): string {
+    return order?.vertical === 'mart' ? 'Mart' : 'Eats';
+  }
+
+  getVerticalIcon(order: any): string {
+    return order?.vertical === 'mart' ? 'bag-handle-outline' : 'restaurant-outline';
+  }
+
+  getEmptyStateText(): string {
+    if (this.activeFilter === 'delivered') return 'No delivered orders yet';
+    if (this.activeFilter === 'cancelled') return 'No cancelled orders';
+    return 'No orders yet';
+  }
+
+  getEmptyStateSubtext(): string {
+    if (this.activeFilter === 'delivered') return 'Your completed orders will appear here';
+    if (this.activeFilter === 'cancelled') return 'Cancelled orders will show up here';
+    return 'Your order history will appear here.\nStart by browsing restaurants!';
   }
 }

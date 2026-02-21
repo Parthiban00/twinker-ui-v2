@@ -31,11 +31,11 @@ export class HomeMainService {
     return this.webservice.post('locality/checkServiceArea', coords);
   }
 
-  getDashboard(localityId: string): Observable<any> {
-    return this.webservice.get(`home/dashboard/${localityId}`);
+  getDashboard(localityId: string, vertical: 'eats' | 'mart' = 'eats'): Observable<any> {
+    return this.webservice.get(`home/dashboard/${localityId}?vertical=${vertical}`);
   }
 
-  getCategoryLanding(localityId: string, categoryId: string): Observable<any> {
-    return this.webservice.get(`home/category-landing/${localityId}/${categoryId}`);
+  getCategoryLanding(localityId: string, categoryId: string, vertical: 'eats' | 'mart' = 'eats'): Observable<any> {
+    return this.webservice.get(`home/category-landing/${localityId}/${categoryId}?vertical=${vertical}`);
   }
 }

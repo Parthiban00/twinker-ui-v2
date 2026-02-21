@@ -47,4 +47,13 @@ export class ProfilePage {
   goToVendorOrders() {
     this.router.navigate(['/vendor-orders']);
   }
+
+  goToOrders() {
+    this.router.navigate(['/tabs/orders']);
+  }
+
+  logout() {
+    this.storageService.clean();
+    this.router.navigate(['/'], { replaceUrl: true });
+  }
 }

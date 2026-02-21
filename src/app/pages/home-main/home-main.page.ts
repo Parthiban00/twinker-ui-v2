@@ -48,9 +48,24 @@ export class HomeMainPage implements OnInit, OnDestroy {
   cartTotal = 0;
   cartItemCount = 0;
 
+  // Vertical
+  activeVertical: 'eats' | 'mart' = 'eats';
+
   // Feature flags
   showWallet = false;
-  showBuddy = true;
+  showBuddy = false;
+
+  // Category gradient palette (cycles by index)
+  private categoryGradients = [
+    'linear-gradient(135deg, #FF6B6B, #FF8E53)',
+    'linear-gradient(135deg, #FFA726, #EF6C00)',
+    'linear-gradient(135deg, #AB47BC, #6A1B9A)',
+    'linear-gradient(135deg, #EC407A, #C2185B)',
+    'linear-gradient(135deg, #26C6DA, #0097A7)',
+    'linear-gradient(135deg, #66BB6A, #2E7D32)',
+    'linear-gradient(135deg, #42A5F5, #1565C0)',
+    'linear-gradient(135deg, #5C6BC0, #283593)',
+  ];
 
   constructor(
     public router: Router,
@@ -76,6 +91,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
 
   ionViewWillEnter() {
     this.setGreeting();
+    this.activeVertical = this.storageService.getActiveVertical();
     this.loadCart();
     const token = this.storageService.getToken();
     if (!token) {
@@ -94,6 +110,15 @@ export class HomeMainPage implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/login'], { replaceUrl: true });
     }
+  }
+
+  switchVertical(v: 'eats' | 'mart') {
+    if (this.activeVertical === v) return;
+    this.activeVertical = v;
+    this.storageService.saveActiveVertical(v);
+    this.eventBus.emit('vertical:changed', v);
+    this.loadCart();
+    this.loadDashboard();
   }
 
   ngOnDestroy() {
@@ -120,16 +145,13 @@ export class HomeMainPage implements OnInit, OnDestroy {
   }
 
   loadCart() {
-    const cartItems = this.storageService.getItem('cart-items');
-    if (cartItems && cartItems.length > 0) {
-      this.cartItems = cartItems;
-      this.cartItemCount = cartItems.reduce((sum: number, item: any) => sum + (item.itemCount || item.quantity || 1), 0);
-      this.cartTotal = cartItems.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.itemCount || item.quantity || 1)), 0);
-    } else {
-      this.cartItems = [];
-      this.cartItemCount = 0;
-      this.cartTotal = 0;
-    }
+    // Show combined cart count across both verticals in the bar; but navigate to cart with active vertical
+    const eatsCart = this.storageService.getEatsCart();
+    const martCart = this.storageService.getMartCart();
+    const activeCart = this.activeVertical === 'mart' ? martCart : eatsCart;
+    this.cartItems = activeCart;
+    this.cartItemCount = activeCart.reduce((sum: number, item: any) => sum + (item.itemCount || item.quantity || 1), 0);
+    this.cartTotal = activeCart.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.itemCount || item.quantity || 1)), 0);
   }
 
   navigateToCart() {
@@ -141,7 +163,8 @@ export class HomeMainPage implements OnInit, OnDestroy {
       queryParams: {
         title: category.categoryName,
         localityId: this.defaultAddress?.locality?._id,
-        categoryId: category._id
+        categoryId: category._id,
+        vertical: this.activeVertical,
       }
     });
   }
@@ -150,34 +173,41 @@ export class HomeMainPage implements OnInit, OnDestroy {
     this.router.navigate(['/search'], {
       queryParams: {
         localityId: this.defaultAddress?.locality?._id || '',
-        q: cuisine.name
+        q: cuisine.name,
+        vertical: this.activeVertical,
       }
     });
   }
 
   navigateRestaurant(vendor: any) {
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: vendor._id || '' }
+      queryParams: {
+        vendorId: vendor._id || '',
+        vertical: this.activeVertical
+      }
     });
   }
 
   navigatePopularItem(item: any) {
     if (item.vendor?._id) {
       this.router.navigate(['/items'], {
-        queryParams: { vendorId: item.vendor._id }
+        queryParams: {
+          vendorId: item.vendor._id,
+          vertical: this.activeVertical
+        }
       });
     }
   }
 
   navigateToPopularItems() {
     this.router.navigate(['/popular-items'], {
-      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '', vertical: this.activeVertical }
     });
   }
 
   navigateToPopularVendors() {
     this.router.navigate(['/popular-vendors'], {
-      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '', vertical: this.activeVertical }
     });
   }
 
@@ -189,17 +219,18 @@ export class HomeMainPage implements OnInit, OnDestroy {
       queryParams: {
         title,
         localityId: this.defaultAddress?.locality?._id,
-        categoryId: cat?._id || ''
+        categoryId: cat?._id || '',
+        vertical: this.activeVertical
       }
     });
   }
 
   addToCart(item: any) {
-    const cartItems = this.storageService.getItem('cart-items') || [];
+    const cartItems = this.storageService.getCartByVertical(this.activeVertical);
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId));
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -215,9 +246,10 @@ export class HomeMainPage implements OnInit, OnDestroy {
         vendorName: item.vendorName || vendor.businessName || vendor.name || '',
         vendorImage: item.vendorImage || vendor.imageUrl || '',
         vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+        vertical: this.activeVertical,
       });
     }
-    this.storageService.setItem('cart-items', cartItems);
+    this.storageService.saveCartByVertical(this.activeVertical, cartItems);
     const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
     this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
@@ -226,12 +258,10 @@ export class HomeMainPage implements OnInit, OnDestroy {
 
   getDiscountLabel(deal: any): string {
     if (!deal.discount) return '';
-    if (deal.discountType === 'in-percentage') {
-      return `${deal.discount}% OFF`;
-    } else if (deal.discountType === 'in-price') {
-      return `\u20B9${deal.discount} OFF`;
-    }
-    return '';
+    if (deal.discountType === 'in-percentage') return `${deal.discount}% OFF`;
+    if (deal.discountType === 'in-price') return `₹${deal.discount} OFF`;
+    // Fallback: discount exists but type unrecognised — assume percentage
+    return `${deal.discount}% OFF`;
   }
 
   getRatingStars(rating: number): number[] {
@@ -283,7 +313,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
     this.isLoading = true;
     const localityId = this.defaultAddress.locality._id;
 
-    this.homeService.getDashboard(localityId).subscribe({
+    this.homeService.getDashboard(localityId, this.activeVertical).subscribe({
       next: (resdata: any) => {
         if (resdata.status && resdata.data) {
           this.categories = resdata.data.categories || [];
@@ -326,7 +356,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
 
   navigateToSearch() {
     this.router.navigate(['/search'], {
-      queryParams: { localityId: this.defaultAddress?.locality?._id || '' }
+      queryParams: { localityId: this.defaultAddress?.locality?._id || '', vertical: this.activeVertical }
     });
   }
 
@@ -405,7 +435,48 @@ export class HomeMainPage implements OnInit, OnDestroy {
 
   navigateFlashDeal(deal: any) {
     if (deal.vendor?._id) {
-      this.router.navigate(['/items'], { queryParams: { vendorId: deal.vendor._id } });
+      this.router.navigate(['/items'], {
+        queryParams: {
+          vendorId: deal.vendor._id,
+          vertical: this.activeVertical
+        }
+      });
     }
+  }
+
+  getCategoryGradient(index: number): string {
+    return this.categoryGradients[index % this.categoryGradients.length];
+  }
+
+  getCategoryImageUrl(cat: any): string {
+    if (!cat?.imageUrl) return '';
+    if (cat.imageUrl.startsWith('http')) return cat.imageUrl;
+    return this.imgBaseUrl + cat.imageUrl;
+  }
+
+  isVendorOpen(vendor: any): boolean {
+    if (!vendor?.openAt || !vendor?.closeAt) return true;
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+
+    console.log(`Checking open status for ${vendor.name}: current time ${current}, openAt ${vendor.openAt}, closeAt ${vendor.closeAt}`);
+    return current >= vendor.openAt && current <= vendor.closeAt;
+  }
+
+  getNextOpenTime(vendor: any): string {
+    if (!vendor?.openAt) return '';
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    const [openH, openM] = vendor.openAt.split(':').map(Number);
+    const ampm = openH >= 12 ? 'PM' : 'AM';
+    const h12 = openH % 12 || 12;
+    const timeStr = `${h12}:${openM.toString().padStart(2, '0')} ${ampm}`;
+    return current < vendor.openAt ? `Opens at ${timeStr}` : `Opens tomorrow at ${timeStr}`;
   }
 }

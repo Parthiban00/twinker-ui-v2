@@ -139,11 +139,12 @@ export class CategoryListPage implements OnInit, OnDestroy {
   }
 
   addToCart(item: any) {
-    const cartItems = this.storageService.getItem('cart-items') || [];
+    const vertical = this.storageService.getActiveVertical();
+    const cartItems = this.storageService.getCartByVertical(vertical);
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId));
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -159,10 +160,11 @@ export class CategoryListPage implements OnInit, OnDestroy {
         vendorName: item.vendorName || vendor.businessName || vendor.name || '',
         vendorImage: item.vendorImage || vendor.imageUrl || '',
         vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+        vertical,
       });
     }
 
-    this.storageService.setItem('cart-items', cartItems);
+    this.storageService.saveCartByVertical(vertical, cartItems);
     const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
     this.eventBus.emit('cart:updated', totalCount);
     this.commonService.presentToast('bottom', `${item.productName || item.name || 'Item'} added to cart`, 'success');

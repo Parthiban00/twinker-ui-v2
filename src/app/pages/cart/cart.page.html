@@ -13,19 +13,71 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+
+  <!-- Vertical Switcher Tabs -->
+  <div class="cart-vertical-tabs">
+    <button class="cv-tab"
+            [class.cv-active-eats]="activeVertical === 'eats'"
+            (click)="switchVertical('eats')">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <span>Eats</span>
+      <span class="cv-badge cv-badge-eats" *ngIf="eatsCartCount > 0">{{ eatsCartCount }}</span>
+    </button>
+    <button class="cv-tab"
+            [class.cv-active-mart]="activeVertical === 'mart'"
+            (click)="switchVertical('mart')">
+      <ion-icon name="bag-handle-outline"></ion-icon>
+      <span>Mart</span>
+      <span class="cv-badge cv-badge-mart" *ngIf="martCartCount > 0">{{ martCartCount }}</span>
+    </button>
+  </div>
 </ion-header>
 
 <ion-content [fullscreen]="true">
 
   <!-- Empty State -->
   <div class="empty-state" *ngIf="isCartEmpty">
-    <ion-icon name="cart-outline" class="empty-icon"></ion-icon>
-    <h2 class="empty-title">Your cart is empty</h2>
-    <p class="empty-subtitle">Add items from a restaurant to start your order</p>
-    <button class="browse-btn" (click)="browsRestaurants()">Browse Restaurants</button>
+    <ion-icon [name]="activeVertical === 'mart' ? 'bag-handle-outline' : 'cart-outline'" class="empty-icon"
+              [class.empty-icon-mart]="activeVertical === 'mart'"></ion-icon>
+    <h2 class="empty-title">
+      {{ activeVertical === 'mart' ? 'Your Mart cart is empty' : 'Your Eats cart is empty' }}
+    </h2>
+    <p class="empty-subtitle">
+      {{ activeVertical === 'mart'
+        ? 'Add groceries, medicines or essentials to get started'
+        : 'Add items from restaurants to start your order' }}
+    </p>
+    <button class="browse-btn" [class.browse-btn-mart]="activeVertical === 'mart'" (click)="browsRestaurants()">
+      {{ activeVertical === 'mart' ? 'Browse Stores' : 'Browse Restaurants' }}
+    </button>
+    <!-- Nudge: if other vertical has items -->
+    <div class="empty-other-vertical" *ngIf="activeVertical === 'eats' && martCartCount > 0" (click)="switchVertical('mart')">
+      <ion-icon name="bag-handle-outline"></ion-icon>
+      <span>You have {{ martCartCount }} item{{ martCartCount > 1 ? 's' : '' }} in your Mart cart</span>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+    <div class="empty-other-vertical" *ngIf="activeVertical === 'mart' && eatsCartCount > 0" (click)="switchVertical('eats')">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <span>You have {{ eatsCartCount }} item{{ eatsCartCount > 1 ? 's' : '' }} in your Eats cart</span>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
   </div>
 
   <div class="cart-content" *ngIf="!isCartEmpty">
+
+    <!-- Vertical context banner (shown only when both carts have items) -->
+    <div class="vertical-context-banner" *ngIf="hasBothCarts">
+      <ion-icon [name]="activeVertical === 'mart' ? 'bag-handle-outline' : 'restaurant-outline'"></ion-icon>
+      <span>
+        Ordering from <strong>{{ activeVertical === 'mart' ? 'Twinker Mart' : 'Twinker Eats' }}</strong>
+        &nbsp;·&nbsp;
+        <ng-container *ngIf="activeVertical === 'mart'">{{ eatsCartCount }} item{{ eatsCartCount > 1 ? 's' : '' }} waiting in Eats</ng-container>
+        <ng-container *ngIf="activeVertical === 'eats'">{{ martCartCount }} item{{ martCartCount > 1 ? 's' : '' }} waiting in Mart</ng-container>
+      </span>
+      <button class="vcb-switch-btn" (click)="switchVertical(activeVertical === 'mart' ? 'eats' : 'mart')">
+        Switch
+      </button>
+    </div>
 
     <!-- Delivery Location -->
     <div class="section-block">
@@ -303,7 +355,7 @@
       <div class="summary-row vendor-savings-row" *ngIf="vendorDiscountTotal > 0">
         <div class="vendor-savings-label">
           <ion-icon name="storefront-outline" class="vendor-savings-icon"></ion-icon>
-          <span>Restaurant offers</span>
+          <span>{{ activeVertical === 'mart' ? 'Store offers' : 'Restaurant offers' }}</span>
         </div>
         <span class="coupon-discount-amount">-&#8377;{{ vendorDiscountTotal.toFixed(2) }}</span>
       </div>

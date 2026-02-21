@@ -16,14 +16,14 @@ export class SearchService {
 
   constructor(private webService: WebService) {}
 
-  searchAll(query: string, localityId: string): Observable<SearchResults> {
+  searchAll(query: string, localityId: string, vertical: 'eats' | 'mart' = 'eats'): Observable<SearchResults> {
     if (!query || !query.trim() || !localityId) {
       return of({ vendors: [], products: [], categories: [] });
     }
 
     const trimmed = encodeURIComponent(query.trim());
 
-    return this.webService.get(`home/search/${localityId}?q=${trimmed}`).pipe(
+    return this.webService.get(`home/search/${localityId}?q=${trimmed}&vertical=${vertical}`).pipe(
       map((res: any) => {
         if (res.status && res.data) {
           return {

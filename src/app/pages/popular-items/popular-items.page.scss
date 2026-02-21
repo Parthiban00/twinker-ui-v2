@@ -206,6 +206,16 @@ ion-content {
     }
   }
 
+  .item-placeholder {
+    background: linear-gradient(135deg, #FFF0EC, #FFE4DE);
+  }
+
+  .placeholder-emoji {
+    font-size: 40px;
+    line-height: 1;
+    user-select: none;
+  }
+
   .discount-badge {
     position: absolute;
     top: 8px;

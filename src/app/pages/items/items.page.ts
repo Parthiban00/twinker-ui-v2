@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, ModalController, NavController, PopoverController } from '@ionic/angular';
+import { AlertController, IonContent, ModalController, NavController, PopoverController } from '@ionic/angular';
 import { CommonService } from 'src/app/services/common.service';
 import { EventBusService } from 'src/app/services/event-bus.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -46,6 +46,9 @@ export class ItemsPage implements OnInit {
 
   // Cart
   cartItems: any[] = [];
+
+  // Vertical
+  vertical: 'eats' | 'mart' = 'eats';
 
   // Offers
   vendorOffers: any[] = [];
@@ -168,10 +171,13 @@ export class ItemsPage implements OnInit {
     private eventBus: EventBusService,
     private activatedRoute: ActivatedRoute,
     private itemService: ItemsService,
-    private dealsService: DealsService
+    private dealsService: DealsService,
+    private alertCtrl: AlertController,
   ) {}
 
   ngOnInit() {
+    // Set vertical before loading cart so we read from the correct key
+    this.vertical = this.storageService.getActiveVertical();
     this.initDummyPopularItems();
     this.updateDisplayData();
     this.loadCartFromStorage();
@@ -179,16 +185,23 @@ export class ItemsPage implements OnInit {
 
   ionViewWillEnter() {
     this.userData = this.storageService.getUser();
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.vendorId = params['vendorId'];
-      if (this.vendorId) {
-        this.getAllProductsByVendor(this.vendorId);
-        this.getDiscountedItemsByVendor(this.vendorId);
-        this.getVendorDetails(this.vendorId);
-        this.getReviewsByVendor(this.vendorId);
-        this.loadVendorOffers();
-      }
-    });
+    this.vertical = this.storageService.getActiveVertical();
+    const params = this.activatedRoute.snapshot.queryParamMap;
+    this.vendorId = params.get('vendorId') || '';
+    const verticalParam = params.get('vertical');
+    if (verticalParam === 'eats' || verticalParam === 'mart') {
+      this.vertical = verticalParam;
+    }
+    this.storageService.saveActiveVertical(this.vertical);
+    this.loadCartFromStorage();
+
+    if (this.vendorId) {
+      this.getAllProductsByVendor(this.vendorId);
+      this.getDiscountedItemsByVendor(this.vendorId);
+      this.getVendorDetails(this.vendorId);
+      this.getReviewsByVendor(this.vendorId);
+      this.loadVendorOffers();
+    }
   }
 
   async ionViewDidEnter() {
@@ -266,7 +279,7 @@ export class ItemsPage implements OnInit {
     const allProducts = this.dummyProducts
       .filter((p: any) => p.category._id !== 'popular')
       .flatMap((p: any) => p.products);
-    const popular = allProducts.filter((p: any) => p.tag === 'popular');
+    const popular = allProducts.filter((p: any) => p.tag && p.tag !== 'none');
     this.dummyProducts[0].products = popular.length ? popular : allProducts.slice(0, 4);
   }
 
@@ -278,12 +291,25 @@ export class ItemsPage implements OnInit {
       this.selectedCategory = this.categoryTabs[0].id;
     }
     const allProducts = products.flatMap((p: any) => p.products);
+    // Filter items that have any tag (Recommended, Trending, Best Selling, Featured)
     this.mostPopularItems = allProducts
-      .filter((p: any) => p.tag === 'popular' || p.tag === 'bestseller')
+      .filter((p: any) => p.tag && p.tag !== 'none')
       .slice(0, 6);
     if (!this.mostPopularItems.length) {
       this.mostPopularItems = allProducts.slice(0, 6);
     }
+  }
+
+  // Maps product tag enum values to clean display labels
+  readonly TAG_LABELS: Record<string, string> = {
+    'Recommended': 'Recommended',
+    'Trending': 'Trending',
+    'Best Selling': 'Best Seller',
+    'Featured': 'Featured',
+  };
+
+  getTagLabel(tag: string): string {
+    return this.TAG_LABELS[tag] || tag;
   }
 
   get displayVendor(): any {
@@ -321,12 +347,50 @@ export class ItemsPage implements OnInit {
   }
 
   addItem(product: any) {
+    // For Eats: if cart has items from a different restaurant, prompt to clear
+    if (this.vertical === 'eats') {
+      const cart = this.storageService.getEatsCart();
+      const otherVendorItems = cart.filter(c => c.vendorId && c.vendorId !== this.vendorId);
+      if (otherVendorItems.length > 0) {
+        this.showSwitchRestaurantAlert(product);
+        return;
+      }
+    }
+    this.doAddItem(product);
+  }
+
+  private doAddItem(product: any) {
     if (this.isCustomizable(product)) {
       this.openModal(product);
     } else {
       product.itemCount = (product.itemCount || 0) + 1;
       this.syncCart();
     }
+  }
+
+  private async showSwitchRestaurantAlert(product: any) {
+    const currentCart = this.storageService.getEatsCart();
+    const otherVendorName = currentCart.find(c => c.vendorId !== this.vendorId)?.vendorName || 'another restaurant';
+    const alert = await this.alertCtrl.create({
+      header: 'Switch Restaurant?',
+      message: `Your cart has items from <strong>${otherVendorName}</strong>. Starting a new cart will remove those items.`,
+      buttons: [
+        { text: 'Keep', role: 'cancel' },
+        {
+          text: 'Start Fresh',
+          role: 'destructive',
+          handler: () => {
+            // Clear only other-vendor items; keep current vendor items
+            const thisVendorItems = currentCart.filter(c => c.vendorId === this.vendorId);
+            this.storageService.saveEatsCart(thisVendorItems);
+            // Sync cartItems array
+            this.cartItems = this.cartItems.filter(c => c.vendorId === this.vendorId);
+            this.doAddItem(product);
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   removeItem(product: any) {
@@ -369,9 +433,18 @@ export class ItemsPage implements OnInit {
       }
       return false;
     });
-    // Keep customized entries and other-vendor items
-    const customizedItems = this.cartItems.filter(c => c.cartItemId);
-    const otherVendorItems = this.cartItems.filter(c => !c.cartItemId && c.vendorId && c.vendorId !== this.vendorId);
+    // Keep customized entries
+    const customizedItems = this.cartItems.filter((c: any) => c.cartItemId);
+    // For Mart: read other-vendor items directly from storage to avoid stale in-memory state.
+    // For Eats: single-vendor only — other-vendor items are cleared via the switch-restaurant alert.
+    let otherVendorItems: any[] = [];
+    if (this.vertical === 'mart') {
+      const currentProductIds = new Set(allProducts.map((p: any) => p._id));
+      const savedMart = this.storageService.getCartByVertical('mart');
+      otherVendorItems = savedMart.filter(
+        (c: any) => !c.cartItemId && c.vendorId !== this.vendorId && !currentProductIds.has(c._id)
+      );
+    }
     this.cartItems = [...simpleItems, ...customizedItems, ...otherVendorItems];
     this.saveCartToStorage();
   }
@@ -405,17 +478,18 @@ export class ItemsPage implements OnInit {
       vendorId: p.vendorId || this.vendorId,
       vendorName: p.vendorName || vendor.name,
       vendorImage: p.vendorImage || vendor.profileImgUrl || vendor.dummyImg,
-      vendorCuisine: p.vendorCuisine || vendor.cuisine || vendor.slogan
+      vendorCuisine: p.vendorCuisine || vendor.cuisine || vendor.slogan,
+      vertical: this.vertical,
     }));
-    localStorage.setItem('cart-items', JSON.stringify(data));
+    this.storageService.saveCartByVertical(this.vertical, data);
     this.eventBus.emit('cart:updated', data.length);
   }
 
   loadCartFromStorage() {
-    const raw = localStorage.getItem('cart-items');
-    if (!raw) return;
+    this.resetLocalCartState();
+    const saved: any[] = this.storageService.getCartByVertical(this.vertical);
+    if (!saved.length) return;
     try {
-      const saved: any[] = JSON.parse(raw);
       const allProducts = this.displayProducts.flatMap((s: any) => s.products);
       const currentProductIds = new Set(allProducts.map((p: any) => p._id));
 
@@ -445,6 +519,14 @@ export class ItemsPage implements OnInit {
 
       this.cartItems = [...simpleItems, ...customizedItems, ...otherVendorItems];
     } catch (_) {}
+  }
+
+  private resetLocalCartState() {
+    this.cartItems = [];
+    const allProducts = this.displayProducts.flatMap((s: any) => s.products);
+    allProducts.forEach((p: any) => {
+      p.itemCount = 0;
+    });
   }
 
   onToggleChange(event: any) {
@@ -483,7 +565,11 @@ export class ItemsPage implements OnInit {
   // --- API Methods ---
 
   getAllProductsByVendor(vendorId: string) {
-    const queryParams = this.vegOnly ? '?vegOnly=true' : '' + this.searchTerm ? `?search=${this.searchTerm}` : '';
+    const queryParts: string[] = [];
+    if (this.vegOnly) queryParts.push('vegOnly=true');
+    const trimmedSearch = this.searchTerm?.trim();
+    if (trimmedSearch) queryParts.push(`search=${encodeURIComponent(trimmedSearch)}`);
+    const queryParams = queryParts.length ? `?${queryParts.join('&')}` : '';
     this.itemService.getAllProductsByVendor(vendorId, queryParams).subscribe({
       next: (resdata: any) => {
         if (resdata.status) {
@@ -635,7 +721,8 @@ export class ItemsPage implements OnInit {
       vendorId: this.vendorId,
       vendorName: vendor.name,
       vendorImage: vendor.profileImgUrl || vendor.dummyImg,
-      vendorCuisine: vendor.cuisine || vendor.slogan
+      vendorCuisine: vendor.cuisine || vendor.slogan,
+      vertical: this.vertical,
     };
     this.cartItems.push(cartEntry);
     this.saveCartToStorage();
@@ -718,12 +805,10 @@ export class ItemsPage implements OnInit {
 
   getDiscountLabel(item: any): string {
     if (!item.discount) return '';
-    if (item.discountType === 'in-percentage') {
-      return `${item.discount}% OFF`;
-    } else if (item.discountType === 'in-price') {
-      return `\u20B9${item.discount} OFF`;
-    }
-    return '';
+    if (item.discountType === 'in-percentage') return `${item.discount}% OFF`;
+    if (item.discountType === 'in-price') return `₹${item.discount} OFF`;
+    // Fallback: if discount exists but type is unrecognised, assume percentage
+    return `${item.discount}% OFF`;
   }
 
   goToCart() {

@@ -33,7 +33,7 @@
       <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
     </div>
 
-    <div class="menu-item">
+    <div class="menu-item" (click)="goToOrders()">
       <div class="menu-icon-wrap">
         <ion-icon name="receipt-outline"></ion-icon>
       </div>
@@ -42,7 +42,7 @@
     </div>
 
     <div class="menu-item">
-      <div class="menu-icon-wrap">
+      <div class="menu-icon-wrap help-icon-wrap">
         <ion-icon name="help-circle-outline"></ion-icon>
       </div>
       <span class="menu-label">Help & Support</span>
@@ -50,14 +50,20 @@
     </div>
 
     <div class="menu-item">
-      <div class="menu-icon-wrap">
+      <div class="menu-icon-wrap info-icon-wrap">
         <ion-icon name="information-circle-outline"></ion-icon>
       </div>
-      <span class="menu-label">About</span>
+      <span class="menu-label">About Twinker</span>
       <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
     </div>
 
   </div>
+
+  <!-- Logout button -->
+  <button class="logout-btn" (click)="logout()">
+    <ion-icon name="log-out-outline"></ion-icon>
+    Log out
+  </button>
 
   <p class="app-version">Twinker v1.0.0</p>
 

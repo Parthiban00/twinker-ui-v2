@@ -64,7 +64,13 @@
     <!-- Customer row -->
     <div class="customer-row">
       <div class="customer-info">
-        <div class="customer-name">{{ order.userId?.fullName || 'Customer' }}</div>
+        <div class="customer-name">
+          {{ order.userId?.fullName || 'Customer' }}
+          <span class="vertical-tag" [class.mart-tag]="getOrderVertical(order) === 'mart'">
+            <ion-icon [name]="getVerticalIcon(order)"></ion-icon>
+            {{ getOrderVertical(order) === 'mart' ? 'Mart' : 'Eats' }}
+          </span>
+        </div>
         <div class="order-id-text">{{ order.orderId }}</div>
       </div>
       <button class="call-btn" (click)="callCustomer(order)" *ngIf="activeTab !== 'cancelled'">
@@ -102,7 +108,7 @@
       <!-- ACCEPTED tab -->
       <ng-container *ngIf="activeTab === 'accepted'">
         <button class="btn-decline" (click)="openCancelModal(order)">Cancel</button>
-        <button class="btn-ready" (click)="markReady(order)">Mark Ready</button>
+        <button class="btn-ready" (click)="markReady(order)">{{ getMarkReadyLabel(order) }}</button>
       </ng-container>
 
       <!-- READY tab -->
@@ -117,7 +123,7 @@
       <ng-container *ngIf="activeTab === 'pickedup'">
         <div class="status-pill done">
           <ion-icon name="checkmark-circle-outline"></ion-icon>
-          Picked Up
+          {{ getPickedUpLabel(order) }}
         </div>
       </ng-container>
 

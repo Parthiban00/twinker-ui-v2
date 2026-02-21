@@ -17,8 +17,9 @@ export class OrderService {
     return this.web.get(`order/user/${userId}`);
   }
 
-  getActiveOrder(userId: string): Observable<any> {
-    return this.web.get(`order/active/${userId}`);
+  getActiveOrder(userId: string, vertical?: 'eats' | 'mart'): Observable<any> {
+    const qs = vertical ? `?vertical=${vertical}` : '';
+    return this.web.get(`order/active/${userId}${qs}`);
   }
 
   getOrderById(orderId: string): Observable<any> {

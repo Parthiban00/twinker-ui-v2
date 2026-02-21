@@ -20,13 +20,107 @@ ion-toolbar {
   color: $text-primary;
 }
 
+// ── Vertical Switcher Tabs ────────────────────────────────────────────────
+.cart-vertical-tabs {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 16px;
+}
+
+.cv-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: #999;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s, border-color 0.2s;
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  &.cv-active-eats {
+    color: $primary;
+    border-bottom-color: $primary;
+    font-family: 'latoBold', sans-serif;
+  }
+
+  &.cv-active-mart {
+    color: #4A5BF5;
+    border-bottom-color: #4A5BF5;
+    font-family: 'latoBold', sans-serif;
+  }
+}
+
+.cv-badge {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  padding: 0 5px;
+  font-size: 10px;
+  font-family: 'latoBold', sans-serif;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.cv-badge-eats { background: $primary; }
+  &.cv-badge-mart { background: #4A5BF5; }
+}
+
+// ── Vertical Context Banner ───────────────────────────────────────────────
+.vertical-context-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 12px;
+  margin: 8px 16px 0;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: #555;
+
+  ion-icon {
+    font-size: 16px;
+    color: $primary;
+    flex-shrink: 0;
+  }
+
+  span { flex: 1; }
+
+  .vcb-switch-btn {
+    background: none;
+    border: 1px solid $primary;
+    color: $primary;
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+
 // Empty State
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 32px;
+  padding: 60px 32px 40px;
   text-align: center;
 
   .empty-icon {
@@ -49,6 +143,8 @@ ion-toolbar {
     margin: 0 0 28px;
   }
 
+  .empty-icon-mart { color: #4A5BF5; }
+
   .browse-btn {
     background: linear-gradient(135deg, $primary, $secondary);
     color: #fff;
@@ -58,7 +154,29 @@ ion-toolbar {
     border-radius: 30px;
     padding: 12px 36px;
     cursor: pointer;
+
+    &.browse-btn-mart {
+      background: linear-gradient(135deg, #4A5BF5, #6B7BFF);
+    }
   }
+}
+
+// nudge to switch vertical from empty state
+.empty-other-vertical {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: #555;
+
+  ion-icon { font-size: 16px; color: $primary; }
+  ion-icon:last-child { color: #bbb; margin-left: auto; }
 }
 
 // Cart Content

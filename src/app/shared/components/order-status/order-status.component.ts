@@ -2,6 +2,7 @@ import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { EventBusService } from 'src/app/services/event-bus.service';
+import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'app-order-status',
@@ -12,6 +13,7 @@ import { EventBusService } from 'src/app/services/event-bus.service';
 })
 export class OrderStatusComponent implements OnInit {
   @Input() orderCode: string = '';
+  @Input() vertical: 'eats' | 'mart' = 'eats';
 
   state: 'success' = 'success';
 
@@ -19,11 +21,12 @@ export class OrderStatusComponent implements OnInit {
     private modalCtrl: ModalController,
     private cdr: ChangeDetectorRef,
     private eventBus: EventBusService,
+    private storageService: StorageService,
   ) {}
 
   ngOnInit() {
-    // Order already placed by PaymentPage — clear cart immediately
-    localStorage.removeItem('cart-items');
+    // Order already placed by PaymentPage — clear the vertical's cart
+    this.storageService.clearCartByVertical(this.vertical);
     this.eventBus.emit('cart:updated', 0);
     this.cdr.detectChanges();
   }

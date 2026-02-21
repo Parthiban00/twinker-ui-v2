@@ -13,7 +13,6 @@ export class WebService {
   }
 
   get(uri: string) {
-    console.log(uri);
     return this.http.get(`${this.rootURL}/${uri}`);
   }
 

@@ -25,6 +25,7 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   isLoading = false;
   hasSearched = false;
   localityId = '';
+  vertical: 'eats' | 'mart' = 'eats';
   imgBaseUrl: string = environment.imageBaseUrl;
 
   recentSearches: string[] = [];
@@ -56,6 +57,11 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     this.localityId = this.route.snapshot.queryParamMap.get('localityId') || '';
+    const routeVertical = this.route.snapshot.queryParamMap.get('vertical');
+    this.vertical = (routeVertical === 'eats' || routeVertical === 'mart')
+      ? routeVertical
+      : this.storageService.getActiveVertical();
+    this.storageService.saveActiveVertical(this.vertical);
     const prefill = this.route.snapshot.queryParamMap.get('q') || '';
     this.loadRecentSearches();
     this.loadBrowseData();
@@ -87,11 +93,13 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   private loadBrowseData() {
     if (!this.localityId) return;
 
-    // Load categories
+    // Load categories — filter by active vertical (categories with no vertical field shown for both)
     this.homeMainService.getAllCategoriesByLocality(this.localityId).subscribe({
       next: (res: any) => {
         if (res.status && res.data) {
-          this.apiCategories = res.data;
+          this.apiCategories = res.data.filter(
+            (c: any) => !c.vertical || c.vertical === this.vertical
+          );
         }
         this.cdr.detectChanges();
       },
@@ -99,7 +107,7 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
     });
 
     // Load dashboard for cuisines + trending dishes
-    this.homeMainService.getDashboard(this.localityId).subscribe({
+    this.homeMainService.getDashboard(this.localityId, this.vertical).subscribe({
       next: (res: any) => {
         if (res.status && res.data) {
           this.apiCuisines = res.data.cuisines || [];
@@ -171,8 +179,10 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
         }
       }),
       switchMap(term => {
-        if (!term.trim()) return [];
-        return this.searchService.searchAll(term, this.localityId);
+        if (!term.trim()) {
+          return this.searchService.searchAll('', this.localityId, this.vertical);
+        }
+        return this.searchService.searchAll(term, this.localityId, this.vertical);
       })
     ).subscribe({
       next: (results: SearchResults) => {
@@ -374,7 +384,8 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
       queryParams: {
         categoryId: cat.categoryId || cat._id,
         localityId: this.localityId,
-        title: cat.name
+        title: cat.name,
+        vertical: this.vertical
       }
     });
   }
@@ -382,14 +393,20 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   navigateVendor(vendor: any) {
     this.saveRecentSearch(this.searchTerm);
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: vendor._id }
+      queryParams: {
+        vendorId: vendor._id,
+        vertical: this.vertical
+      }
     });
   }
 
   navigateProduct(product: any) {
     this.saveRecentSearch(this.searchTerm);
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: product.vendorId }
+      queryParams: {
+        vendorId: product.vendorId,
+        vertical: this.vertical
+      }
     });
   }
 
@@ -398,7 +415,8 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
       queryParams: {
         categoryId: cat._id,
         localityId: this.localityId,
-        title: cat.categoryName
+        title: cat.categoryName,
+        vertical: this.vertical
       }
     });
   }
@@ -413,7 +431,8 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
         categoryId: foodCat?._id || '',
         localityId: this.localityId,
         title: 'Food',
-        cuisineFilter: cuisine.name
+        cuisineFilter: cuisine.name,
+        vertical: this.vertical
       }
     });
   }

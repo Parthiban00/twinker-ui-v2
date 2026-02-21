@@ -374,6 +374,12 @@ ion-content {
     border-radius: 50%;
     object-fit: cover;
   }
+
+  .cuisine-emoji-fallback {
+    font-size: 26px;
+    line-height: 1;
+    user-select: none;
+  }
 }
 
 .cuisine-label {

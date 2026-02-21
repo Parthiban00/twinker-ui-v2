@@ -33,6 +33,7 @@ export class PopularItemsPage {
   cartItemCount = 0;
 
   localityId = '';
+  vertical: 'eats' | 'mart' = 'eats';
   imgBaseUrl = environment.imageBaseUrl;
 
   tagOptions = ['All', 'Best Selling', 'Trending', 'Recommended', 'Featured'];
@@ -64,6 +65,8 @@ export class PopularItemsPage {
 
   ionViewWillEnter() {
     this.localityId = this.route.snapshot.queryParamMap.get('localityId') || '';
+    this.vertical = (this.route.snapshot.queryParamMap.get('vertical') as 'eats' | 'mart') || 'eats';
+    this.storageService.saveActiveVertical(this.vertical);
     this.loadCart();
     this.loadItems(true);
   }
@@ -84,7 +87,8 @@ export class PopularItemsPage {
 
     const params: any = {
       page: this.currentPage,
-      limit: 20
+      limit: 20,
+      vertical: this.vertical,
     };
     if (this.searchTerm) params.search = this.searchTerm;
     if (this.activeTag && this.activeTag !== 'All') params.tag = this.activeTag;
@@ -174,7 +178,7 @@ export class PopularItemsPage {
     this.currentPage++;
     this.isLoadingMore = true;
 
-    const params: any = { page: this.currentPage, limit: 20 };
+    const params: any = { page: this.currentPage, limit: 20, vertical: this.vertical };
     if (this.searchTerm) params.search = this.searchTerm;
     if (this.activeTag && this.activeTag !== 'All') params.tag = this.activeTag;
     if (this.vegOnly) params.type = 'veg';
@@ -205,11 +209,11 @@ export class PopularItemsPage {
   }
 
   addToCart(item: any) {
-    const cartItems = this.storageService.getItem('cart-items') || [];
+    const cartItems = this.storageService.getCartByVertical(this.vertical);
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId));
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -225,9 +229,10 @@ export class PopularItemsPage {
         vendorName: item.vendorName || vendor.businessName || vendor.name || '',
         vendorImage: item.vendorImage || vendor.imageUrl || '',
         vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+        vertical: this.vertical,
       });
     }
-    this.storageService.setItem('cart-items', cartItems);
+    this.storageService.saveCartByVertical(this.vertical, cartItems);
     const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
     this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
@@ -235,7 +240,7 @@ export class PopularItemsPage {
   }
 
   loadCart() {
-    const cartItems = this.storageService.getItem('cart-items');
+    const cartItems = this.storageService.getCartByVertical(this.vertical);
     if (cartItems && cartItems.length > 0) {
       this.cartItems = cartItems;
       this.cartItemCount = cartItems.reduce((sum: number, item: any) => sum + (item.itemCount || item.quantity || 1), 0);
@@ -249,11 +254,17 @@ export class PopularItemsPage {
 
   navigateToVendor(item: any) {
     if (item.vendor?._id) {
-      this.router.navigate(['/items'], { queryParams: { vendorId: item.vendor._id } });
+      this.router.navigate(['/items'], {
+        queryParams: {
+          vendorId: item.vendor._id,
+          vertical: this.vertical
+        }
+      });
     }
   }
 
   navigateToCart() {
+    this.storageService.saveActiveVertical(this.vertical);
     this.router.navigate(['/tabs/cart']);
   }
 

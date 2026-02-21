@@ -217,7 +217,7 @@
               <img *ngIf="product.type==='non-veg'" src="assets/non-veg.png" class="type-icon" />
               <img *ngIf="product.type==='veg'" src="assets/veg.png" class="type-icon" />
               <img *ngIf="product.type==='egg'" src="assets/egg.png" class="type-icon" />
-              <span class="item-tag" *ngIf="product.tag && product.tag !== 'none'">{{ product.tag | uppercase }}</span>
+              <span class="item-tag" *ngIf="product.tag && product.tag !== 'none'">{{ getTagLabel(product.tag) }}</span>
             </div>
             <h4 class="item-name">{{ product.productName }}</h4>
             <p class="item-desc">{{ product.description }}</p>

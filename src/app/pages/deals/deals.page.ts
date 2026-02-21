@@ -17,6 +17,7 @@ register();
 export class DealsPage {
   isLoading = true;
   localityId: string = '';
+  activeVertical: 'eats' | 'mart' = 'eats';
 
   // Data sections
   featured: any[] = [];
@@ -51,6 +52,7 @@ export class DealsPage {
   ) {}
 
   ionViewWillEnter() {
+    this.activeVertical = this.storageService.getActiveVertical();
     const userData = this.storageService.getUser();
     if (userData?._id) {
       this.loadDefaultAddress(userData._id);
@@ -262,7 +264,12 @@ export class DealsPage {
 
   navigateToVendor(offer: any) {
     if (offer.vendor?._id) {
-      this.router.navigate(['/items'], { queryParams: { vendorId: offer.vendor._id } });
+      this.router.navigate(['/items'], {
+        queryParams: {
+          vendorId: offer.vendor._id,
+          vertical: this.activeVertical
+        }
+      });
     }
   }
 

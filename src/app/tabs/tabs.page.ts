@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { EventBusService } from '../services/event-bus.service';
+import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-tabs',
@@ -11,6 +12,7 @@ import { EventBusService } from '../services/event-bus.service';
 export class TabsPage implements OnInit, OnDestroy {
   cartBadgeCount = 0;
   private cartSub!: Subscription;
+  private verticalSub!: Subscription;
 
   tabs = [
     { path: '/tabs/home-main', icon: 'home', iconOutline: 'home-outline', label: 'Home' },
@@ -22,12 +24,21 @@ export class TabsPage implements OnInit, OnDestroy {
 
   constructor(
     private eventBus: EventBusService,
+    private storageService: StorageService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.updateCartBadge();
+
+    // Update badge when items are added/removed from cart
     this.cartSub = this.eventBus.on('cart:updated').subscribe(() => {
+      this.updateCartBadge();
+      this.cdr.detectChanges();
+    });
+
+    // Update badge when the user switches vertical (eats ↔ mart)
+    this.verticalSub = this.eventBus.on('vertical:changed').subscribe(() => {
       this.updateCartBadge();
       this.cdr.detectChanges();
     });
@@ -39,20 +50,13 @@ export class TabsPage implements OnInit, OnDestroy {
   }
 
   updateCartBadge() {
-    try {
-      const raw = localStorage.getItem('cart-items');
-      if (raw) {
-        const items: any[] = JSON.parse(raw);
-        this.cartBadgeCount = items.reduce((sum: number, item: any) => sum + (item.itemCount || 0), 0);
-      } else {
-        this.cartBadgeCount = 0;
-      }
-    } catch {
-      this.cartBadgeCount = 0;
-    }
+    const vertical = this.storageService.getActiveVertical();
+    const items = this.storageService.getCartByVertical(vertical);
+    this.cartBadgeCount = items.reduce((sum: number, item: any) => sum + (item.itemCount || 0), 0);
   }
 
   ngOnDestroy() {
     this.cartSub?.unsubscribe();
+    this.verticalSub?.unsubscribe();
   }
 }

@@ -159,6 +159,23 @@ const categoryThemes: Record<string, CategoryTheme> = {
 
 const defaultTheme = categoryThemes['Food'];
 
+const martDefaultTheme: CategoryTheme = {
+  accentColor: '#2DBCB6',
+  gradientStart: '#2DBCB6',
+  gradientEnd: '#27ae60',
+  bgTint: 'rgba(45,188,182,0.06)',
+  icon: 'bag-handle-outline',
+  heroTitle: 'Shop what you need',
+  heroSubtitle: 'Delivered fresh to your doorstep',
+  searchPlaceholder: 'Search for stores or products...',
+  filterChips: ['Nearest', 'Top rated', 'Fast delivery', 'Best price'],
+  cuisines: [],
+  deals: [
+    { title: 'Free delivery', subtitle: 'On orders above \u20B9299', badge: 'FREE', color: '#2ecc71' },
+    { title: '20% OFF on first order', subtitle: 'Use code MART20', badge: 'NEW', color: '#2DBCB6' },
+  ]
+};
+
 @Component({
   selector: 'app-home-land',
   templateUrl: './home-land.page.html',
@@ -179,6 +196,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
   deals: any[] = [];
   pageTitle = 'Food';
   cuisineFilter = '';
+  activeVertical: 'eats' | 'mart' = 'eats';
 
   isLoading = true;
   isDealsLoading = true;
@@ -242,7 +260,15 @@ export class HomeLandPage implements OnInit, OnDestroy {
   }
 
   get theme(): CategoryTheme {
-    return categoryThemes[this.pageTitle] || defaultTheme;
+    // Exact match first
+    if (categoryThemes[this.pageTitle]) return categoryThemes[this.pageTitle];
+    // Partial match — "Groceries & Staples" → matches key "Groceries"
+    const partialKey = Object.keys(categoryThemes).find(
+      k => this.pageTitle.toLowerCase().includes(k.toLowerCase())
+    );
+    if (partialKey) return categoryThemes[partialKey];
+    // Vertical-based fallback
+    return this.activeVertical === 'mart' ? martDefaultTheme : defaultTheme;
   }
 
   get displayVendors(): any[] {
@@ -258,7 +284,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
   }
 
   loadCart() {
-    this.cartItems = this.storageService.getItem('cart-items') || [];
+    this.cartItems = this.storageService.getCartByVertical(this.activeVertical) || [];
   }
 
   goToCart() {
@@ -269,12 +295,17 @@ export class HomeLandPage implements OnInit, OnDestroy {
     this.isLoading = true;
     this.isDealsLoading = true;
     this.isTrendingLoading = true;
-    this.loadCart();
     const userData = this.storageService.getUser();
     const params = this.activatedRoute.snapshot.queryParamMap;
     this.categoryId = params.get('categoryId') || '';
     this.localityId = params.get('localityId') || '';
     this.cuisineFilter = params.get('cuisineFilter') || '';
+    const verticalParam = params.get('vertical');
+    this.activeVertical = (verticalParam === 'eats' || verticalParam === 'mart')
+      ? verticalParam
+      : this.storageService.getActiveVertical();
+    this.storageService.saveActiveVertical(this.activeVertical);
+    this.loadCart();
     const title = params.get('title');
     if (title) {
       this.pageTitle = title;
@@ -355,7 +386,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
   }
 
   loadCategoryLandingData() {
-    this.homeService.getCategoryLanding(this.localityId, this.categoryId).subscribe({
+    this.homeService.getCategoryLanding(this.localityId, this.categoryId, this.activeVertical).subscribe({
       next: (resdata: any) => {
         if (resdata.status && resdata.data) {
           const d = resdata.data;
@@ -509,7 +540,10 @@ export class HomeLandPage implements OnInit, OnDestroy {
 
   navigateToProductVendor(product: any) {
     this.router.navigate(['/items'], {
-      queryParams: { vendorId: product.vendorId || product.vendor?._id }
+      queryParams: {
+        vendorId: product.vendorId || product.vendor?._id,
+        vertical: this.activeVertical
+      }
     });
   }
 
@@ -637,7 +671,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
   }
 
   addToCart(item: any) {
-    const cartItems = this.storageService.getItem('cart-items') || [];
+    const cartItems = this.storageService.getCartByVertical(this.activeVertical) || [];
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
@@ -657,9 +691,10 @@ export class HomeLandPage implements OnInit, OnDestroy {
         vendorName: item.vendorName || vendor.businessName || vendor.name || '',
         vendorImage: item.vendorImage || vendor.imageUrl || '',
         vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+        vertical: this.activeVertical,
       });
     }
-    this.storageService.setItem('cart-items', cartItems);
+    this.storageService.saveCartByVertical(this.activeVertical, cartItems);
     const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
     this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
@@ -721,4 +756,32 @@ export class HomeLandPage implements OnInit, OnDestroy {
     const { data, role } = await modal.onWillDismiss();
     if (role === 'confirm') {}
   }
+
+  isVendorOpen(vendor: any): boolean {
+    if (!vendor?.openAt || !vendor?.closeAt) return true;
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    return current >= vendor.openAt && current <= vendor.closeAt;
+  }
+
+  getNextOpenTime(vendor: any): string {
+    if (!vendor?.openAt) return '';
+    const now = new Date();
+    const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    const hh = istNow.getUTCHours().toString().padStart(2, '0');
+    const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
+    const current = `${hh}:${mm}`;
+    const [openH, openM] = vendor.openAt.split(':').map(Number);
+    const ampm = openH >= 12 ? 'PM' : 'AM';
+    const h12 = openH % 12 || 12;
+    const timeStr = `${h12}:${openM.toString().padStart(2, '0')} ${ampm}`;
+    return current < vendor.openAt ? `Opens at ${timeStr}` : `Opens tomorrow at ${timeStr}`;
+  }
 }
+
+
+
+

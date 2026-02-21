@@ -258,4 +258,25 @@ export class VendorOrdersPage {
     const diffMin = (Date.now() - new Date(dateStr).getTime()) / 60000;
     return diffMin > 10;
   }
+
+  // Vertical-aware labels
+  getOrderVertical(order: any): 'eats' | 'mart' {
+    return order?.vertical || 'eats';
+  }
+
+  getReadyLabel(order: any): string {
+    return this.getOrderVertical(order) === 'mart' ? 'Packed' : 'Ready';
+  }
+
+  getMarkReadyLabel(order: any): string {
+    return this.getOrderVertical(order) === 'mart' ? 'Mark Packed' : 'Mark Ready';
+  }
+
+  getPickedUpLabel(order: any): string {
+    return this.getOrderVertical(order) === 'mart' ? 'Picked Up' : 'Picked Up';
+  }
+
+  getVerticalIcon(order: any): string {
+    return this.getOrderVertical(order) === 'mart' ? 'bag-handle-outline' : 'restaurant-outline';
+  }
 }

@@ -11,7 +11,7 @@
           type="text"
           [(ngModel)]="searchTerm"
           (input)="onSearchInput()"
-          placeholder="Search food, groceries, medicines..."
+          [placeholder]="vertical === 'mart' ? 'Search stores, products, groceries...' : 'Search restaurants, dishes, cuisines...'"
           class="search-input"
         />
         <button class="clear-btn" *ngIf="searchTerm" (click)="clearSearch()">
@@ -57,14 +57,14 @@
       </div>
     </div>
 
-    <!-- Popular Cuisines -->
-    <div class="cuisine-section" *ngIf="apiCuisines.length">
+    <!-- Popular Cuisines — eats only (cuisines are a food concept, not applicable to mart) -->
+    <div class="cuisine-section" *ngIf="apiCuisines.length && vertical === 'eats'">
       <span class="section-title">Popular cuisines</span>
       <div class="cuisine-grid">
         <div class="cuisine-item" *ngFor="let cuisine of apiCuisines" (click)="navigateCuisine(cuisine)">
           <div class="cuisine-circle">
             <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name" class="cuisine-img" />
-            <ion-icon *ngIf="!cuisine.imageUrl" name="restaurant-outline" style="font-size: 24px; color: #F85C70;"></ion-icon>
+            <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji-fallback">{{ cuisine.icon || '🍽️' }}</span>
           </div>
           <span class="cuisine-label">{{ cuisine.name }}</span>
         </div>
@@ -117,9 +117,9 @@
         </div>
       </div>
 
-      <!-- Restaurants Group -->
+      <!-- Vendors Group -->
       <div class="result-group" *ngIf="matchedVendors.length">
-        <span class="group-title">Restaurants</span>
+        <span class="group-title">{{ vertical === 'mart' ? 'Stores' : 'Restaurants' }}</span>
         <div class="vendor-result" *ngFor="let vendor of matchedVendors" (click)="navigateVendor(vendor)">
           <div class="vendor-img">
             <img *ngIf="vendor.imageUrl" [src]="vendor.imageUrl" alt="" />
@@ -139,13 +139,13 @@
         </div>
       </div>
 
-      <!-- Dishes Group -->
+      <!-- Dishes / Products Group -->
       <div class="result-group" *ngIf="matchedProducts.length">
-        <span class="group-title">Dishes</span>
+        <span class="group-title">{{ vertical === 'mart' ? 'Products' : 'Dishes' }}</span>
         <div class="product-result" *ngFor="let product of matchedProducts" (click)="navigateProduct(product)">
           <div class="product-img">
             <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="" />
-            <ion-icon *ngIf="!product.imageUrl" name="fast-food-outline" class="product-placeholder"></ion-icon>
+            <ion-icon *ngIf="!product.imageUrl" [name]="vertical === 'mart' ? 'cube-outline' : 'fast-food-outline'" class="product-placeholder"></ion-icon>
             <span class="product-discount-badge" *ngIf="product.discount">{{ getDiscountLabel(product) }}</span>
           </div>
           <div class="product-info">
@@ -167,17 +167,17 @@
       <div class="empty-state">
         <ion-icon name="search-outline" class="empty-icon"></ion-icon>
         <span class="empty-title">No results for "{{ searchTerm }}"</span>
-        <span class="empty-subtitle">Try a different search or browse popular cuisines</span>
+        <span class="empty-subtitle">Try a different search{{ vertical === 'eats' ? ' or browse popular cuisines' : '' }}</span>
       </div>
 
-      <!-- Fallback cuisine grid -->
-      <div class="cuisine-section fallback-cuisines" *ngIf="apiCuisines.length">
+      <!-- Fallback cuisine grid — eats only -->
+      <div class="cuisine-section fallback-cuisines" *ngIf="apiCuisines.length && vertical === 'eats'">
         <span class="section-title">Popular cuisines</span>
         <div class="cuisine-grid">
           <div class="cuisine-item" *ngFor="let cuisine of apiCuisines" (click)="navigateCuisine(cuisine)">
             <div class="cuisine-circle">
               <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" [alt]="cuisine.name" class="cuisine-img" />
-              <ion-icon *ngIf="!cuisine.imageUrl" name="restaurant-outline" style="font-size: 24px; color: #F85C70;"></ion-icon>
+              <span *ngIf="!cuisine.imageUrl" class="cuisine-emoji-fallback">{{ cuisine.icon || '🍽️' }}</span>
             </div>
             <span class="cuisine-label">{{ cuisine.name }}</span>
           </div>
