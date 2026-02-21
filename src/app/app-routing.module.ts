@@ -1,15 +1,27 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { GuestGuard } from './guards/guest.guard';
 
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+    redirectTo: 'startup',
+    pathMatch: 'full'
+  },
+  {
+    path: 'startup',
+    loadChildren: () => import('./pages/startup/startup.module').then( m => m.StartupPageModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule),
+    canActivate: [GuestGuard]
   },
   {
     path: 'otp-verification',
-    loadChildren: () => import('./pages/otp-verification/otp-verification.module').then( m => m.OtpVerificationPageModule)
+    loadChildren: () => import('./pages/otp-verification/otp-verification.module').then( m => m.OtpVerificationPageModule),
+    canActivate: [GuestGuard]
   },
   {
     path: 'service-not-available',
@@ -88,6 +100,21 @@ const routes: Routes = [
   {
     path: 'search',
     loadChildren: () => import('./pages/search/search.module').then( m => m.SearchPageModule),
+    canLoad: [AuthGuard]
+  },
+  {
+    path: 'order-detail',
+    loadChildren: () => import('./pages/order-detail-view/order-detail-view.module').then( m => m.OrderDetailViewPageModule),
+    canLoad: [AuthGuard]
+  },
+  {
+    path: 'order-tracking',
+    loadChildren: () => import('./pages/order-tracking/order-tracking.module').then( m => m.OrderTrackingPageModule),
+    canLoad: [AuthGuard]
+  },
+  {
+    path: 'vendor-orders',
+    loadChildren: () => import('./pages/vendor-orders/vendor-orders.module').then( m => m.VendorOrdersPageModule),
     canLoad: [AuthGuard]
   }
 ];

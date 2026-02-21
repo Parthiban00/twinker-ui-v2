@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
-import { forkJoin, of } from 'rxjs';
+import { ModalController, Platform } from '@ionic/angular';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { PaymentPage } from '../payment/payment.page';
 import { OrderStatusComponent } from 'src/app/shared/components/order-status/order-status.component';
@@ -12,6 +12,7 @@ import { HomeMainService } from '../home-main/home-main.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { CommonService } from 'src/app/services/common.service';
 import { CartService } from './cart.service';
+import { OrderService } from 'src/app/services/order.service';
 
 interface CartItem {
   _id: string;
@@ -72,7 +73,7 @@ interface FeeBreakdown {
   styleUrls: ['./cart.page.scss'],
   standalone: false,
 })
-export class CartPage implements OnInit {
+export class CartPage implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   vendorGroups: VendorGroup[] = [];
   imgBaseUrl: string = environment.imageBaseUrl;
@@ -93,17 +94,31 @@ export class CartPage implements OnInit {
   isLoadingFees: boolean = false;
   showFeeDetails: boolean = false;
   userAddress: any = null;
+  private backButtonSub?: Subscription;
+
+  // Active order banner
+  activeOrders: any[] = [];
+  forcePlace: boolean = false;
+
+  get activeOrder(): any {
+    return this.activeOrders[0] || null;
+  }
+
+  get activeOrderCount(): number {
+    return this.activeOrders.length;
+  }
 
   constructor(
     private modalCtrl: ModalController,
-    private router: Router,
-    private navController: NavController,
+    public router: Router,
     private eventBus: EventBusService,
     private dealsService: DealsService,
     private homeMainService: HomeMainService,
     private storageService: StorageService,
     private commonService: CommonService,
     private cartService: CartService,
+    private orderService: OrderService,
+    private platform: Platform,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -111,6 +126,26 @@ export class CartPage implements OnInit {
 
   ionViewWillEnter() {
     this.loadCart();
+  }
+
+  ionViewDidEnter() {
+    this.backButtonSub = this.platform.backButton.subscribeWithPriority(9999, () => {
+      this.goBack();
+    });
+  }
+
+  ionViewWillLeave() {
+    if (this.backButtonSub) {
+      this.backButtonSub.unsubscribe();
+      this.backButtonSub = undefined;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.backButtonSub) {
+      this.backButtonSub.unsubscribe();
+      this.backButtonSub = undefined;
+    }
   }
 
   loadCart() {
@@ -174,6 +209,15 @@ export class CartPage implements OnInit {
 
     this.isLoadingOffers = true;
 
+    // Check for active orders (for banner)
+    this.orderService.getActiveOrder(user._id).subscribe({
+      next: (res: any) => {
+        this.activeOrders = res?.data || [];
+        this.cdr.detectChanges();
+      },
+      error: () => { this.activeOrders = []; }
+    });
+
     this.homeMainService.getDefaultAddressByUserId(user._id).subscribe({
       next: (res: any) => {
         if (res?.status && res?.data?.locality) {
@@ -191,6 +235,11 @@ export class CartPage implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  setForcePlace() {
+    this.forcePlace = true;
+    this.cdr.detectChanges();
   }
 
   private fetchOffers() {
@@ -408,6 +457,11 @@ export class CartPage implements OnInit {
     return this.cartItems.reduce((sum, item) => sum + item.itemCount, 0);
   }
 
+  get isCheckoutLoading(): boolean {
+    if (this.isCartEmpty) return false;
+    return this.isLoadingOffers || this.isLoadingFees || !this.userAddress || !this.feeBreakdown;
+  }
+
   incrementItem(item: CartItem) {
     item.itemCount++;
     this.saveAndRefresh();
@@ -423,7 +477,7 @@ export class CartPage implements OnInit {
 
   private saveAndRefresh() {
     localStorage.setItem('cart-items', JSON.stringify(this.cartItems));
-    this.eventBus.emit('cart:updated', this.cartItems.length);
+    this.eventBus.emit('cart:updated', this.totalItems);
     this.buildVendorGroups();
     // Re-fetch offers and fees (order amount may have changed)
     if (this.localityId) {
@@ -492,7 +546,7 @@ export class CartPage implements OnInit {
   }
 
   goBack() {
-    this.navController.back();
+    this.router.navigate(['/tabs/home-main']);
   }
 
   clearCart() {
@@ -519,6 +573,69 @@ export class CartPage implements OnInit {
   }
 
   async openPaymentModal() {
+    if (this.isCheckoutLoading) return;
+
+    const user = this.storageService.getUser();
+
+    // Build the full order payload to send to the backend
+    const orderPayload = {
+      userId: user._id,
+      localityId: this.localityId,
+      vendorOrders: this.vendorGroups.map(group => ({
+        vendor: group.vendorId,
+        vendorName: group.vendorName,
+        vendorAddress: '',
+        items: group.items.map(item => ({
+          product: item._id,
+          productName: item.productName,
+          quantity: item.itemCount,
+          price: item.price,
+          actualPrice: item.basePrice || item.price,
+          totalPrice: item.price * item.itemCount,
+        })),
+        subtotal: group.subtotal,
+        offerDiscount: group.offerDiscount || 0,
+        appliedOffer: group.appliedOffer ? {
+          offerId: group.appliedOffer._id,
+          offerTitle: group.appliedOffer.title,
+          offerCode: group.appliedOffer.code || '',
+          offerType: group.appliedOffer.type || group.appliedOffer.offerType || 'restaurant',
+          discountType: group.appliedOffer.discountType || 'percentage',
+          discountValue: group.appliedOffer.discountValue || 0,
+          maxDiscountCap: group.appliedOffer.maxDiscountCap ?? null,
+          minOrderAmount: group.appliedOffer.minOrderAmount || 0,
+          discountAmount: group.offerDiscount || 0,
+        } : undefined,
+        status: 'placed',
+      })),
+      deliveryAddress: {
+        addressId: this.userAddress?._id,
+        label: this.userAddress?.addressType || 'Home',
+        fullAddress: this.userAddress?.fullAddress || this.userAddress?.addressLine1 || '',
+        landmark: this.userAddress?.landmark || '',
+        coords: this.userAddress?.coords || { lat: 0, lng: 0 },
+      },
+      itemTotal: this.totalDiscountedPrice,
+      vendorDiscounts: this.vendorDiscountTotal,
+      couponDiscount: this.couponDiscount,
+      appliedCoupon: this.appliedOffer ? {
+        code: this.appliedOffer.code || '',
+        offerId: this.appliedOffer._id,
+        offerTitle: this.appliedOffer.title || '',
+        offerType: this.appliedOffer.type || this.appliedOffer.offerType || 'platform_coupon',
+        discountType: this.appliedOffer.discountType || 'percentage',
+        discountValue: this.appliedOffer.discountValue || 0,
+        maxDiscountCap: this.appliedOffer.maxDiscountCap ?? null,
+        minOrderAmount: this.appliedOffer.minOrderAmount || 0,
+        discountAmount: this.couponDiscount,
+      } : undefined,
+      deliveryFee: this.deliveryFee,
+      platformFee: this.platformFee,
+      taxAmount: this.taxAmount,
+      totalAmount: this.totalPayment,
+      forcePlace: this.forcePlace,
+    };
+
     const modal = await this.modalCtrl.create({
       component: PaymentPage,
       componentProps: {
@@ -531,21 +648,24 @@ export class CartPage implements OnInit {
         platformFee: this.platformFee,
         taxAmount: this.taxAmount,
         feeBreakdown: this.feeBreakdown,
-        deliveryAddress: this.userAddress?.fullAddress || ''
+        deliveryAddress: this.userAddress?.fullAddress || '',
+        orderPayload,
       },
       cssClass: 'payment-confirm-modal'
     });
     await modal.present();
 
-    const { role } = await modal.onWillDismiss();
+    const { data, role } = await modal.onWillDismiss();
     if (role === 'confirm') {
-      this.openOrderStatus();
+      // data = { orderId: 'TW-...', _id: '...' }
+      await this.openOrderStatus(data?.orderId);
     }
   }
 
-  private async openOrderStatus() {
+  private async openOrderStatus(orderCode: string = '') {
     const modal = await this.modalCtrl.create({
       component: OrderStatusComponent,
+      componentProps: { orderCode },
       cssClass: 'order-status-modal',
       backdropDismiss: false,
       showBackdrop: false
@@ -554,16 +674,16 @@ export class CartPage implements OnInit {
 
     const { data, role } = await modal.onWillDismiss();
     if (role === 'cancel') {
-      // User cancelled — cart is still intact, stay on cart page
+      // User dismissed — stay on cart page
       return;
     }
-    // Order placed successfully — cart already cleared by component
+    // Cart already cleared by OrderStatusComponent
     this.cartItems = [];
     this.vendorGroups = [];
     this.appliedOffer = null;
     this.couponDiscount = 0;
     if (data?.action === 'track') {
-      this.router.navigate(['/orders']);
+      this.router.navigate(['/tabs/orders'], { queryParams: { highlight: orderCode } });
     } else {
       this.router.navigate(['/tabs/home-main']);
     }

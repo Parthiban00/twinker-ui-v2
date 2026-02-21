@@ -1,238 +1,215 @@
+<!-- Header -->
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="cancel()">
-        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back" color="dark"></ion-icon>
       </ion-button>
-      <ion-title>Order Detail View</ion-title>
+    </ion-buttons>
+    <ion-title class="detail-title" *ngIf="order">{{ order.orderId }}</ion-title>
+    <ion-title class="detail-title" *ngIf="!order && !isLoading">Order Detail</ion-title>
+    <ion-buttons slot="end">
+      <!-- Live Track button: out_for_delivery -->
+      <ion-button *ngIf="isOutForDelivery" (click)="openTracking()" class="track-header-btn">
+        <ion-icon name="navigate-outline"></ion-icon>
+        <span>Track</span>
+      </ion-button>
+      <!-- Cancel: placed only -->
+      <ion-button *ngIf="canCancel" (click)="cancelOrder()">
+        <span class="cancel-header-btn">Cancel</span>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="container">
-    <ion-card class="shop-details">
-      <ion-row>
-        <ion-col size="3">
-          <div class="shop-thumb">
-            <img src="../../../assets/cuisine-img.jpg" />
+<ion-content class="detail-content">
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && order">
+
+    <!-- ===== STATUS TIMELINE ===== -->
+    <div class="section-card" *ngIf="order.status !== 'cancelled'">
+      <div class="timeline-steps">
+        <div class="timeline-step"
+             *ngFor="let step of STATUS_STEPS; let i = index"
+             [class.done]="getStatusStep(order.status) > i"
+             [class.active]="getStatusStep(order.status) === i">
+          <div class="t-dot">
+            <ion-icon name="checkmark" *ngIf="getStatusStep(order.status) > i"></ion-icon>
           </div>
-        </ion-col>
-        <ion-col size="9">
-          <ion-row>
-            <ion-col size="12" class="shop-title">
-              Hottel Vallavan
-            </ion-col>
-            <ion-col size="12" class="shop-description">
-              alsdf alsjdfl alsdjf aflasd fla alsdjf.
-            </ion-col>
-            <ion-col size="12" class="shop-location">
-             <span> <img src="../../../assets/location_pin.png"></span>&nbsp; 123, therku raja veethi, siavaganga.
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-
-    </ion-card>
-  </div>
-
-  <div class="container">
-    <ion-card class="cart-item-details">
-
-      <ion-row>
-        <ion-col size="1" class="item-type">
-
-            <img src="assets/non-veg.png"/>
-
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
-
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-    <ion-card class="cart-item-details">
-
-      <ion-row>
-        <ion-col size="1" class="item-type">
-
-            <img src="assets/egg.png"/>
-
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
-
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-    <ion-card class="cart-item-details">
-
-      <ion-row>
-        <ion-col size="1" class="item-type">
-
-            <img src="assets/veg.png"/>
-
-        </ion-col>
-        <ion-col size="8" class="item-details">
-          <ion-row>
-            <ion-col size="12" class="item-name">
-              Chicken Rice
-            </ion-col>
-            <ion-col size="12" class="item-description">
-              Full Plate
-            </ion-col>
-            <ion-col size="12" class="item-price">
-              Rs: 200
-            </ion-col>
-            <ion-col size="12" class="customize-btn">
-              <ion-button fill="clear" color="secondary" id="customise-item">
-                Customize
-                <ion-icon  slot="end" name="chevron-down-outline"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="3" class="item-qty-adjust-parent">
-          <ion-row>
-            <ion-col size="12" class="item-qty-adjust">
-              <div class="qty-selector" >
-                <ion-button fill="clear" >-</ion-button>
-                <ion-label>2</ion-label>
-                <ion-button fill="clear"  >+</ion-button>
-
-                      </div>
-            </ion-col>
-            <ion-col size="12" class="item-total">
-              Rs: 9999.00
-            </ion-col>
-          </ion-row>
-
-        </ion-col>
-      </ion-row>
-    </ion-card>
-
-
-
-  </div>
-
-
-  <div class="container">
-    <ion-card class="bill-summary">
-      <ion-row>
-        <ion-col size="9" class="sub-total-text">
-          Sub Total
-        </ion-col>
-        <ion-col size="3" class="sub-total">
-           9999.00
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="9" class="delivery-cost-text">
-          Delivery Cost
-        </ion-col>
-        <ion-col size="3" class="delivery-cost">
-           30.00
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="9" class="total-amt-text">
-          Total Amount
-        </ion-col>
-        <ion-col size="3" class="total-amt">
-          9999.00
-        </ion-col>
-      </ion-row>
-      <app-status-stepper></app-status-stepper>
-    </ion-card>
-  </div>
-  
-
-</ion-content>
-
-<ion-footer>
-  <ion-toolbar>
-    <div class="body-container">
-      <ion-item lines="none">
-        <ion-avatar slot="start">
-          <img alt="Person" src="assets/profile.png" />
-        </ion-avatar>
-        <ion-label class="custom-lable">
-          Parthiban&nbsp;<span class="role-span">(Delivery Partner)</span>
-          <p>9095924511</p>
-        </ion-label>
-        <!-- <ion-button slot="end" class='custom-btn-clear' fill="clear" style="margin-right: -30px;" href="https://wa.me/9095924511/?text=Hi">
-          <ion-icon name="chatbox"></ion-icon>
-        </ion-button> -->
-        <ion-button slot="end" class='custom-btn-clear' fill="clear" (click)="callToMobileNo(profileData.customer?.phone?profileData.customer?.phone:profileData.mobile)">
-          <ion-icon name="call"></ion-icon>
-        </ion-button>
-      </ion-item>
+          <div class="t-line" *ngIf="i < STATUS_STEPS.length - 1"
+               [class.filled]="getStatusStep(order.status) > i"></div>
+        </div>
+      </div>
+      <div class="timeline-labels">
+        <span *ngFor="let step of STATUS_STEPS">{{ getStatusLabel(step) }}</span>
+      </div>
+      <div class="last-update" *ngIf="getLastStatusEntry() as entry">
+        {{ getStatusLabel(entry.status) }} · {{ entry.timestamp | date:'h:mm a' }}
+      </div>
     </div>
 
-  </ion-toolbar>
-</ion-footer>
+    <!-- Cancelled Banner -->
+    <div class="cancelled-banner" *ngIf="order.status === 'cancelled'">
+      <ion-icon name="close-circle-outline"></ion-icon>
+      <div>
+        <span class="cancelled-title">Order Cancelled</span>
+        <span class="cancelled-reason" *ngIf="order.cancellationReason">{{ order.cancellationReason }}</span>
+      </div>
+    </div>
+
+    <!-- ===== DELIVERY BOY SECTION (out_for_delivery) ===== -->
+    <div class="section-card delivery-boy-section" *ngIf="isOutForDelivery && hasDeliveryBoy">
+      <div class="db-row">
+        <div class="db-avatar-wrap">
+          <img *ngIf="order.deliveryBoy?.imageUrl" [src]="order.deliveryBoy.imageUrl" alt="Delivery partner" />
+          <div class="db-avatar-placeholder" *ngIf="!order.deliveryBoy?.imageUrl">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="db-details">
+          <span class="db-name">{{ order.deliveryBoy?.name || 'Delivery Partner' }}</span>
+          <span class="db-role">Your delivery partner</span>
+          <span class="db-vehicle" *ngIf="order.deliveryBoy?.vehicleNo">
+            <ion-icon name="car-outline"></ion-icon> {{ order.deliveryBoy.vehicleNo }}
+          </span>
+        </div>
+      </div>
+      <div class="db-btns">
+        <button class="db-call-btn" *ngIf="order.deliveryBoy?.phone" (click)="callDeliveryBoy()">
+          <ion-icon name="call-outline"></ion-icon> Call
+        </button>
+        <button class="db-track-btn" (click)="openTracking()">
+          <ion-icon name="navigate-outline"></ion-icon> Live Track
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== DELIVERY ADDRESS ===== -->
+    <div class="section-card">
+      <div class="section-title">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>Delivery Address</span>
+      </div>
+      <div class="address-row">
+        <span class="address-label">{{ order.deliveryAddress?.label || 'Home' }}</span>
+        <span class="address-text">{{ order.deliveryAddress?.fullAddress }}</span>
+        <span class="address-landmark" *ngIf="order.deliveryAddress?.landmark">Near {{ order.deliveryAddress.landmark }}</span>
+      </div>
+    </div>
+
+    <!-- ===== VENDOR ORDERS ===== -->
+    <div class="section-card vendor-section"
+         *ngFor="let vo of order.vendorOrders">
+
+      <!-- Vendor Header -->
+      <div class="vendor-header">
+        <div class="vendor-thumb">
+          <img [src]="getVendorImage(vo.vendor)" [alt]="vo.vendorName" />
+        </div>
+        <div class="vendor-info">
+          <span class="vendor-name">{{ vo.vendorName }}</span>
+          <span class="vendor-address" *ngIf="vo.vendor?.address">{{ vo.vendor.address }}</span>
+        </div>
+        <span class="vendor-status-chip"
+              [style.color]="getVendorStatusColor(vo.status)"
+              [style.background]="getVendorStatusColor(vo.status) + '18'">
+          {{ getVendorStatusLabel(vo.status) }}
+        </span>
+      </div>
+
+      <!-- Items -->
+      <div class="item-row" *ngFor="let item of vo.items">
+        <div class="item-left">
+          <span class="item-name">{{ item.productName }}</span>
+          <span class="item-qty">× {{ item.quantity }}</span>
+        </div>
+        <span class="item-price">₹{{ item.totalPrice?.toFixed(2) }}</span>
+      </div>
+
+      <!-- Vendor subtotal -->
+      <div class="vendor-subtotal-row">
+        <span>Subtotal</span>
+        <span>₹{{ vo.subtotal?.toFixed(2) }}</span>
+      </div>
+      <div class="vendor-offer-row" *ngIf="vo.offerDiscount > 0">
+        <span>{{ vo.appliedOffer?.offerTitle || 'Restaurant Offer' }}</span>
+        <span class="offer-discount">-₹{{ vo.offerDiscount?.toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <!-- ===== PAYMENT SUMMARY ===== -->
+    <div class="section-card">
+      <div class="section-title">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <span>Payment Summary</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Item total</span>
+        <span>₹{{ order.itemTotal?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row green-row" *ngIf="order.vendorDiscounts > 0">
+        <span>Restaurant offers</span>
+        <span>-₹{{ order.vendorDiscounts?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row green-row" *ngIf="order.couponDiscount > 0">
+        <span>Coupon ({{ order.appliedCoupon?.code || 'Discount' }})</span>
+        <span>-₹{{ order.couponDiscount?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery fee</span>
+        <span>₹{{ order.deliveryFee?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row" *ngIf="order.platformFee > 0">
+        <span>Platform fee</span>
+        <span>₹{{ order.platformFee?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row" *ngIf="order.taxAmount > 0">
+        <span>Tax</span>
+        <span>₹{{ order.taxAmount?.toFixed(2) }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <span>₹{{ order.totalAmount?.toFixed(2) }}</span>
+      </div>
+      <div class="payment-method-row">
+        <ion-icon name="cash-outline" *ngIf="order.paymentMethod === 'cod'"></ion-icon>
+        <ion-icon name="card-outline" *ngIf="order.paymentMethod !== 'cod'"></ion-icon>
+        <span>{{ order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment' }}</span>
+      </div>
+
+      <!-- Pay Now (disabled, Coming Soon) -->
+      <button class="pay-now-btn" *ngIf="showPayNow" disabled>
+        <ion-icon name="card-outline"></ion-icon>
+        Pay Now
+        <span class="coming-soon-tag">Coming Soon</span>
+      </button>
+    </div>
+
+    <!-- ===== ORDER INFO ===== -->
+    <div class="section-card info-card">
+      <div class="info-row">
+        <span class="info-label">Order ID</span>
+        <span class="info-value">{{ order.orderId }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Placed on</span>
+        <span class="info-value">{{ order.createdAt | date:'d MMM yyyy, h:mm a' }}</span>
+      </div>
+      <div class="info-row" *ngIf="order.estimatedDeliveryTime && order.status !== 'delivered' && order.status !== 'cancelled'">
+        <span class="info-label">Est. delivery</span>
+        <span class="info-value">{{ order.estimatedDeliveryTime | date:'h:mm a' }}</span>
+      </div>
+    </div>
+
+    <div class="bottom-pad"></div>
+
+  </ng-container>
+
+</ion-content>

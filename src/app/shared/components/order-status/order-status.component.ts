@@ -1,6 +1,7 @@
-import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { EventBusService } from 'src/app/services/event-bus.service';
 
 @Component({
   selector: 'app-order-status',
@@ -9,51 +10,22 @@ import { IonicModule, ModalController } from '@ionic/angular';
   standalone: true,
   imports: [CommonModule, IonicModule]
 })
-export class OrderStatusComponent implements OnInit, OnDestroy {
-  state: 'placing' | 'success' = 'placing';
-  countdown = 10;
-  private timerInterval: ReturnType<typeof setInterval> | null = null;
+export class OrderStatusComponent implements OnInit {
+  @Input() orderCode: string = '';
+
+  state: 'success' = 'success';
 
   constructor(
     private modalCtrl: ModalController,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private eventBus: EventBusService,
   ) {}
 
   ngOnInit() {
-    this.startCountdown();
-  }
-
-  ngOnDestroy() {
-    this.clearTimer();
-  }
-
-  private startCountdown() {
-    this.timerInterval = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) {
-        this.clearTimer();
-        this.onOrderPlaced();
-      }
-      this.cdr.detectChanges();
-    }, 1000);
-  }
-
-  private onOrderPlaced() {
-    this.state = 'success';
+    // Order already placed by PaymentPage — clear cart immediately
     localStorage.removeItem('cart-items');
+    this.eventBus.emit('cart:updated', 0);
     this.cdr.detectChanges();
-  }
-
-  private clearTimer() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
-    }
-  }
-
-  cancelOrder() {
-    this.clearTimer();
-    this.modalCtrl.dismiss(null, 'cancel');
   }
 
   trackOrder() {

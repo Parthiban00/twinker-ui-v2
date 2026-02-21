@@ -47,9 +47,15 @@
           </div>
           <div class="deal-chip-info">
             <span class="deal-chip-name">{{ deal.productName }}</span>
+            <span class="deal-chip-vendor" *ngIf="deal.vendor?.name || deal.vendorName">{{ deal.vendor?.name || deal.vendorName }}</span>
             <div class="deal-chip-price-row">
-              <span class="deal-chip-price">&#x20B9;{{ deal.price }}</span>
-              <span class="deal-chip-original" *ngIf="deal.actualPrice > deal.price">&#x20B9;{{ deal.actualPrice }}</span>
+              <div class="price-group">
+                <span class="deal-chip-price">&#x20B9;{{ deal.price }}</span>
+                <span class="deal-chip-original" *ngIf="deal.actualPrice > deal.price">&#x20B9;{{ deal.actualPrice }}</span>
+              </div>
+              <button class="add-btn" (click)="addToCart(deal); $event.stopPropagation()">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
             </div>
             <span class="deal-chip-badge" *ngIf="deal.discount">{{ getDiscountLabel(deal) }}</span>
           </div>

@@ -1,42 +1,7 @@
 <div class="order-status-page">
 
-  <!-- ===== PLACING ORDER STATE ===== -->
-  <div class="status-content" *ngIf="state === 'placing'">
-
-    <!-- Animated Icon -->
-    <div class="icon-area">
-      <div class="circle-bg placing-circle">
-        <!-- Spinning arc -->
-        <svg class="spinner-arc" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4" />
-          <circle cx="60" cy="60" r="56" fill="none" stroke="#fff" stroke-width="4"
-                  stroke-dasharray="88 264" stroke-linecap="round" class="arc" />
-        </svg>
-        <!-- Bag icon -->
-        <ion-icon name="bag-handle-outline" class="status-icon"></ion-icon>
-      </div>
-      <!-- Pulse rings -->
-      <div class="pulse-ring ring-1"></div>
-      <div class="pulse-ring ring-2"></div>
-    </div>
-
-    <h1 class="status-title">Placing order..</h1>
-    <p class="status-subtitle">Wait a moment, your order is<br/>being placed!</p>
-
-    <!-- Progress bar -->
-    <div class="progress-wrap">
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="((10 - countdown) / 10) * 100"></div>
-      </div>
-      <span class="progress-time">{{ countdown }}s remaining</span>
-    </div>
-
-    <!-- Cancel button -->
-    <button class="cancel-btn" (click)="cancelOrder()">Cancel order</button>
-  </div>
-
   <!-- ===== ORDER SUCCESS STATE ===== -->
-  <div class="status-content success-content" *ngIf="state === 'success'">
+  <div class="status-content success-content">
 
     <!-- Animated Icon -->
     <div class="icon-area">
@@ -52,8 +17,9 @@
       <div class="confetti-dot dot-6"></div>
     </div>
 
-    <h1 class="status-title success-title">Order successful</h1>
-    <p class="status-subtitle">Cool down, your food will arrive in<br/>25 minutes.</p>
+    <h1 class="status-title success-title">Order placed!</h1>
+    <p class="order-code" *ngIf="orderCode">{{ orderCode }}</p>
+    <p class="status-subtitle">Your order is confirmed.<br/>Sit back and relax!</p>
 
     <!-- Action buttons -->
     <div class="action-buttons">

@@ -7,6 +7,7 @@ import { PopularItemsService } from './popular-items.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { CommonService } from 'src/app/services/common.service';
 import { environment } from 'src/environments/environment';
+import { EventBusService } from 'src/app/services/event-bus.service';
 
 @Component({
   selector: 'app-popular-items',
@@ -36,6 +37,7 @@ export class PopularItemsPage {
 
   tagOptions = ['All', 'Best Selling', 'Trending', 'Recommended', 'Featured'];
   private searchSubject = new Subject<string>();
+  private cartSub: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +46,7 @@ export class PopularItemsPage {
     private popularItemsService: PopularItemsService,
     private storageService: StorageService,
     private commonService: CommonService,
+    private eventBus: EventBusService,
     private cdr: ChangeDetectorRef
   ) {
     this.searchSubject.pipe(
@@ -53,14 +56,22 @@ export class PopularItemsPage {
       this.searchTerm = term;
       this.loadItems(true);
     });
+    this.cartSub = this.eventBus.on('cart:updated').subscribe(() => {
+      this.loadCart();
+      this.cdr.detectChanges();
+    });
   }
 
   ionViewWillEnter() {
-    this.route.queryParams.subscribe(params => {
-      this.localityId = params['localityId'] || '';
-      this.loadCart();
-      this.loadItems(true);
-    });
+    this.localityId = this.route.snapshot.queryParamMap.get('localityId') || '';
+    this.loadCart();
+    this.loadItems(true);
+  }
+
+  ngOnDestroy() {
+    if (this.cartSub) {
+      this.cartSub.unsubscribe();
+    }
   }
 
   loadItems(reset: boolean) {
@@ -198,7 +209,7 @@ export class PopularItemsPage {
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => c._id === item._id);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -217,6 +228,8 @@ export class PopularItemsPage {
       });
     }
     this.storageService.setItem('cart-items', cartItems);
+    const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
+    this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
     this.commonService.presentToast('bottom', `${item.productName || item.name || 'Item'} added to cart`, 'success');
   }

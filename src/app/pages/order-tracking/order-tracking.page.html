@@ -1,0 +1,84 @@
+<!-- Header -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back" color="dark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="tracking-title">Order Tracking</ion-title>
+    <ion-buttons slot="end" *ngIf="order">
+      <span class="status-badge" [class]="'status-' + order.status">
+        {{ getStatusLabel(order.status) }}
+      </span>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="tracking-content">
+
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Loading map...</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- Map -->
+    <div class="map-container">
+      <div #mapRef class="map-element"></div>
+
+      <!-- Map overlay: no delivery boy location yet -->
+      <div class="map-overlay-hint" *ngIf="order?.status !== 'out_for_delivery'">
+        <ion-icon name="navigate-circle-outline"></ion-icon>
+        <span>Live tracking starts when the order is out for delivery</span>
+      </div>
+    </div>
+
+    <!-- Delivery Boy Card -->
+    <div class="delivery-boy-card" *ngIf="deliveryBoy?.name || deliveryBoy?.phone">
+      <div class="db-avatar">
+        <img *ngIf="deliveryBoy?.imageUrl" [src]="deliveryBoy.imageUrl" alt="Delivery partner" />
+        <div class="db-avatar-placeholder" *ngIf="!deliveryBoy?.imageUrl">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+      </div>
+      <div class="db-info">
+        <span class="db-name">{{ deliveryBoy?.name || 'Delivery Partner' }}</span>
+        <span class="db-role">Your delivery partner</span>
+        <span class="db-vehicle" *ngIf="deliveryBoy?.vehicleNo">
+          <ion-icon name="car-outline"></ion-icon> {{ deliveryBoy.vehicleNo }}
+        </span>
+      </div>
+      <div class="db-actions">
+        <button class="db-call-btn" *ngIf="deliveryBoy?.phone" (click)="callDeliveryBoy()">
+          <ion-icon name="call-outline"></ion-icon>
+          Call
+        </button>
+        <button class="db-dir-btn" *ngIf="deliveryBoy?.location?.latitude" (click)="openDirections()">
+          <ion-icon name="navigate-outline"></ion-icon>
+          Directions
+        </button>
+      </div>
+    </div>
+
+    <!-- ETA Strip -->
+    <div class="eta-strip" *ngIf="order">
+      <div class="eta-left">
+        <ion-icon name="time-outline"></ion-icon>
+        <div class="eta-text">
+          <span class="eta-label">Estimated arrival</span>
+          <span class="eta-value">~{{ estimatedMinutes }} min</span>
+        </div>
+      </div>
+      <div class="eta-right">
+        <span class="eta-order-id">{{ order.orderId }}</span>
+        <span class="eta-amount">₹{{ order.totalAmount?.toFixed(0) }}</span>
+        <span class="eta-payment">{{ order.paymentMethod === 'cod' ? 'COD' : 'Online' }}</span>
+      </div>
+    </div>
+
+  </ng-container>
+
+</ion-content>

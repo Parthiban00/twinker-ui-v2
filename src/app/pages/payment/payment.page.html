@@ -112,6 +112,12 @@
     <span>Please keep exact change ready for the delivery partner</span>
   </div>
 
+  <!-- Error Message -->
+  <div class="error-note" *ngIf="placeError">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <span>{{ placeError }}</span>
+  </div>
+
 </ion-content>
 
 <!-- Footer -->

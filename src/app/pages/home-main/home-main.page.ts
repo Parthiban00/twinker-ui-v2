@@ -24,6 +24,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
   imgBaseUrl = environment.imageBaseUrl;
   eventMessage: string;
   eventSubscription: Subscription;
+  cartSubscription: Subscription;
   todayDate: Date = new Date();
   greeting: string = '';
   userName: string = '';
@@ -49,7 +50,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
 
   // Feature flags
   showWallet = false;
-  showBuddy = false;
+  showBuddy = true;
 
   constructor(
     public router: Router,
@@ -67,27 +68,40 @@ export class HomeMainPage implements OnInit, OnDestroy {
     this.eventSubscription = this.eventBus.on('address-updated').subscribe((payload) => {
       this.ionViewWillEnter();
     });
+    this.cartSubscription = this.eventBus.on('cart:updated').subscribe(() => {
+      this.loadCart();
+      this.cdr.detectChanges();
+    });
   }
 
   ionViewWillEnter() {
     this.setGreeting();
     this.loadCart();
+    const token = this.storageService.getToken();
+    if (!token) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+      return;
+    }
+
     const userData = this.storageService.getUser();
-    if (userData.mobileNo) {
+    if (userData?._id) {
       if (userData.addresses && userData.addresses.length) {
         this.userName = userData.name || userData.fullName || '';
         this.getDefaultAddressByUserId(userData._id);
       } else {
-        this.router.navigate(['/shared/location-setup']);
+        this.router.navigate(['/shared/location-setup'], { replaceUrl: true });
       }
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/login'], { replaceUrl: true });
     }
   }
 
   ngOnDestroy() {
     if (this.eventSubscription) {
       this.eventSubscription.unsubscribe();
+    }
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
     }
     if (this.flashTimerInterval) {
       clearInterval(this.flashTimerInterval);
@@ -185,7 +199,7 @@ export class HomeMainPage implements OnInit, OnDestroy {
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => c._id === item._id);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -204,6 +218,8 @@ export class HomeMainPage implements OnInit, OnDestroy {
       });
     }
     this.storageService.setItem('cart-items', cartItems);
+    const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
+    this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
     this.commonService.presentToast('bottom', `${item.productName || item.name || 'Item'} added to cart`, 'success');
   }

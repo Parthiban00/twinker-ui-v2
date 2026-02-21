@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController, NavParams } from '@ionic/angular';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ModalController, NavParams, Platform } from '@ionic/angular';
+import { CommonService } from 'src/app/services/common.service';
+import { EventBusService } from 'src/app/services/event-bus.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { environment } from 'src/environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-category-list',
@@ -8,7 +12,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./category-list.page.scss'],
   standalone: false,
 })
-export class CategoryListPage implements OnInit {
+export class CategoryListPage implements OnInit, OnDestroy {
   categories: any[] = [];
   filteredCategories: any[] = [];
   localityId = '';
@@ -19,6 +23,7 @@ export class CategoryListPage implements OnInit {
   deals: any[] = [];
   bestCoupon: any = null;
   dealCountMap: Record<string, number> = {};
+  private backButtonSub?: Subscription;
 
   private iconMap: Record<string, string> = {
     'food': 'restaurant-outline',
@@ -44,7 +49,14 @@ export class CategoryListPage implements OnInit {
     { bg: '#E8F5E9', accent: '#43A047' }
   ];
 
-  constructor(private modalCtrl: ModalController, private navParams: NavParams) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private navParams: NavParams,
+    private storageService: StorageService,
+    private commonService: CommonService,
+    private eventBus: EventBusService,
+    private platform: Platform
+  ) {}
 
   ngOnInit(): void {
     this.categories = this.navParams.get('categories') || [];
@@ -53,6 +65,19 @@ export class CategoryListPage implements OnInit {
     this.bestCoupon = this.navParams.get('bestCoupon') || null;
     this.filteredCategories = [...this.categories];
     this.buildDealCountMap();
+  }
+
+  ionViewDidEnter() {
+    this.backButtonSub = this.platform.backButton.subscribeWithPriority(10001, () => {
+      this.cancel();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.backButtonSub) {
+      this.backButtonSub.unsubscribe();
+      this.backButtonSub = undefined;
+    }
   }
 
   cancel() {
@@ -111,6 +136,36 @@ export class CategoryListPage implements OnInit {
 
   getDealCount(categoryId: string): number {
     return this.dealCountMap[categoryId] || 0;
+  }
+
+  addToCart(item: any) {
+    const cartItems = this.storageService.getItem('cart-items') || [];
+    const vendor = item.vendor || {};
+    const vendorId = item.vendorId || vendor._id || 'unknown';
+
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
+    if (existing) {
+      existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
+    } else {
+      cartItems.push({
+        _id: item._id,
+        productName: item.productName || item.name || '',
+        price: item.price || 0,
+        basePrice: item.actualPrice || item.basePrice || undefined,
+        itemCount: 1,
+        imageUrl: item.imageUrl || '',
+        type: item.type || '',
+        vendorId,
+        vendorName: item.vendorName || vendor.businessName || vendor.name || '',
+        vendorImage: item.vendorImage || vendor.imageUrl || '',
+        vendorCuisine: item.vendorCuisine || vendor.cuisineType || '',
+      });
+    }
+
+    this.storageService.setItem('cart-items', cartItems);
+    const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
+    this.eventBus.emit('cart:updated', totalCount);
+    this.commonService.presentToast('bottom', `${item.productName || item.name || 'Item'} added to cart`, 'success');
   }
 
   private buildDealCountMap() {

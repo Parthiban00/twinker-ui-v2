@@ -1,29 +1,211 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>My Orders</ion-title>
+    <ion-title class="orders-title">My Orders</ion-title>
   </ion-toolbar>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" *ngIf="!isLoading">
+    <button class="filter-tab" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">All</button>
+    <button class="filter-tab" [class.active]="activeFilter === 'active'" (click)="setFilter('active')">
+      Active
+      <span class="filter-badge" *ngIf="activeOrders.length > 1">{{ activeOrders.length }}</span>
+    </button>
+    <button class="filter-tab" [class.active]="activeFilter === 'delivered'" (click)="setFilter('delivered')">Delivered</button>
+    <button class="filter-tab" [class.active]="activeFilter === 'cancelled'" (click)="setFilter('cancelled')">Cancelled</button>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
-  <div class="body-container">
-    <ion-card *ngFor="let list of ordersCard" [routerLink]="['/tabs/orders/orders-list']"
-      [queryParams]="{orderType:list.value, ordervalue: list.type}">
-      <ion-grid>
-        <ion-row>
-          <ion-col size="3" class="thumbnail-col">
-            <img src="assets/heroicons-outline_shopping-cart.svg" />
-          </ion-col>
-          <ion-col size="7" class="content-col">
-            {{list.type}}
-          </ion-col>
-          <ion-col size="2" class="count-col">
-            <ion-badge>{{list.count}}</ion-badge>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card>
+<ion-content class="orders-content">
+
+  <!-- Loading Skeletons -->
+  <div class="skeleton-wrap" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+      <ion-skeleton-text animated style="width:60%; height:16px; border-radius:8px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width:80%; height:12px; border-radius:6px; margin-top:8px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width:40%; height:12px; border-radius:6px; margin-top:6px;"></ion-skeleton-text>
+    </div>
   </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- ===== ACTIVE ORDERS (multiple) ===== -->
+    <ng-container *ngIf="showActiveCards">
+
+      <!-- Multiple active orders header -->
+      <div class="active-orders-header" *ngIf="activeOrders.length > 1">
+        <ion-icon name="layers-outline"></ion-icon>
+        <span>{{ activeOrders.length }} Active Orders</span>
+      </div>
+
+      <div class="active-order-card"
+           *ngFor="let order of activeOrders; let i = index"
+           [class.highlight]="highlightOrderId && order.orderId === highlightOrderId"
+           (click)="navigateToDetail(order.orderId)">
+
+        <div class="active-header">
+          <div class="active-header-left">
+            <div class="active-status-dot pulse"></div>
+            <span class="active-status-label">{{ getStatusLabel(order.status) }}</span>
+          </div>
+          <span class="active-order-id">{{ order.orderId }}</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-track-wrap">
+          <div class="progress-steps">
+            <div class="progress-step"
+                 *ngFor="let step of STATUS_STEPS; let si = index"
+                 [class.done]="getStatusStep(order.status) > si"
+                 [class.active]="getStatusStep(order.status) === si">
+              <div class="step-dot">
+                <ion-icon name="checkmark" *ngIf="getStatusStep(order.status) > si"></ion-icon>
+              </div>
+              <div class="step-connector" *ngIf="si < STATUS_STEPS.length - 1"
+                   [class.filled]="getStatusStep(order.status) > si"></div>
+            </div>
+          </div>
+          <div class="progress-labels">
+            <span *ngFor="let step of STATUS_STEPS">{{ getStatusLabel(step) }}</span>
+          </div>
+        </div>
+
+        <!-- Delivery Boy (when out_for_delivery) -->
+        <div class="delivery-boy-row"
+             *ngIf="order.status === 'out_for_delivery' && orderHasDeliveryBoy(order)">
+          <ion-icon name="bicycle-outline" class="db-icon"></ion-icon>
+          <span class="db-name">{{ order.deliveryBoy?.name || 'Delivery Partner' }}</span>
+          <span class="db-vehicle" *ngIf="order.deliveryBoy?.vehicleNo">{{ order.deliveryBoy.vehicleNo }}</span>
+        </div>
+
+        <!-- Vendor Summary -->
+        <div class="active-vendors">
+          <ion-icon name="storefront-outline" class="vendor-icon"></ion-icon>
+          <span>{{ getVendorNames(order) }}</span>
+        </div>
+
+        <!-- ETA widget: confirmed / out_for_delivery -->
+        <div class="eta-widget" *ngIf="order.etaMinutes && order.status !== 'placed'" (click)="$event.stopPropagation()">
+          <div class="eta-top-row">
+            <div class="eta-time-block">
+              <span class="eta-mins">{{ etaMap[order.orderId]?.minsLeft ?? '—' }}</span>
+              <span class="eta-unit">min</span>
+            </div>
+            <div class="eta-info">
+              <span class="eta-arriving">{{ order.status === 'out_for_delivery' ? 'Arriving in' : 'Ready in' }}</span>
+              <span class="eta-phase">{{ etaMap[order.orderId]?.phaseLabel }}</span>
+            </div>
+            <div class="eta-arrival-time">
+              <ion-icon name="alarm-outline"></ion-icon>
+              <span>{{ getEtaArrivalTime(order) }}</span>
+            </div>
+          </div>
+          <!-- Animated progress bar -->
+          <div class="eta-bar-track">
+            <div class="eta-bar-fill" [style.width.%]="etaMap[order.orderId]?.pctElapsed || 2">
+              <div class="eta-bar-shimmer"></div>
+            </div>
+          </div>
+          <div class="eta-bottom-row">
+            <span class="eta-pct">{{ etaMap[order.orderId]?.pctElapsed || 0 }}% complete</span>
+            <span class="eta-steps-hint">
+              <ng-container *ngIf="order.status === 'confirmed'">🍳 Preparing</ng-container>
+              <ng-container *ngIf="order.status === 'out_for_delivery'">🛵 Out for delivery</ng-container>
+            </span>
+          </div>
+        </div>
+
+        <!-- Waiting state: placed, no ETA yet -->
+        <div class="eta-waiting" *ngIf="order.status === 'placed'">
+          <ion-icon name="hourglass-outline"></ion-icon>
+          <span>Waiting for restaurant to accept...</span>
+        </div>
+
+        <!-- Meta Row -->
+        <div class="active-meta">
+          <div class="active-meta-left">
+            <span class="meta-chip">{{ getItemCount(order) }} items</span>
+            <span class="meta-chip">₹{{ order.totalAmount?.toFixed(0) }}</span>
+            <span class="meta-chip">{{ order.paymentMethod === 'cod' ? 'COD' : 'Online' }}</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons Row -->
+        <div class="active-actions-row">
+          <!-- Cancel: placed only -->
+          <button class="cancel-order-btn"
+                  *ngIf="order.status === 'placed'"
+                  (click)="$event.stopPropagation(); cancelOrder(order)">
+            <ion-icon name="close-circle-outline"></ion-icon>
+            Cancel
+          </button>
+
+          <!-- Live Track: out_for_delivery -->
+          <button class="track-btn"
+                  *ngIf="order.status === 'out_for_delivery'"
+                  (click)="$event.stopPropagation(); openTracking(order)">
+            <ion-icon name="navigate-outline"></ion-icon>
+            Live Track
+          </button>
+
+          <!-- Call: out_for_delivery + deliveryBoy.phone -->
+          <button class="call-btn"
+                  *ngIf="order.status === 'out_for_delivery' && order.deliveryBoy?.phone"
+                  (click)="$event.stopPropagation(); callDeliveryBoy(order)">
+            <ion-icon name="call-outline"></ion-icon>
+            Call
+          </button>
+        </div>
+
+        <div class="active-track-hint">
+          <span>Tap to view details</span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- ===== ORDER HISTORY ===== -->
+    <div class="history-section" *ngIf="filteredGroupedOrders.length > 0">
+      <div class="history-group" *ngFor="let group of filteredGroupedOrders">
+        <div class="group-label">{{ group.label }}</div>
+        <div class="history-card"
+             *ngFor="let order of group.orders"
+             (click)="navigateToDetail(order.orderId)">
+
+          <div class="history-status-bar"
+               [style.background]="getStatusColor(order.status)"></div>
+
+          <div class="history-card-body">
+            <div class="history-icon-wrap">
+              <ion-icon [name]="getStatusIcon(order.status)"
+                        [style.color]="getStatusColor(order.status)"></ion-icon>
+            </div>
+            <div class="history-info">
+              <span class="history-order-id">{{ order.orderId }}</span>
+              <span class="history-vendor">{{ getVendorNames(order) }}</span>
+              <span class="history-meta">{{ getItemCount(order) }} items</span>
+            </div>
+            <div class="history-right">
+              <span class="history-amount">₹{{ order.totalAmount?.toFixed(0) }}</span>
+              <span class="history-status-chip"
+                    [style.color]="getStatusColor(order.status)"
+                    [style.background]="getStatusColor(order.status) + '15'">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EMPTY STATE ===== -->
+    <div class="empty-state" *ngIf="isEmpty">
+      <ion-icon name="receipt-outline" class="empty-icon"></ion-icon>
+      <h2 class="empty-title">No orders yet</h2>
+      <p class="empty-subtitle">Your order history will appear here.<br/>Start by browsing restaurants!</p>
+      <button class="empty-browse-btn" (click)="goHome()">Browse Restaurants</button>
+    </div>
+
+  </ng-container>
+
 </ion-content>

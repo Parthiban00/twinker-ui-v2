@@ -1,0 +1,228 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Manage Orders</ion-title>
+  </ion-toolbar>
+
+  <!-- Date filter row -->
+  <div class="filter-bar">
+    <button class="filter-chip" [class.active]="dateFilter === 'today'" (click)="setDateFilter('today')">Today</button>
+    <button class="filter-chip" [class.active]="dateFilter === 'yesterday'" (click)="setDateFilter('yesterday')">Yesterday</button>
+    <button class="filter-chip" [class.active]="dateFilter === 'week'" (click)="setDateFilter('week')">Last 7 Days</button>
+  </div>
+
+  <!-- Status tabs -->
+  <div class="status-tabs">
+    <button class="status-tab" [class.active]="activeTab === 'new'" (click)="setTab('new')">New</button>
+    <button class="status-tab" [class.active]="activeTab === 'accepted'" (click)="setTab('accepted')">Accepted</button>
+    <button class="status-tab" [class.active]="activeTab === 'ready'" (click)="setTab('ready')">Ready</button>
+    <button class="status-tab" [class.active]="activeTab === 'pickedup'" (click)="setTab('pickedup')">Picked Up</button>
+    <button class="status-tab" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">Cancelled</button>
+  </div>
+</ion-header>
+
+<ion-content>
+
+  <!-- Loading skeletons -->
+  <ng-container *ngIf="isLoading">
+    <div class="order-card skeleton-card" *ngFor="let i of [1,2,3]">
+      <ion-skeleton-text animated style="width: 45%; height: 13px; border-radius: 6px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 65%; height: 18px; margin-top: 10px; border-radius: 6px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 80%; height: 13px; margin-top: 8px; border-radius: 6px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 100%; height: 40px; margin-top: 14px; border-radius: 10px;"></ion-skeleton-text>
+    </div>
+  </ng-container>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!isLoading && orders.length === 0">
+    <div class="empty-icon-wrap">
+      <ion-icon name="receipt-outline"></ion-icon>
+    </div>
+    <p>No orders here</p>
+    <span>{{ activeTab === 'new' ? 'New orders will appear here' : 'No ' + activeTab + ' orders for this period' }}</span>
+  </div>
+
+  <!-- Order cards -->
+  <div
+    class="order-card"
+    *ngFor="let order of orders"
+    [class.urgent-card]="activeTab === 'new' && isUrgent(order.createdAt)">
+
+    <!-- Top row: time ago + payment badge -->
+    <div class="card-top-row">
+      <div class="time-ago" [class.urgent]="activeTab === 'new' && isUrgent(order.createdAt)">
+        <ion-icon name="time-outline"></ion-icon>
+        {{ getTimeSince(order.createdAt) }}
+      </div>
+      <span class="payment-badge" [class.online]="order.paymentMethod === 'online'">
+        {{ order.paymentMethod === 'online' ? 'ONLINE' : 'COD' }}
+      </span>
+    </div>
+
+    <!-- Customer row -->
+    <div class="customer-row">
+      <div class="customer-info">
+        <div class="customer-name">{{ order.userId?.fullName || 'Customer' }}</div>
+        <div class="order-id-text">{{ order.orderId }}</div>
+      </div>
+      <button class="call-btn" (click)="callCustomer(order)" *ngIf="activeTab !== 'cancelled'">
+        <ion-icon name="call-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Items + amount row -->
+    <div class="order-summary-row">
+      <div class="items-list">
+        <ng-container *ngIf="getMyVendorOrder(order) as vo">
+          <span *ngFor="let item of $any(vo).items | slice:0:2" class="item-text">
+            {{ $any(item).productName || $any(item).product?.name }} ×{{ $any(item).quantity }}
+          </span>
+          <span class="more-items" *ngIf="$any(vo).items?.length > 2">
+            +{{ $any(vo).items.length - 2 }} more
+          </span>
+        </ng-container>
+      </div>
+      <div class="order-amount">₹{{ order.totalAmount | number:'1.0-0' }}</div>
+    </div>
+
+    <!-- Divider -->
+    <div class="card-divider"></div>
+
+    <!-- Action buttons -->
+    <div class="action-row">
+
+      <!-- NEW tab -->
+      <ng-container *ngIf="activeTab === 'new'">
+        <button class="btn-decline" (click)="openCancelModal(order)">Decline</button>
+        <button class="btn-accept" (click)="openConfirmModal(order)">Accept →</button>
+      </ng-container>
+
+      <!-- ACCEPTED tab -->
+      <ng-container *ngIf="activeTab === 'accepted'">
+        <button class="btn-decline" (click)="openCancelModal(order)">Cancel</button>
+        <button class="btn-ready" (click)="markReady(order)">Mark Ready</button>
+      </ng-container>
+
+      <!-- READY tab -->
+      <ng-container *ngIf="activeTab === 'ready'">
+        <button class="btn-pickup" (click)="markPickedUp(order)">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Mark Picked Up
+        </button>
+      </ng-container>
+
+      <!-- PICKED UP (read-only) -->
+      <ng-container *ngIf="activeTab === 'pickedup'">
+        <div class="status-pill done">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Picked Up
+        </div>
+      </ng-container>
+
+      <!-- CANCELLED (read-only) -->
+      <ng-container *ngIf="activeTab === 'cancelled'">
+        <div class="cancel-reason-row">
+          <ion-icon name="close-circle-outline"></ion-icon>
+          <span>{{ getMyVendorOrder(order)?.vendorCancellationReason || 'Cancelled' }}</span>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <div style="height: 24px;"></div>
+</ion-content>
+
+<!-- ========== CONFIRM MODAL ========== -->
+<div class="modal-backdrop" *ngIf="showConfirmModal" (click)="closeConfirmModal()"></div>
+<div class="modal-sheet" *ngIf="showConfirmModal">
+
+  <!-- Handle bar -->
+  <div class="sheet-handle"></div>
+
+  <div class="sheet-header">
+    <div>
+      <div class="sheet-title">Confirm Order</div>
+      <div class="sheet-subtitle">{{ selectedOrder?.orderId }}</div>
+    </div>
+    <button class="close-btn" (click)="closeConfirmModal()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- Customer info -->
+  <div class="modal-customer-row" *ngIf="selectedOrder?.userId">
+    <div class="modal-customer-avatar">
+      <ion-icon name="person-outline"></ion-icon>
+    </div>
+    <div>
+      <div class="modal-customer-name">{{ selectedOrder.userId?.fullName }}</div>
+      <div class="modal-customer-phone">{{ selectedOrder.userId?.mobileNo }}</div>
+    </div>
+  </div>
+
+  <!-- Items section -->
+  <div class="sheet-section-label">Order Items</div>
+
+  <div class="item-row" *ngFor="let item of editableItems">
+    <span class="item-name">{{ item.productName || item.product?.name }}</span>
+    <div class="qty-control">
+      <button class="qty-btn" (click)="adjustQty(item, -1)">−</button>
+      <span class="qty-val">{{ item.quantity }}</span>
+      <button class="qty-btn" (click)="adjustQty(item, 1)">+</button>
+    </div>
+    <span class="item-price">₹{{ item.totalPrice | number:'1.0-0' }}</span>
+    <button class="remove-btn" (click)="removeItem(item)">
+      <ion-icon name="trash-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- Offer warning -->
+  <div class="offer-warning" *ngIf="offerWillBeRemoved">
+    <ion-icon name="warning-outline"></ion-icon>
+    Offer will be removed — subtotal below ₹{{ selectedVendorOrder?.appliedOffer?.minOrderAmount }}
+  </div>
+
+  <!-- Subtotal -->
+  <div class="subtotal-bar">
+    <span>Subtotal</span>
+    <strong>₹{{ getEditableSubtotal() | number:'1.0-0' }}</strong>
+  </div>
+
+  <!-- Prep time -->
+  <div class="sheet-section-label">Prep Time</div>
+  <div class="prep-chips">
+    <button
+      class="prep-chip"
+      *ngFor="let t of PREP_TIMES"
+      [class.active]="selectedPrepTime === t"
+      (click)="selectedPrepTime = t">
+      {{ t }} min
+    </button>
+  </div>
+
+  <button class="confirm-btn" [disabled]="editableItems.length === 0" (click)="confirmOrder()">
+    Confirm Order
+  </button>
+</div>
+
+<!-- ========== CANCEL MODAL ========== -->
+<div class="modal-backdrop" *ngIf="showCancelModal" (click)="closeCancelModal()"></div>
+<div class="cancel-modal" *ngIf="showCancelModal">
+  <div class="cancel-modal-icon">
+    <ion-icon name="close-circle-outline"></ion-icon>
+  </div>
+  <div class="cancel-modal-title">Decline Order?</div>
+  <div class="cancel-modal-subtitle">{{ selectedOrder?.orderId }}</div>
+  <textarea
+    class="reason-textarea"
+    [(ngModel)]="cancelReason"
+    placeholder="Reason (optional)...">
+  </textarea>
+  <div class="cancel-modal-actions">
+    <button class="keep-btn" (click)="closeCancelModal()">Keep</button>
+    <button class="cancel-confirm-btn" (click)="submitCancel()">Decline</button>
+  </div>
+</div>

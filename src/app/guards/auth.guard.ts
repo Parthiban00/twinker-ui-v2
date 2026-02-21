@@ -14,14 +14,14 @@ export class AuthGuard implements CanActivate, CanLoad {
     if (this.storageService.isLoggedIn()) {
       return true;
     }
-    return this.router.createUrlTree(['/']);
+    return this.router.createUrlTree(['/login']);
   }
 
   canLoad(route: Route, segments: UrlSegment[]): boolean | Observable<boolean> | Promise<boolean> {
     if (this.storageService.isLoggedIn()) {
       return true;
     }
-    this.router.navigate(['/']);
+    this.router.navigate(['/login'], { replaceUrl: true });
     return false;
   }
 }

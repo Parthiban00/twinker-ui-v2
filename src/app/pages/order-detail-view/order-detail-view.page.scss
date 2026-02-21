@@ -1,142 +1,536 @@
-.role-span{
-    font-size: 14px;
-    color: gray;
+$primary: #F85C70;
+$secondary: #FC8C5C;
+$text-primary: #1a1a1a;
+$text-secondary: #888888;
+$green: #2ecc71;
+
+ion-toolbar {
+  --background: #fff;
 }
 
-.custom-lable {
-    white-space: unset !important;
-    line-height: 1;
+.detail-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: $text-primary;
 }
 
-//shop details
-.shop-details{
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    border-radius: 10px;
-  
-   .shop-thumb{
-    img{
-      border-radius: 10px;
-    }
-   }
-  
-   .shop-title{
-    font-family: 'latoBold';
-   }
-   .shop-description{
+.cancel-header-btn {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: #e74c3c;
+}
+
+.detail-content {
+  --background: #f5f5f5;
+}
+
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+// Section card
+.section-card {
+  background: #fff;
+  border-radius: 14px;
+  margin: 12px 16px 0;
+  padding: 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+
+  ion-icon {
+    font-size: 18px;
+    color: $primary;
+  }
+
+  span {
+    font-family: 'latoBold', sans-serif;
     font-size: 14px;
-    font-family: 'latoRegular';
-    color: var(--ion-color-medium);
-  
-   }
-   .shop-location{
+    color: $text-primary;
+  }
+}
+
+// Status timeline
+.timeline-steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timeline-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+
+  &:last-child { flex: 0; }
+}
+
+.t-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid #ddd;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+
+  ion-icon {
     font-size: 12px;
-    font-family: "latoRegular";
-  
-    span{
-      img{
-        width: 10px;
-      }
-    }
-   }
+    color: #fff;
   }
 
-  //cart item details
-  .cart-item-details{
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
-  
-    .item-type{
-      img{
-        width: 15px;
-      }
-    }
-  
-    .item-details{
-      padding: 0;
-    }
-  
-    .item-name{
-      font-size: 14px;
-      font-family: "latoBold";
-    }
-  
-    .item-description{
-      font-size: 14px;
-      font-family: "latoRegular";
-      color: var(--ion-color-medium);
-    }
-  
-    .item-price{
-      font-family: 'latoBold';
-      font-size: 14px;
-    }
-  
-    .customize-btn{
-      ion-button {
-      height: fit-content;
-      font-size: 14px;
-  
-    .button-native{
-      padding: 0;
-    }
-      }
-    }
-  
-  
-  
-  .item-qty-adjust-parent{
-    padding: 0;
-  
-    .item-qty-adjust{
-      .qty-selector{
-        display: flex;
-  
-  
-      // position: absolute;
-    //  bottom:16px;
-     right: 10px;
-     height: 30px;
-        justify-content: center;
-        align-items: center;
-        background: #ffffff;
-        border: 1px solid rgb(248, 120, 14);
-        border-radius:2px;
-        // margin-top:10px;
-        width:fit-content;
-  
-  
-    ion-button{
-      width: 30px;
-    }
-  
-    .ion-label{
-      font-size: 12px;
-    }
-    }
-    }
-  
-    .item-total{
-      font-family: 'latoBold';
-    }
-  
-  }
-  
+  .done & {
+    background: $primary;
+    border-color: $primary;
   }
 
-  .bill-summary{
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-    padding: 10px;
-    .sub-total-text, .delivery-cost-text, .total-amt-text{
-      font-family: 'latoBold';
-    }
-  
-    .sub-total, .delivery-cost, .total-amt{
-      font-family: 'latoBold';
-      text-align: right;
-    }
-  
-    .total-amt, .total-amt-text{
-      font-family: 'latoBold';
-      font-size: 16px;
-    }
-  
+  .active & {
+    background: $primary;
+    border-color: $primary;
+    box-shadow: 0 0 0 4px rgba($primary, 0.2);
   }
+}
+
+.t-line {
+  flex: 1;
+  height: 3px;
+  background: #eee;
+  margin: 0 2px;
+
+  &.filled {
+    background: $primary;
+  }
+}
+
+.timeline-labels {
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 10px;
+    color: $text-secondary;
+    text-align: center;
+    flex: 1;
+  }
+}
+
+.last-update {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  margin-top: 10px;
+  text-align: center;
+}
+
+// Cancelled banner
+.cancelled-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 16px;
+  background: #FFF0F0;
+  border-radius: 14px;
+  border-left: 4px solid #e74c3c;
+
+  ion-icon {
+    font-size: 24px;
+    color: #e74c3c;
+    flex-shrink: 0;
+  }
+}
+
+.cancelled-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: #e74c3c;
+  display: block;
+}
+
+.cancelled-reason {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: #888;
+  display: block;
+  margin-top: 2px;
+}
+
+// Delivery address
+.address-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.address-label {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.address-text {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.address-landmark {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: #aaa;
+}
+
+// Vendor section
+.vendor-section {
+  padding: 0;
+  overflow: hidden;
+}
+
+.vendor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.vendor-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.vendor-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vendor-name {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.vendor-address {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vendor-status-chip {
+  font-family: 'latoBold', sans-serif;
+  font-size: 11px;
+  border-radius: 20px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+
+// Item rows
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #fafafa;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-name {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.item-qty {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.item-price {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.vendor-subtotal-row, .vendor-offer-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-secondary;
+
+  &:first-of-type {
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+.offer-discount {
+  color: $green;
+  font-family: 'latoBold', sans-serif;
+}
+
+// Payment summary
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.green-row span:last-child {
+  font-family: 'latoBold', sans-serif;
+  color: $green;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 8px 0;
+}
+
+.total-row {
+  span {
+    font-family: 'latoBold', sans-serif;
+    font-size: 16px;
+    color: $text-primary;
+  }
+}
+
+.payment-method-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+
+  ion-icon {
+    font-size: 16px;
+    color: $text-secondary;
+  }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: $text-secondary;
+  }
+}
+
+// Order info
+.info-card { padding: 14px 16px; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.info-label {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.info-value {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.bottom-pad {
+  height: 40px;
+}
+
+// Track header button
+.track-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $green;
+
+  ion-icon { font-size: 16px; }
+  span { font-size: 13px; }
+}
+
+// Delivery Boy Section
+.delivery-boy-section {
+  padding: 14px;
+}
+
+.db-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.db-avatar-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f0f0f0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.db-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($primary, 0.1);
+
+  ion-icon {
+    font-size: 22px;
+    color: $primary;
+  }
+}
+
+.db-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.db-name {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.db-role {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.db-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  margin-top: 2px;
+
+  ion-icon { font-size: 12px; }
+}
+
+.db-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.db-call-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: $green;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+
+  ion-icon { font-size: 14px; }
+}
+
+.db-track-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1.5px solid $primary;
+  border-radius: 20px;
+  padding: 8px 18px;
+  color: $primary;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+
+  ion-icon { font-size: 14px; }
+}
+
+// Pay Now button (disabled / coming soon)
+.pay-now-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border: 1.5px dashed #ddd;
+  border-radius: 12px;
+  color: #bbb;
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  cursor: not-allowed;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  .coming-soon-tag {
+    margin-left: auto;
+    background: #efefef;
+    color: #aaa;
+    font-family: 'latoRegular', sans-serif;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+}

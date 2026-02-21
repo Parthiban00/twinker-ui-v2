@@ -1,34 +1,64 @@
 <ion-content>
-  <div class="profile-container">
-    <div class="profile-header">
-      <div class="avatar">
-        <ion-icon name="person-circle-outline"></ion-icon>
-      </div>
-      <h2>{{ user?.name || 'User' }}</h2>
-      <p>{{ user?.mobile || '' }}</p>
-    </div>
 
-    <div class="profile-menu">
-      <div class="menu-item" routerLink="/location-setup">
-        <ion-icon name="location-outline"></ion-icon>
-        <span>Manage Addresses</span>
-        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
-      </div>
-      <div class="menu-item">
-        <ion-icon name="receipt-outline"></ion-icon>
-        <span>Order History</span>
-        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
-      </div>
-      <div class="menu-item">
-        <ion-icon name="help-circle-outline"></ion-icon>
-        <span>Help & Support</span>
-        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
-      </div>
-      <div class="menu-item">
-        <ion-icon name="information-circle-outline"></ion-icon>
-        <span>About</span>
-        <ion-icon name="chevron-forward-outline" class="arrow"></ion-icon>
-      </div>
+  <!-- Hero banner -->
+  <div class="profile-hero">
+    <div class="avatar-wrap">
+      <ion-icon name="person-outline"></ion-icon>
+    </div>
+    <h2 class="hero-name">{{ user?.fullName || 'User' }}</h2>
+    <p class="hero-mobile">{{ user?.mobileNo || '' }}</p>
+    <div class="vendor-tag" *ngIf="isVendor">
+      <ion-icon name="storefront-outline"></ion-icon>
+      Vendor Account
     </div>
   </div>
+
+  <!-- Menu card (overlaps the banner bottom) -->
+  <div class="profile-menu">
+
+    <div class="menu-item vendor-menu-item" *ngIf="isVendor" (click)="goToVendorOrders()">
+      <div class="menu-icon-wrap">
+        <ion-icon name="storefront-outline"></ion-icon>
+      </div>
+      <span class="menu-label">Manage Orders</span>
+      <span class="pending-badge" *ngIf="pendingOrderCount > 0">{{ pendingOrderCount }}</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+    <div class="menu-item" routerLink="/location-setup">
+      <div class="menu-icon-wrap">
+        <ion-icon name="location-outline"></ion-icon>
+      </div>
+      <span class="menu-label">Manage Addresses</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+    <div class="menu-item">
+      <div class="menu-icon-wrap">
+        <ion-icon name="receipt-outline"></ion-icon>
+      </div>
+      <span class="menu-label">Order History</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+    <div class="menu-item">
+      <div class="menu-icon-wrap">
+        <ion-icon name="help-circle-outline"></ion-icon>
+      </div>
+      <span class="menu-label">Help & Support</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+    <div class="menu-item">
+      <div class="menu-icon-wrap">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </div>
+      <span class="menu-label">About</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+  </div>
+
+  <p class="app-version">Twinker v1.0.0</p>
+
 </ion-content>

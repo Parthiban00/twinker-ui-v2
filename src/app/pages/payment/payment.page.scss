@@ -415,3 +415,28 @@ ion-footer {
   height: 20px;
   --color: #fff;
 }
+
+.error-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 20px 20px;
+  padding: 12px 14px;
+  background: #FFF0F1;
+  border-radius: 12px;
+  border: 1px solid rgba($primary, 0.2);
+
+  ion-icon {
+    font-size: 18px;
+    color: $primary;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: #c0392b;
+    line-height: 1.4;
+  }
+}

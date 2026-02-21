@@ -2,6 +2,13 @@
   "appId": "com.parthitechs.starter",
   "appName": "Twinker",
   "webDir": "www/browser",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "launchAutoHide": true,
+      "showSpinner": false
+    }
+  },
   "server": {
     "allowNavigation": [
       "maps.googleapis.com",

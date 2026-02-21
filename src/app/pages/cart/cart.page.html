@@ -423,7 +423,35 @@
 
 <!-- Footer: Place Order -->
 <ion-footer class="ion-no-border" *ngIf="!isCartEmpty">
+
+  <!-- Active Order Banner -->
+  <div class="active-order-banner" *ngIf="activeOrderCount > 0">
+    <div class="aob-info">
+      <ion-icon name="time-outline" class="aob-icon"></ion-icon>
+      <div class="aob-text">
+        <span class="aob-title" *ngIf="activeOrderCount === 1">
+          Order {{ activeOrder.orderId }} is in progress
+        </span>
+        <span class="aob-title" *ngIf="activeOrderCount > 1">
+          {{ activeOrderCount }} orders in progress
+        </span>
+        <span class="aob-sub">You can still place another order.</span>
+      </div>
+    </div>
+    <div class="aob-actions">
+      <button class="aob-view-btn" (click)="router.navigate(['/tabs/orders'])">View</button>
+      <button class="aob-force-btn" [class.active]="forcePlace" (click)="setForcePlace()">
+        {{ forcePlace ? 'Will place' : 'Place anyway' }}
+      </button>
+    </div>
+  </div>
+
   <div class="footer-wrap">
-    <button class="place-order-btn" (click)="openPaymentModal()">Place order</button>
+    <button class="place-order-btn" [disabled]="isCheckoutLoading" (click)="openPaymentModal()">
+      <span class="place-order-spinner" *ngIf="isCheckoutLoading">
+        <ion-spinner name="crescent"></ion-spinner>
+      </span>
+      <span>{{ isCheckoutLoading ? 'Preparing summary...' : 'Place order' }}</span>
+    </button>
   </div>
 </ion-footer>

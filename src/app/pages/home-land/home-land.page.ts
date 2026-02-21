@@ -10,6 +10,7 @@ import { CommonService } from 'src/app/services/common.service';
 import { HomeMainService } from '../home-main/home-main.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { environment } from 'src/environments/environment';
+import { EventBusService } from 'src/app/services/event-bus.service';
 import { AllItemsPage } from 'src/app/shared/pages/all-items/all-items.page';
 import { register } from 'swiper/element/bundle';
 
@@ -203,6 +204,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
 
   private searchSubject = new Subject<string>();
   private searchSub: any;
+  private cartSub: any;
 
   constructor(
     private modalCtrl: ModalController,
@@ -213,6 +215,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
     private commonService: CommonService,
     private homeService: HomeMainService,
     private storageService: StorageService,
+    private eventBus: EventBusService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -223,11 +226,18 @@ export class HomeLandPage implements OnInit, OnDestroy {
     ).subscribe(term => {
       this.performSearch(term);
     });
+    this.cartSub = this.eventBus.on('cart:updated').subscribe(() => {
+      this.loadCart();
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnDestroy() {
     if (this.searchSub) {
       this.searchSub.unsubscribe();
+    }
+    if (this.cartSub) {
+      this.cartSub.unsubscribe();
     }
   }
 
@@ -261,25 +271,23 @@ export class HomeLandPage implements OnInit, OnDestroy {
     this.isTrendingLoading = true;
     this.loadCart();
     const userData = this.storageService.getUser();
+    const params = this.activatedRoute.snapshot.queryParamMap;
+    this.categoryId = params.get('categoryId') || '';
+    this.localityId = params.get('localityId') || '';
+    this.cuisineFilter = params.get('cuisineFilter') || '';
+    const title = params.get('title');
+    if (title) {
+      this.pageTitle = title;
+    }
 
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.categoryId = params['categoryId'] || '';
-      this.localityId = params['localityId'] || '';
-      this.cuisineFilter = params['cuisineFilter'] || '';
-
-      if (params['title']) {
-        this.pageTitle = params['title'];
-      }
-
-      if (userData?._id) {
-        this.getDefaultAddressByUserId(userData._id);
-      } else {
-        this.isLoading = false;
-        this.isDealsLoading = false;
-        this.isTrendingLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
+    if (userData?._id) {
+      this.getDefaultAddressByUserId(userData._id);
+    } else {
+      this.isLoading = false;
+      this.isDealsLoading = false;
+      this.isTrendingLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   getDefaultAddressByUserId(userId: string) {
@@ -633,7 +641,7 @@ export class HomeLandPage implements OnInit, OnDestroy {
     const vendor = item.vendor || {};
     const vendorId = item.vendorId || vendor._id || 'unknown';
 
-    const existing = cartItems.find((c: any) => c._id === item._id);
+    const existing = cartItems.find((c: any) => (c._id === item._id) && ((c.vendorId || 'unknown') === vendorId) && !c.cartItemId);
     if (existing) {
       existing.itemCount = (existing.itemCount || existing.quantity || 1) + 1;
     } else {
@@ -652,6 +660,8 @@ export class HomeLandPage implements OnInit, OnDestroy {
       });
     }
     this.storageService.setItem('cart-items', cartItems);
+    const totalCount = cartItems.reduce((sum: number, ci: any) => sum + (ci.itemCount || ci.quantity || 1), 0);
+    this.eventBus.emit('cart:updated', totalCount);
     this.loadCart();
     this.commonService.presentToast('bottom', `${item.productName || 'Item'} added to cart`, 'success');
   }

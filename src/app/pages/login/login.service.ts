@@ -18,6 +18,6 @@ export class LoginService {
 
   logout() {
     this.storageServie.clean();
-    this.router.navigate(['/']);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

@@ -22,6 +22,6 @@ export class ServiceNotAvailablePage {
 
   logout() {
     this.storageService.clean();
-    this.router.navigate(['/']);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

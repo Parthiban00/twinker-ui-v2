@@ -1,34 +1,718 @@
-ion-card {
-    font-family: 'latoBold';
-    border-radius: 0;
+$primary: #F85C70;
+$secondary: #FC8C5C;
+$text-primary: #1a1a1a;
+$text-secondary: #888888;
+$green: #2ecc71;
+
+ion-toolbar {
+  --background: #fff;
 }
 
-ion-grid {
-    padding: 0;
+// ======== FILTER TABS ========
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+  background: #fff;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 
-    ion-row {
-        .thumbnail-col {
-            padding: 0;
-            height: 70px;
-            background: var(--ion-color-secondary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  &::-webkit-scrollbar { display: none; }
+}
 
-        .content-col {
-            padding-left: 10px;
-            margin: auto;
-        }
+.filter-tab {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 
-        .count-col {
-            margin: auto;
+  &.active {
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
 
-            ion-badge {
-                border-radius: 50%;
-                min-width: 20px;
-                min-height: 20px;
-            }
-        }
+    .filter-badge {
+      background: rgba(255,255,255,0.3);
+      color: #fff;
     }
+  }
+}
+
+.filter-badge {
+  background: $primary;
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 10px;
+  border-radius: 20px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.orders-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 20px;
+  color: $text-primary;
+}
+
+.orders-content {
+  --background: #f5f5f5;
+}
+
+// ======== SKELETON ========
+.skeleton-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+// ======== ACTIVE ORDERS HEADER (shown when >1 active) ========
+.active-orders-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px 4px;
+
+  ion-icon {
+    font-size: 16px;
+    color: $primary;
+  }
+
+  span {
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ======== ACTIVE ORDER CARD ========
+.active-order-card {
+  margin: 16px 16px 8px;
+  background: linear-gradient(135deg, $primary, $secondary);
+  border-radius: 18px;
+  padding: 18px 18px 14px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &.highlight {
+    animation: highlightPulse 1.5s ease 2;
+  }
+}
+
+@keyframes highlightPulse {
+  0%, 100% { box-shadow: 0 4px 24px rgba($primary, 0.3); }
+  50% { box-shadow: 0 4px 40px rgba($primary, 0.7); }
+}
+
+.active-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.active-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.active-status-dot {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+
+  &.pulse {
+    animation: livePulse 1.5s ease infinite;
+  }
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+.active-status-label {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: #fff;
+}
+
+.active-order-id {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+// Progress Steps
+.progress-track-wrap {
+  margin-bottom: 14px;
+}
+
+.progress-steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+
+  &:last-child { flex: 0; }
+}
+
+.step-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: 2px solid rgba(255,255,255,0.5);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+
+  ion-icon {
+    font-size: 10px;
+    color: $primary;
+  }
+
+  .done & {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  .active & {
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
+  }
+}
+
+.step-connector {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  margin: 0 2px;
+  border-radius: 2px;
+
+  &.filled {
+    background: #fff;
+  }
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 9px;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ======== ETA WIDGET ========
+.eta-widget {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.eta-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.eta-time-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.eta-mins {
+  font-family: 'latoBold', sans-serif;
+  font-size: 36px;
+  color: #fff;
+  line-height: 1;
+}
+
+.eta-unit {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 3px;
+}
+
+.eta-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.eta-arriving {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.eta-phase {
+  font-family: 'latoBold', sans-serif;
+  font-size: 14px;
+  color: #fff;
+}
+
+.eta-arrival-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 6px 10px;
+
+  ion-icon {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  span {
+    font-family: 'latoBold', sans-serif;
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+  }
+}
+
+// Animated progress bar
+.eta-bar-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.eta-bar-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 8px;
+}
+
+.eta-bar-shimmer {
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  animation: etaShimmer 2s linear infinite;
+}
+
+@keyframes etaShimmer {
+  0%   { left: -60%; }
+  100% { left: 120%; }
+}
+
+.eta-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eta-pct {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.eta-steps-hint {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+// Waiting state (placed, no ETA yet)
+.eta-waiting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+
+  ion-icon {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    animation: hourglassRock 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+@keyframes hourglassRock {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(15deg); }
+  75%       { transform: rotate(-15deg); }
+}
+
+// Vendor summary
+.active-vendors {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  .vendor-icon {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  span {
+    font-family: 'latoBold', sans-serif;
+    font-size: 14px;
+    color: #fff;
+  }
+}
+
+// Meta row
+.active-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.active-meta-left {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+// Delivery boy row
+.delivery-boy-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+
+  .db-icon {
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .db-name {
+    font-family: 'latoBold', sans-serif;
+    font-size: 13px;
+    color: #fff;
+    flex: 1;
+  }
+
+  .db-vehicle {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 2px 8px;
+  }
+}
+
+// Action buttons row
+.active-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cancel-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  padding: 7px 16px;
+  cursor: pointer;
+
+  ion-icon { font-size: 14px; }
+}
+
+.track-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #2ecc71;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  padding: 7px 16px;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+  animation: trackGlow 2s ease infinite;
+
+  ion-icon { font-size: 14px; }
+}
+
+@keyframes trackGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
+  50% { box-shadow: 0 0 18px rgba(46, 204, 113, 0.8); }
+}
+
+.call-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.2);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 20px;
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  padding: 7px 16px;
+  cursor: pointer;
+
+  ion-icon { font-size: 14px; }
+}
+
+.active-track-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  span {
+    font-family: 'latoRegular', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  ion-icon {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+  }
+}
+
+// ======== ORDER HISTORY ========
+.history-section {
+  padding: 8px 16px 24px;
+}
+
+.history-group {
+  margin-bottom: 4px;
+}
+
+.group-label {
+  font-family: 'latoBold', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 14px 0 8px;
+}
+
+.history-card {
+  display: flex;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+
+  &:active {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+}
+
+.history-status-bar {
+  width: 4px;
+  flex-shrink: 0;
+}
+
+.history-card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  flex: 1;
+}
+
+.history-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.history-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-order-id {
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.history-vendor {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 12px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-meta {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.history-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.history-amount {
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  color: $text-primary;
+}
+
+.history-status-chip {
+  font-family: 'latoBold', sans-serif;
+  font-size: 10px;
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+// ======== EMPTY STATE ========
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 32px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 22px;
+  color: $text-primary;
+  margin: 0 0 10px;
+}
+
+.empty-subtitle {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.5;
+  margin: 0 0 28px;
+}
+
+.empty-browse-btn {
+  background: linear-gradient(135deg, $primary, $secondary);
+  color: #fff;
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 32px;
+  cursor: pointer;
 }
