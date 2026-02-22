@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { GmapsService } from 'src/app/services/gmaps/gmaps.service';
 import { OrderService } from 'src/app/services/order.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -20,6 +21,7 @@ export class OrderTrackingPage implements OnDestroy {
   private map: any = null;
   private deliveryBoyMarker: any = null;
   private trackInterval: any = null;
+  private paramsSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,17 +34,21 @@ export class OrderTrackingPage implements OnDestroy {
   ) {}
 
   ionViewWillEnter() {
-    this.route.queryParams.subscribe(params => {
+    // Unsubscribe first to prevent duplicate subscriptions on back-nav re-enter
+    this.paramsSub?.unsubscribe();
+    this.paramsSub = this.route.queryParams.subscribe(params => {
       this.orderId = params['orderId'] || '';
       if (this.orderId) this.loadOrder();
     });
   }
 
   ionViewWillLeave() {
+    this.paramsSub?.unsubscribe();
     this.stopTracking();
   }
 
   ngOnDestroy() {
+    this.paramsSub?.unsubscribe();
     this.stopTracking();
   }
 
@@ -212,7 +218,7 @@ export class OrderTrackingPage implements OnDestroy {
 
   private startTrackingPoll() {
     this.stopTracking();
-    this.trackInterval = setInterval(() => this.refreshLocation(), 5000);
+    this.trackInterval = setInterval(() => this.refreshLocation(), 10000);
   }
 
   private refreshLocation() {

@@ -84,11 +84,11 @@
         <span class="see-all-link" (click)="exploreCategories()">See all</span>
       </div>
       <div class="service-pillars-scroll">
-        <div class="service-pillar" *ngFor="let cat of categories; let i = index"
+        <div class="service-pillar" *ngFor="let cat of categories; let i = index; trackBy: trackById"
           [style.animation-delay]="(i * 0.05) + 's'"
           (click)="navigateService(cat)">
           <div class="pillar-icon-wrap">
-            <img *ngIf="cat.imageUrl" [src]="getCategoryImageUrl(cat)" class="pillar-img" alt="{{ cat.categoryName }}" />
+            <img *ngIf="cat.imageUrl" [src]="getCategoryImageUrl(cat)" class="pillar-img" alt="{{ cat.categoryName }}" loading="eager" />
             <ion-icon *ngIf="!cat.imageUrl" name="storefront-outline" class="pillar-fallback-icon"></ion-icon>
           </div>
           <span class="pillar-name">{{ cat.categoryName }}</span>
@@ -99,10 +99,10 @@
     <!-- Section 2: Offers & Deals Swiper -->
     <div class="banner-carousel anim-section" *ngIf="deals.length" style="animation-delay: 0.1s;">
       <swiper-container slides-per-view="1.3" space-between="12" pagination="true" autoplay-delay="3000" loop="true">
-        <swiper-slide *ngFor="let deal of deals">
+        <swiper-slide *ngFor="let deal of deals; trackBy: trackById">
           <div class="deal-card" (click)="navigateRestaurant(deal.vendor)">
             <div class="deal-img-wrap">
-              <img *ngIf="deal.imageUrl" [src]="imgBaseUrl + deal.imageUrl" alt="{{ deal.productName }}" />
+              <img *ngIf="deal.imageUrl" [src]="imgBaseUrl + deal.imageUrl" alt="{{ deal.productName }}" loading="lazy" />
               <div class="deal-img-placeholder" *ngIf="!deal.imageUrl">
                 <ion-icon name="pricetag-outline"></ion-icon>
               </div>
@@ -134,7 +134,7 @@
         </h2>
       </div>
       <div class="flash-deals-scroll">
-        <div class="flash-deal-card" *ngFor="let deal of flashDeals" (click)="navigateFlashDeal(deal)">
+        <div class="flash-deal-card" *ngFor="let deal of flashDeals; trackBy: trackById" (click)="navigateFlashDeal(deal)">
           <div class="flash-timer-chip">
             <ion-icon name="time-outline"></ion-icon>
             {{ deal.timeLeft }}
@@ -180,9 +180,9 @@
         <span class="see-all" (click)="navigateToPopularItems()">See all</span>
       </div>
       <div class="order-again-scroll">
-        <div class="order-again-card" *ngFor="let item of popularItems" (click)="navigatePopularItem(item)">
+        <div class="order-again-card" *ngFor="let item of popularItems; trackBy: trackById" (click)="navigatePopularItem(item)">
           <div class="order-again-img">
-            <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" alt="{{ item.productName }}" />
+            <img *ngIf="item.imageUrl" [src]="imgBaseUrl + item.imageUrl" alt="{{ item.productName }}" loading="lazy" />
             <div class="img-placeholder item-placeholder" *ngIf="!item.imageUrl">
               <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🛒' : '🍽️' }}</span>
             </div>
@@ -237,9 +237,9 @@
         <h2>What's on your mind?</h2>
       </div>
       <div class="cuisine-grid">
-        <div class="cuisine-item" *ngFor="let cuisine of cuisines" (click)="navigateCuisine(cuisine)">
+        <div class="cuisine-item" *ngFor="let cuisine of cuisines; trackBy: trackById" (click)="navigateCuisine(cuisine)">
           <div class="cuisine-circle" [ngStyle]="{'background-color': cuisine.bgColor || '#f5f5f5', 'border': '2px solid ' + (cuisine.accentColor || '#ddd') + '22'}">
-            <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" class="cuisine-img" alt="{{ cuisine.name }}" />
+            <img *ngIf="cuisine.imageUrl" [src]="imgBaseUrl + cuisine.imageUrl" class="cuisine-img" alt="{{ cuisine.name }}" loading="lazy" />
             <span *ngIf="!cuisine.imageUrl && cuisine.icon" class="cuisine-emoji">{{ cuisine.icon }}</span>
             <ion-icon *ngIf="!cuisine.imageUrl && !cuisine.icon" name="restaurant-outline" [ngStyle]="{'color': cuisine.accentColor || '#888'}"></ion-icon>
           </div>
@@ -255,9 +255,9 @@
         <span class="see-all" (click)="navigateToPopularVendors()">See all</span>
       </div>
       <div class="popular-scroll">
-        <div class="restaurant-card" *ngFor="let vendor of popularVendors" (click)="navigateRestaurant(vendor)">
+        <div class="restaurant-card" *ngFor="let vendor of popularVendors; trackBy: trackById" (click)="navigateRestaurant(vendor)">
           <div class="restaurant-cover">
-            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
+            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" loading="lazy" />
             <div class="img-placeholder vendor-placeholder" *ngIf="!vendor.profileImgUrl">
               <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🏪' : '🍽️' }}</span>
             </div>
@@ -301,9 +301,9 @@
         <h2>{{ activeVertical === 'eats' ? 'Top rated restaurants' : 'Top rated stores' }}</h2>
       </div>
       <div class="popular-scroll">
-        <div class="restaurant-card top-rated-card" *ngFor="let vendor of topRatedVendors" (click)="navigateRestaurant(vendor)">
+        <div class="restaurant-card top-rated-card" *ngFor="let vendor of topRatedVendors; trackBy: trackById" (click)="navigateRestaurant(vendor)">
           <div class="restaurant-cover">
-            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" />
+            <img *ngIf="vendor.profileImgUrl" [src]="imgBaseUrl + vendor.profileImgUrl" alt="{{ vendor.name }}" loading="lazy" />
             <div class="img-placeholder vendor-placeholder" *ngIf="!vendor.profileImgUrl">
               <span class="placeholder-emoji">{{ activeVertical === 'mart' ? '🏪' : '🍽️' }}</span>
             </div>

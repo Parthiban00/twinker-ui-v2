@@ -159,7 +159,6 @@
         <div class="trending-img-wrap">
           <img [src]="vendor.profileImgUrl ? (imgBaseUrl + vendor.profileImgUrl) : 'assets/announcement-banner.jpg'"
             [alt]="vendor.name" />
-          <div class="trending-tag" [style.background]="theme.accentColor">Popular</div>
           <!-- Open badge (only when open) -->
           <div class="vendor-open-badge" *ngIf="isVendorOpen(vendor)">
             <span class="open-dot"></span>Open

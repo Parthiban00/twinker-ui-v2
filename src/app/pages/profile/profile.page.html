@@ -11,6 +11,10 @@
       <ion-icon name="storefront-outline"></ion-icon>
       Vendor Account
     </div>
+    <div class="vendor-tag delivery-tag" *ngIf="isDelivery">
+      <ion-icon name="bicycle-outline"></ion-icon>
+      Delivery Partner
+    </div>
   </div>
 
   <!-- Menu card (overlaps the banner bottom) -->
@@ -22,6 +26,14 @@
       </div>
       <span class="menu-label">Manage Orders</span>
       <span class="pending-badge" *ngIf="pendingOrderCount > 0">{{ pendingOrderCount }}</span>
+      <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+    </div>
+
+    <div class="menu-item delivery-menu-item" *ngIf="isDelivery" (click)="goToDeliveryOrders()">
+      <div class="menu-icon-wrap delivery-icon-wrap">
+        <ion-icon name="bicycle-outline"></ion-icon>
+      </div>
+      <span class="menu-label">My Deliveries</span>
       <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
     </div>
 

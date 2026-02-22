@@ -112,11 +112,6 @@
     <span>Please keep exact change ready for the delivery partner</span>
   </div>
 
-  <!-- Error Message -->
-  <div class="error-note" *ngIf="placeError">
-    <ion-icon name="alert-circle-outline"></ion-icon>
-    <span>{{ placeError }}</span>
-  </div>
 
 </ion-content>
 
@@ -140,3 +135,72 @@
     </button>
   </div>
 </ion-footer>
+
+<!-- ─── Order Error Dialog ─── -->
+<div class="err-backdrop" *ngIf="showErrorDialog" (click)="errorType !== 'vendor_closed' && closeErrorDialog()">
+  <div class="err-sheet" [class]="'err-sheet--' + errorType" (click)="$event.stopPropagation()">
+
+    <!-- Handle bar -->
+    <div class="err-handle"></div>
+
+    <!-- Icon -->
+    <div class="err-icon-ring" [class]="'err-icon-ring--' + errorType">
+      <div class="err-icon-circle" [class]="'err-icon-circle--' + errorType">
+        <ion-icon [name]="errorIcon"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <h2 class="err-title">{{ errorTitle }}</h2>
+    <p class="err-message">{{ errorMessage }}</p>
+
+    <!-- Vendor chips (VENDOR_UNAVAILABLE only) -->
+    <div class="err-vendor-chips" *ngIf="errorType === 'vendor_closed' && errorClosedVendors.length">
+      <span class="err-vendor-chip" *ngFor="let v of errorClosedVendors">
+        <ion-icon name="storefront-outline"></ion-icon>
+        {{ v }}
+      </span>
+    </div>
+
+    <!-- Helper note for vendor_closed -->
+    <div class="err-helper-note" *ngIf="errorType === 'vendor_closed'">
+      <ion-icon name="time-outline"></ion-icon>
+      <span>Remove the closed store from your cart or try again when it reopens.</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="err-actions">
+
+      <!-- vendor_closed -->
+      <ng-container *ngIf="errorType === 'vendor_closed'">
+        <button class="err-btn err-btn--primary" (click)="dismissToCart()">
+          <ion-icon name="cart-outline"></ion-icon>
+          Back to Cart
+        </button>
+      </ng-container>
+
+      <!-- active_order -->
+      <ng-container *ngIf="errorType === 'active_order'">
+        <button class="err-btn err-btn--primary" (click)="placeOrderForced()">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Place Anyway
+        </button>
+        <button class="err-btn err-btn--ghost" (click)="closeErrorDialog()">
+          Cancel
+        </button>
+      </ng-container>
+
+      <!-- generic -->
+      <ng-container *ngIf="errorType === 'generic'">
+        <button class="err-btn err-btn--primary" (click)="closeErrorDialog()">
+          <ion-icon name="refresh-outline"></ion-icon>
+          Try Again
+        </button>
+        <button class="err-btn err-btn--ghost" (click)="dismissToCart()">
+          Go Back
+        </button>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

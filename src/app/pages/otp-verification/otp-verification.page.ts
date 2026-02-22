@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { OtpService } from './otp.service';
 import { CommonService } from 'src/app/services/common.service';
+import { PushNotificationService } from 'src/app/services/push-notification.service';
 import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
@@ -28,7 +29,8 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
     private commonService: CommonService,
     private router: Router,
     private storageService: StorageService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private pushNotif: PushNotificationService,
   ) {
     this.activatedRoute.queryParams.subscribe(params => {
       this.mobileNo = params.mobileNo;
@@ -98,6 +100,9 @@ export class OtpVerificationPage implements OnInit, OnDestroy {
             if (resdata.data) {
               if (resdata.data.token) this.storageService.saveToken(resdata.data.token);
               if (resdata.data.user) this.storageService.saveUser(resdata.data.user);
+
+              // Register for push notifications after successful login
+              this.pushNotif.init();
 
               if (resdata.data.hasDefaultAddress) {
                 this.router.navigate(['/tabs/home-main'], { replaceUrl: true });

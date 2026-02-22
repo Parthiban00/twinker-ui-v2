@@ -15,11 +15,26 @@
 
   <!-- Status tabs -->
   <div class="status-tabs">
-    <button class="status-tab" [class.active]="activeTab === 'new'" (click)="setTab('new')">New</button>
-    <button class="status-tab" [class.active]="activeTab === 'accepted'" (click)="setTab('accepted')">Accepted</button>
-    <button class="status-tab" [class.active]="activeTab === 'ready'" (click)="setTab('ready')">Ready</button>
-    <button class="status-tab" [class.active]="activeTab === 'pickedup'" (click)="setTab('pickedup')">Picked Up</button>
-    <button class="status-tab" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">Cancelled</button>
+    <button class="status-tab" [class.active]="activeTab === 'new'" (click)="setTab('new')">
+      New
+      <span class="tab-count" *ngIf="tabCounts.new > 0">{{ tabCounts.new }}</span>
+    </button>
+    <button class="status-tab" [class.active]="activeTab === 'accepted'" (click)="setTab('accepted')">
+      Accepted
+      <span class="tab-count" *ngIf="tabCounts.accepted > 0">{{ tabCounts.accepted }}</span>
+    </button>
+    <button class="status-tab" [class.active]="activeTab === 'ready'" (click)="setTab('ready')">
+      Ready
+      <span class="tab-count" *ngIf="tabCounts.ready > 0">{{ tabCounts.ready }}</span>
+    </button>
+    <button class="status-tab" [class.active]="activeTab === 'pickedup'" (click)="setTab('pickedup')">
+      Picked Up
+      <span class="tab-count" *ngIf="tabCounts.pickedup > 0">{{ tabCounts.pickedup }}</span>
+    </button>
+    <button class="status-tab" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">
+      Cancelled
+      <span class="tab-count" *ngIf="tabCounts.cancelled > 0">{{ tabCounts.cancelled }}</span>
+    </button>
   </div>
 </ion-header>
 
@@ -111,12 +126,12 @@
         <button class="btn-ready" (click)="markReady(order)">{{ getMarkReadyLabel(order) }}</button>
       </ng-container>
 
-      <!-- READY tab -->
+      <!-- READY tab — awaiting delivery partner pickup -->
       <ng-container *ngIf="activeTab === 'ready'">
-        <button class="btn-pickup" (click)="markPickedUp(order)">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
-          Mark Picked Up
-        </button>
+        <div class="awaiting-pickup-row">
+          <ion-icon name="bicycle-outline"></ion-icon>
+          <span>Awaiting pickup by delivery partner</span>
+        </div>
       </ng-container>
 
       <!-- PICKED UP (read-only) -->

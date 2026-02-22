@@ -1,4 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CommonService } from 'src/app/services/common.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { VendorOrderService } from 'src/app/services/vendor-order.service';
@@ -28,6 +30,7 @@ export class VendorOrdersPage {
   dateFilter: DateFilterType = 'today';
   orders: any[] = [];
   isLoading = false;
+  tabCounts: Record<TabType, number> = { new: 0, accepted: 0, ready: 0, pickedup: 0, cancelled: 0 };
 
   // Confirm modal
   showConfirmModal = false;
@@ -53,6 +56,7 @@ export class VendorOrdersPage {
     const user = this.storageService.getUser();
     this.vendorId = user?.vendorId || '';
     this.loadOrders();
+    this.loadCounts();
   }
 
   loadOrders() {
@@ -83,6 +87,32 @@ export class VendorOrdersPage {
     });
   }
 
+  loadCounts() {
+    if (!this.vendorId) return;
+    const { dateFrom, dateTo } = this.buildDateRange();
+    const statusMap: Record<TabType, string> = {
+      new: 'placed',
+      accepted: 'confirmed',
+      ready: 'ready',
+      pickedup: 'picked_up',
+      cancelled: 'cancelled',
+    };
+    forkJoin({
+      new: this.vendorOrderService.getOrdersByVendor(this.vendorId, statusMap.new, dateFrom, dateTo).pipe(catchError(() => of({ data: [] }))),
+      accepted: this.vendorOrderService.getOrdersByVendor(this.vendorId, statusMap.accepted, dateFrom, dateTo).pipe(catchError(() => of({ data: [] }))),
+      ready: this.vendorOrderService.getOrdersByVendor(this.vendorId, statusMap.ready, dateFrom, dateTo).pipe(catchError(() => of({ data: [] }))),
+      pickedup: this.vendorOrderService.getOrdersByVendor(this.vendorId, statusMap.pickedup, dateFrom, dateTo).pipe(catchError(() => of({ data: [] }))),
+      cancelled: this.vendorOrderService.getOrdersByVendor(this.vendorId, statusMap.cancelled, dateFrom, dateTo).pipe(catchError(() => of({ data: [] }))),
+    }).subscribe((results) => {
+      this.tabCounts.new = results.new?.data?.length || 0;
+      this.tabCounts.accepted = results.accepted?.data?.length || 0;
+      this.tabCounts.ready = results.ready?.data?.length || 0;
+      this.tabCounts.pickedup = results.pickedup?.data?.length || 0;
+      this.tabCounts.cancelled = results.cancelled?.data?.length || 0;
+      this.cdr.detectChanges();
+    });
+  }
+
   setTab(tab: TabType) {
     this.activeTab = tab;
     this.loadOrders();
@@ -91,6 +121,7 @@ export class VendorOrdersPage {
   setDateFilter(f: DateFilterType) {
     this.dateFilter = f;
     this.loadOrders();
+    this.loadCounts();
   }
 
   private buildDateRange(): { dateFrom: string; dateTo: string } {
@@ -178,6 +209,7 @@ export class VendorOrdersPage {
         this.closeConfirmModal();
         this.commonService.presentToast('bottom', 'Order confirmed!', 'success');
         this.loadOrders();
+        this.loadCounts();
       },
       error: (err: any) => {
         if (err?.error?.code === 'ORDER_CANCELLED_BY_CUSTOMER') {
@@ -197,18 +229,7 @@ export class VendorOrdersPage {
       next: () => {
         this.commonService.presentToast('bottom', 'Order marked as ready!', 'success');
         this.loadOrders();
-      },
-      error: (err: any) => {
-        this.commonService.presentToast('bottom', err?.error?.message || 'Failed to update status', 'danger');
-      },
-    });
-  }
-
-  markPickedUp(order: any) {
-    this.vendorOrderService.updateVendorOrderStatus(order.orderId, this.vendorId, 'picked_up').subscribe({
-      next: () => {
-        this.commonService.presentToast('bottom', 'Order picked up!', 'success');
-        this.loadOrders();
+        this.loadCounts();
       },
       error: (err: any) => {
         this.commonService.presentToast('bottom', err?.error?.message || 'Failed to update status', 'danger');
@@ -235,6 +256,7 @@ export class VendorOrdersPage {
         this.closeCancelModal();
         this.commonService.presentToast('bottom', 'Order cancelled.', 'danger');
         this.loadOrders();
+        this.loadCounts();
       },
       error: (err: any) => {
         this.commonService.presentToast('bottom', err?.error?.message || 'Failed to cancel order', 'danger');

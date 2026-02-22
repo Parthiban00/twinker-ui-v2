@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonContent, ModalController, NavController, PopoverController } from '@ionic/angular';
+import { IonContent, ModalController, NavController, PopoverController } from '@ionic/angular';
 import { CommonService } from 'src/app/services/common.service';
 import { EventBusService } from 'src/app/services/event-bus.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -172,7 +172,6 @@ export class ItemsPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private itemService: ItemsService,
     private dealsService: DealsService,
-    private alertCtrl: AlertController,
   ) {}
 
   ngOnInit() {
@@ -347,15 +346,6 @@ export class ItemsPage implements OnInit {
   }
 
   addItem(product: any) {
-    // For Eats: if cart has items from a different restaurant, prompt to clear
-    if (this.vertical === 'eats') {
-      const cart = this.storageService.getEatsCart();
-      const otherVendorItems = cart.filter(c => c.vendorId && c.vendorId !== this.vendorId);
-      if (otherVendorItems.length > 0) {
-        this.showSwitchRestaurantAlert(product);
-        return;
-      }
-    }
     this.doAddItem(product);
   }
 
@@ -366,31 +356,6 @@ export class ItemsPage implements OnInit {
       product.itemCount = (product.itemCount || 0) + 1;
       this.syncCart();
     }
-  }
-
-  private async showSwitchRestaurantAlert(product: any) {
-    const currentCart = this.storageService.getEatsCart();
-    const otherVendorName = currentCart.find(c => c.vendorId !== this.vendorId)?.vendorName || 'another restaurant';
-    const alert = await this.alertCtrl.create({
-      header: 'Switch Restaurant?',
-      message: `Your cart has items from <strong>${otherVendorName}</strong>. Starting a new cart will remove those items.`,
-      buttons: [
-        { text: 'Keep', role: 'cancel' },
-        {
-          text: 'Start Fresh',
-          role: 'destructive',
-          handler: () => {
-            // Clear only other-vendor items; keep current vendor items
-            const thisVendorItems = currentCart.filter(c => c.vendorId === this.vendorId);
-            this.storageService.saveEatsCart(thisVendorItems);
-            // Sync cartItems array
-            this.cartItems = this.cartItems.filter(c => c.vendorId === this.vendorId);
-            this.doAddItem(product);
-          }
-        }
-      ]
-    });
-    await alert.present();
   }
 
   removeItem(product: any) {
@@ -435,16 +400,12 @@ export class ItemsPage implements OnInit {
     });
     // Keep customized entries
     const customizedItems = this.cartItems.filter((c: any) => c.cartItemId);
-    // For Mart: read other-vendor items directly from storage to avoid stale in-memory state.
-    // For Eats: single-vendor only — other-vendor items are cleared via the switch-restaurant alert.
-    let otherVendorItems: any[] = [];
-    if (this.vertical === 'mart') {
-      const currentProductIds = new Set(allProducts.map((p: any) => p._id));
-      const savedMart = this.storageService.getCartByVertical('mart');
-      otherVendorItems = savedMart.filter(
-        (c: any) => !c.cartItemId && c.vendorId !== this.vendorId && !currentProductIds.has(c._id)
-      );
-    }
+    // Both eats and mart support multi-store — preserve other-vendor items from storage.
+    const currentProductIds = new Set(allProducts.map((p: any) => p._id));
+    const savedCart = this.storageService.getCartByVertical(this.vertical);
+    const otherVendorItems = savedCart.filter(
+      (c: any) => !c.cartItemId && c.vendorId !== this.vendorId && !currentProductIds.has(c._id)
+    );
     this.cartItems = [...simpleItems, ...customizedItems, ...otherVendorItems];
     this.saveCartToStorage();
   }

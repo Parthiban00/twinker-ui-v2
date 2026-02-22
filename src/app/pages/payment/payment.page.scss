@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $primary: #F85C70;
 $secondary: #FC5C7D;
 $text-primary: #1a1a1a;
@@ -416,19 +418,177 @@ ion-footer {
   --color: #fff;
 }
 
-.error-note {
+// ─── Order Error Dialog ────────────────────────────────────────────
+$err-amber:  #F59E0B;
+$err-blue:   #4A5BF5;
+$err-coral:  #F85C70;
+
+@keyframes errFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes errSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes errPulseRing {
+  0%   { transform: scale(1);    opacity: 0.5; }
+  70%  { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+.err-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 0 20px 20px;
-  padding: 12px 14px;
-  background: #FFF0F1;
-  border-radius: 12px;
-  border: 1px solid rgba($primary, 0.2);
+  align-items: flex-end;
+  animation: errFadeIn 0.22s ease forwards;
+}
+
+.err-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  padding: 10px 24px 36px;
+  padding-bottom: calc(36px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: errSlideUp 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.err-handle {
+  width: 44px;
+  height: 5px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  margin-bottom: 24px;
+}
+
+// ── Icon ──────────────────────────────────────────────────────────
+.err-icon-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation: errPulseRing 2s ease-out infinite;
+  }
+
+  &--vendor_closed {
+    background: rgba($err-amber, 0.10);
+    &::before { background: rgba($err-amber, 0.25); }
+  }
+  &--active_order {
+    background: rgba($err-blue, 0.08);
+    &::before { background: rgba($err-blue, 0.20); }
+  }
+  &--generic {
+    background: rgba($err-coral, 0.10);
+    &::before { background: rgba($err-coral, 0.22); }
+  }
+}
+
+.err-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   ion-icon {
-    font-size: 18px;
-    color: $primary;
+    font-size: 30px;
+  }
+
+  &--vendor_closed {
+    background: rgba($err-amber, 0.18);
+    ion-icon { color: $err-amber; }
+  }
+  &--active_order {
+    background: rgba($err-blue, 0.13);
+    ion-icon { color: $err-blue; }
+  }
+  &--generic {
+    background: rgba($err-coral, 0.14);
+    ion-icon { color: $err-coral; }
+  }
+}
+
+// ── Text ──────────────────────────────────────────────────────────
+.err-title {
+  font-family: 'latoBold', sans-serif;
+  font-size: 20px;
+  color: #1a1a1a;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.err-message {
+  font-family: 'latoRegular', sans-serif;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.55;
+  margin: 0 0 20px;
+  max-width: 300px;
+}
+
+// ── Vendor Chips ─────────────────────────────────────────────────
+.err-vendor-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.err-vendor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba($err-amber, 0.10);
+  border: 1px solid rgba($err-amber, 0.30);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 13px;
+  color: color.adjust($err-amber, $lightness: -20%);
+
+  ion-icon {
+    font-size: 14px;
+    color: $err-amber;
+  }
+}
+
+// ── Helper note ───────────────────────────────────────────────────
+.err-helper-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  background: #FFF8E1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 24px;
+  max-width: 320px;
+  text-align: left;
+
+  ion-icon {
+    font-size: 16px;
+    color: $err-amber;
     flex-shrink: 0;
     margin-top: 1px;
   }
@@ -436,7 +596,53 @@ ion-footer {
   span {
     font-family: 'latoRegular', sans-serif;
     font-size: 13px;
-    color: #c0392b;
+    color: #7A5E00;
     line-height: 1.4;
+  }
+}
+
+// ── Action Buttons ────────────────────────────────────────────────
+.err-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.err-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 30px;
+  padding: 15px 20px;
+  font-family: 'latoBold', sans-serif;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.88;
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+
+    .err-sheet--active_order & {
+      background: linear-gradient(135deg, $err-blue, color.adjust($err-blue, $lightness: 10%));
+    }
+  }
+
+  &--ghost {
+    background: #f5f5f5;
+    color: #555;
   }
 }

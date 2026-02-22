@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { forkJoin, of, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from 'src/app/services/storage.service';
 import { CommonService } from 'src/app/services/common.service';
 import { HomeMainService } from '../home-main/home-main.service';
@@ -93,27 +93,45 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
   private loadBrowseData() {
     if (!this.localityId) return;
 
-    // Load categories — filter by active vertical (categories with no vertical field shown for both)
-    this.homeMainService.getAllCategoriesByLocality(this.localityId).subscribe({
-      next: (res: any) => {
-        if (res.status && res.data) {
-          this.apiCategories = res.data.filter(
-            (c: any) => !c.vertical || c.vertical === this.vertical
-          );
-        }
-        this.cdr.detectChanges();
-      },
-      error: () => {}
-    });
+    // Read default address from local storage — no extra API call needed
+    const userData = this.storageService.getUser();
+    if (userData?.addresses?.length) {
+      this.defaultAddress = userData.addresses.find((a: any) => a.isDefault) || userData.addresses[0];
+    }
 
-    // Load dashboard for cuisines + trending dishes
-    this.homeMainService.getDashboard(this.localityId, this.vertical).subscribe({
-      next: (res: any) => {
-        if (res.status && res.data) {
-          this.apiCuisines = res.data.cuisines || [];
+    // Fire categories + dashboard in parallel (2 calls, both needed for the browse UI)
+    forkJoin({
+      categories: this.homeMainService.getAllCategoriesByLocality(this.localityId).pipe(catchError(() => of(null))),
+      dashboard: this.homeMainService.getDashboard(this.localityId, this.vertical).pipe(catchError(() => of(null))),
+    }).subscribe(({ categories, dashboard }) => {
+      // Categories — filter by active vertical
+      if (categories?.status && categories?.data) {
+        this.apiCategories = categories.data.filter(
+          (c: any) => !c.vertical || c.vertical === this.vertical
+        );
+      }
 
-          // Build trending dishes: popular items first, then discounted deals
-          const popular = (res.data.popularItems || []).map((p: any) => ({
+      // Dashboard — cuisines + trending dishes
+      if (dashboard?.status && dashboard?.data) {
+        this.apiCuisines = dashboard.data.cuisines || [];
+
+        // Build trending dishes: popular items first, then discounted deals
+        const popular = (dashboard.data.popularItems || []).map((p: any) => ({
+          _id: p._id,
+          productName: p.productName,
+          price: p.price,
+          actualPrice: p.actualPrice,
+          imageUrl: p.imageUrl ? (this.imgBaseUrl + p.imageUrl) : '',
+          vendorName: p.vendor?.name || '',
+          vendorId: p.vendor?._id || '',
+          discount: p.discount,
+          discountType: p.discountType,
+          tag: p.tag
+        }));
+
+        const dealItems = (dashboard.data.deals || [])
+          .filter((d: any) => !popular.some((p: any) => p._id === d._id))
+          .map((p: any) => ({
             _id: p._id,
             productName: p.productName,
             price: p.price,
@@ -123,43 +141,14 @@ export class SearchPage implements OnInit, OnDestroy, AfterViewInit {
             vendorId: p.vendor?._id || '',
             discount: p.discount,
             discountType: p.discountType,
-            tag: p.tag
+            tag: p.tag || 'offer'
           }));
 
-          const dealItems = (res.data.deals || [])
-            .filter((d: any) => !popular.some((p: any) => p._id === d._id))
-            .map((p: any) => ({
-              _id: p._id,
-              productName: p.productName,
-              price: p.price,
-              actualPrice: p.actualPrice,
-              imageUrl: p.imageUrl ? (this.imgBaseUrl + p.imageUrl) : '',
-              vendorName: p.vendor?.name || '',
-              vendorId: p.vendor?._id || '',
-              discount: p.discount,
-              discountType: p.discountType,
-              tag: p.tag || 'offer'
-            }));
+        this.trendingDishes = [...popular, ...dealItems];
+      }
 
-          this.trendingDishes = [...popular, ...dealItems];
-        }
-        this.cdr.detectChanges();
-      },
-      error: () => {}
+      this.cdr.detectChanges();
     });
-
-    // Load default address for distance calculation
-    const userData = this.storageService.getUser();
-    if (userData?._id) {
-      this.homeMainService.getDefaultAddressByUserId(userData._id).subscribe({
-        next: (res: any) => {
-          if (res.status && res.data) {
-            this.defaultAddress = res.data;
-          }
-        },
-        error: () => {}
-      });
-    }
   }
 
   // --- Search pipeline ---

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from 'src/app/services/common.service';
+import { PushNotificationService } from 'src/app/services/push-notification.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { VendorOrderService } from 'src/app/services/vendor-order.service';
 
@@ -21,10 +22,15 @@ export class ProfilePage {
     private cdr: ChangeDetectorRef,
     private commonService: CommonService,
     private vendorOrderService: VendorOrderService,
+    private pushNotif: PushNotificationService,
   ) {}
 
   get isVendor(): boolean {
     return this.user?.userType === 'vendor';
+  }
+
+  get isDelivery(): boolean {
+    return this.user?.userType === 'delivery';
   }
 
   ionViewWillEnter() {
@@ -48,11 +54,16 @@ export class ProfilePage {
     this.router.navigate(['/vendor-orders']);
   }
 
+  goToDeliveryOrders() {
+    this.router.navigate(['/delivery-orders']);
+  }
+
   goToOrders() {
     this.router.navigate(['/tabs/orders']);
   }
 
-  logout() {
+  async logout() {
+    await this.pushNotif.clearToken();
     this.storageService.clean();
     this.router.navigate(['/'], { replaceUrl: true });
   }

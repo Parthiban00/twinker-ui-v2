@@ -461,9 +461,15 @@ export class HomeMainPage implements OnInit, OnDestroy {
     const hh = istNow.getUTCHours().toString().padStart(2, '0');
     const mm = istNow.getUTCMinutes().toString().padStart(2, '0');
     const current = `${hh}:${mm}`;
-
-    console.log(`Checking open status for ${vendor.name}: current time ${current}, openAt ${vendor.openAt}, closeAt ${vendor.closeAt}`);
     return current >= vendor.openAt && current <= vendor.closeAt;
+  }
+
+  trackById(_index: number, item: any): string {
+    return item._id || String(_index);
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   getNextOpenTime(vendor: any): string {

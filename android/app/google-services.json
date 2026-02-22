@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "691151165662",
+    "project_id": "twinker-new",
+    "storage_bucket": "twinker-new.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691151165662:android:388cb94faf064f3d860a4f",
+        "android_client_info": {
+          "package_name": "com.parthitechs.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFrYG4l2q-hD1-H-IneYfEbeyB4w9Oy78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

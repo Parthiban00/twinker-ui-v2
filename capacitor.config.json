@@ -7,6 +7,9 @@
       "launchShowDuration": 0,
       "launchAutoHide": true,
       "showSpinner": false
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
     }
   },
   "server": {

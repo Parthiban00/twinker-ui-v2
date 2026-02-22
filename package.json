@@ -23,6 +23,7 @@
     "@capacitor/geolocation": "^8.0.0",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.1",
     "@capacitor/status-bar": "^8.0.0",
     "@ionic/angular": "^8.7.0",
     "@types/google.maps": "^3.58.0",

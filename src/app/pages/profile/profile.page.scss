@@ -61,6 +61,11 @@ ion-content {
   ion-icon { font-size: 13px; }
 }
 
+.delivery-tag {
+  background: rgba(74, 91, 245, 0.20);
+  border-color: rgba(74, 91, 245, 0.40);
+}
+
 // ── Menu card ────────────────────────────────────────────────
 .profile-menu {
   background: #fff;
@@ -106,6 +111,13 @@ ion-content {
 // Vendor menu item gets a slightly deeper icon bg
 .vendor-menu-item .menu-icon-wrap {
   background: linear-gradient(135deg, #fff0f2, #ffe8e0);
+}
+
+// Delivery menu item — blue accent
+.delivery-icon-wrap {
+  background: linear-gradient(135deg, rgba(74, 91, 245, 0.10), rgba(74, 91, 245, 0.06)) !important;
+
+  ion-icon { color: #4A5BF5 !important; }
 }
 
 .menu-label {
